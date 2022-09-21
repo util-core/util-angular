@@ -1,0 +1,15 @@
+<nz-card [nzBorderless]="true">
+    <form #form="ngForm" nz-form="">
+        <nz-form-item [nzGutter]="16"><nz-form-label [nzSpan]="4">应用程序类型</nz-form-label><nz-form-control [nzSpan]="20"><nz-radio-group #x_e4c08b69129d40ada2cba685580d25fb="xSelectExtend" (ngModelChange)="changeType($event)" name="type" nzName="type" x-select-extend="" [(ngModel)]="model.type" [data]="[{'text':'常规应用','value':1,'sortId':1},{'text':'Api','value':2,'sortId':2},{'text':'客户端','value':3,'sortId':3}]"><label *ngFor="let item of x_e4c08b69129d40ada2cba685580d25fb.options" nz-radio="" [nzDisabled]="item.disabled" [nzValue]="item.value">{{item.text}}</label></nz-radio-group></nz-form-control></nz-form-item>
+        <ng-container *ngIf="!isClient">
+            <nz-form-item [nzGutter]="16"><nz-form-label [nzRequired]="true" [nzSpan]="4">应用程序编码</nz-form-label><nz-form-control [nzErrorTip]="v_379bff780b60469993323eea88e5dcd1.getErrorMessage()" [nzSpan]="20"><input #v_379bff780b60469993323eea88e5dcd1="xValidationExtend" displayName="应用程序编码" name="code" nz-input="" x-validation-extend="" [(ngModel)]="model.code" [maxlength]="6" [minlength]="2" [required]="true" /></nz-form-control></nz-form-item>
+            <nz-form-item [nzGutter]="16"><nz-form-label [nzRequired]="true" [nzSpan]="4">应用程序名称</nz-form-label><nz-form-control [nzErrorTip]="v_fe0cb613eb7a42c1a51cefb63ac99000.getErrorMessage()" [nzSpan]="20"><input #v_fe0cb613eb7a42c1a51cefb63ac99000="xValidationExtend" displayName="应用程序名称" name="name" nz-input="" requiredMessage="应用程序名称不能为空" x-validation-extend="" [(ngModel)]="model.name" [maxlength]="200" [required]="true" /></nz-form-control></nz-form-item>
+            <nz-form-item [nzGutter]="16"><nz-form-label [nzSpan]="4">启用</nz-form-label><nz-form-control [nzSpan]="20"><nz-switch name="enabled" [(ngModel)]="model.enabled"></nz-switch></nz-form-control></nz-form-item>
+            <nz-form-item [nzGutter]="16"><nz-form-label [nzSpan]="4">备注</nz-form-label><nz-form-control [nzErrorTip]="v_45452f4c59f044b090109d04a2a93400.getErrorMessage()" [nzSpan]="20"><textarea #v_45452f4c59f044b090109d04a2a93400="xValidationExtend" displayName="备注" name="remark" nz-input="" x-validation-extend="" [(ngModel)]="model.remark" [maxlength]="500" [nzAutosize]="{minRows:3}"></textarea></nz-form-control></nz-form-item>
+        </ng-container>
+        <div nz-row="" nzJustify="end">
+            <button (click)="close()" nz-button="">取消</button>
+            <button #btnSubmit="" (click)="submit(form,btnSubmit)" nz-button="" nzType="primary" x-button-extend="">确定</button>
+        </div>
+    </form>
+</nz-card>

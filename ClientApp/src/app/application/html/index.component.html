@@ -1,0 +1,26 @@
+
+<nz-card [nzBorderless]="true">
+    <button (click)="openCreateDialog()" nz-button="" nzType="primary"><i nz-icon="" nzType="plus"></i>新建</button>
+    <button (click)="delete()" nz-button="" nzType="primary" [nzDanger]="true"><i nz-icon="" nzType="delete"></i>删除</button>
+    <nz-alert nzType="info" [nzMessage]="t_8c9b1acb7d9a4ba9b586dee3925d76e5" [nzShowIcon]="true"><ng-template #t_8c9b1acb7d9a4ba9b586dee3925d76e5="">
+        已选择<strong class="text-primary mx-md">{{getCheckedLength()}}</strong>行
+    </ng-template></nz-alert>
+    <nz-table #tb_Application="" #x_tb_Application="xTableExtend" (nzPageIndexChange)="x_tb_Application.pageIndexChange($event)" (nzPageSizeChange)="x_tb_Application.pageSizeChange($event)" order="CreationTime desc" url="application" x-table-extend="" [(nzPageIndex)]="x_tb_Application.queryParam.page" [(nzPageSize)]="x_tb_Application.queryParam.pageSize" [(queryParam)]="queryParam" [nzData]="x_tb_Application.dataSource" [nzFrontPagination]="false" [nzLoading]="x_tb_Application.loading" [nzShowQuickJumper]="true" [nzShowSizeChanger]="true" [nzShowTotal]="total_tb_Application" [nzTotal]="x_tb_Application.total"><thead><tr><th (nzCheckedChange)="x_tb_Application.masterToggle()" nzWidth="x_tb_Application.config.table.checkboxWidth" [nzChecked]="x_tb_Application.isMasterChecked()" [nzDisabled]="!x_tb_Application.dataSource.length" [nzIndeterminate]="x_tb_Application.isMasterIndeterminate()" [nzShowCheckbox]="x_tb_Application.multiple"></th><th nzWidth="x_tb_Application.config.table.lineNumberWidth">{{x_tb_Application.config.text.lineNumber}}</th><th>应用程序编码</th><th>应用程序名称</th><th>启用</th><th>操作</th></tr></thead><tbody><tr *ngFor="let row of x_tb_Application.dataSource;index as index">
+        <td (click)="$event.stopPropagation()" (nzCheckedChange)="x_tb_Application.checkedSelection.toggle(row)" [nzChecked]="x_tb_Application.checkedSelection.isSelected(row)" [nzShowCheckbox]="x_tb_Application.multiple"></td>
+        <td>{{row.lineNumber}}</td>
+        <td>{{row.code}}</td>
+        <td>{{row.name}}</td>
+        <td>
+            <nz-tag *ngIf="row.enabled" nzColor="geekblue">
+                启用
+            </nz-tag>
+            <nz-tag *ngIf="!row.enabled" nzColor="red">
+                未启用
+            </nz-tag>
+        </td>
+        <td>
+            <button (click)="openEditDialog(row)" nz-button="" nz-tooltip="" nzShape="circle" nzTooltipTitle="编辑" nzType="primary"><i nz-icon="" nzType="edit"></i></button>
+            <button (click)="delete(row.id)" nz-button="" nz-tooltip="" nzShape="circle" nzTooltipTitle="删除" nzType="primary" [nzDanger]="true"><i nz-icon="" nzType="delete"></i></button>
+        </td>
+    </tr></tbody></nz-table><ng-template #total_tb_Application="" let-range="range" let-total="">{{ range[0] }}-{{ range[1] }} 共 {{ total }} 条</ng-template>
+</nz-card>

@@ -1,0 +1,31 @@
+{
+  "name": "util-angular",
+  "version": "0.0.1",
+  "author": "何镇汐 <xiadao521@qq.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/utilcore/util-angular"
+  },
+  "homepage": "https://github.com/utilcore/util-angular",
+  "license": "MIT",
+  "keywords": [
+    "util",
+    "antd",
+    "ng-zorro-antd",
+    "angular"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^14.2.0",
+    "@angular/core": "^14.2.0",
+    "ng-zorro-antd": "^14.0.0",
+    "lodash": "~4.17.21",
+    "moment": "~2.29.4"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.182",
+    "@types/moment": "^2.13.0"
+  }
+}
