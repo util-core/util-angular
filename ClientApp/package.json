@@ -1,11 +1,12 @@
 {
-  "name": "util-angular",
+  "name": "util-demo",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 18888",
-    "build": "ng build",
+    "build": "npm run ng-high-memory build",
     "watch": "ng build --watch --configuration development",
+    "ng-high-memory": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "test": "ng test"
   },
   "private": true,
@@ -40,6 +41,6 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "ng-packagr": "^14.2.1",
-    "typescript": "~4.6.2"
+    "typescript": "4.8.3"
   }
 }

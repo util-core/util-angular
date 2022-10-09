@@ -31,8 +31,7 @@ export class ApplicationEditComponent extends DialogEditComponentBase<Applicatio
     protected createModel() {
         let result = new ApplicationViewModel();
         result.enabled = true;
-        result.registerEnabled = true;
-        result.applicationType = ApplicationType.General;
+        result.type = ApplicationType.General;
         return result;
     }
 
@@ -47,7 +46,7 @@ export class ApplicationEditComponent extends DialogEditComponentBase<Applicatio
      * 应用类型更改事件处理
      * @param type 应用类型
      */
-    changeApplicationType( type ) {
+    changeType( type ) {
         if ( type === ApplicationType.Client ) {
             this.isClient = true;
             return;
@@ -61,6 +60,6 @@ export class ApplicationEditComponent extends DialogEditComponentBase<Applicatio
     loadAfter( result: ApplicationViewModel ) {
         if ( !result )
             return;
-        this.changeApplicationType( result.applicationType );
+        this.changeType(result.type);
     }
 }

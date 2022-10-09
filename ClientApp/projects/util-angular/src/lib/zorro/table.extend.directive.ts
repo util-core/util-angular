@@ -73,19 +73,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     /**
      * 查询参数
      */
-    private _queryParam: QueryParameter;
-    /**
-     * 查询参数
-     */
-    @Input()
-    get queryParam(): QueryParameter {
-        return this._queryParam;
-    }
-    set queryParam(value: QueryParameter) {
-        setTimeout(() => {
-            this._queryParam = value;           
-        }, 0);
-    }
+    @Input() queryParam: QueryParameter;
     /**
      * 初始排序条件
      */
@@ -109,8 +97,8 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      */
     constructor(@Optional() public config: AppConfig) {
         this.util = new Util();
-        initAppConfig(this.config);
-        this._queryParam = new QueryParameter();
+        this.initAppConfig();
+        this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<T>(true, []);
         this.selectedSelection = new SelectionModel<T>(false, []);
@@ -121,11 +109,20 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
+    }
+
+    /**
      * 初始化
      */
     ngOnInit() {
         setTimeout(() => {
-            this.initPage();
+            this.initPageSize();
             this.initOrder();
             if (this.autoLoad)
                 this.query();
@@ -133,9 +130,9 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
-     * 初始化分页参数
+     * 初始化分页大小
      */
-    private initPage() {
+    private initPageSize() {
         if (this.pageSizeOptions && this.pageSizeOptions.length > 0)
             this.queryParam.pageSize = this.pageSizeOptions[0];
     }
@@ -200,10 +197,12 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
-     * 获取请求地址
+     * 获取地址
+     * @param url 地址
+     * @param path 路径
      */
-    private getUrl(url: string) {
-        return this.util.helper.getUrl(url, this.config.apiEndpoint);
+    getUrl(url: string, path: string = null) {
+        return this.util.helper.getUrl(url, this.config.apiEndpoint, path);
     }
 
     /**
@@ -219,7 +218,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
-     * 加载完成后操作
+     * 加载完成操作
      * @param result
      */
     loadAfter(result) {
@@ -270,12 +269,24 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
         this.clear();
         this.queryParam = queryParam;
         this.queryParamChange.emit(queryParam);
-        this.initPage();
+        this.initPageSize();
         this.queryParam.order = this.order;
         this.query({
             button: button,
             handler: handler
         });
+    }
+
+    /**
+     * 清理
+     */
+    clear() {
+        this.dataSource = [];
+        this.queryParam.page = 1;
+        this.total = 0;
+        this.checkedSelection.clear();
+        this.selectedSelection.clear();
+        this.checkedKeys = null;
     }
 
     /**
@@ -344,13 +355,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * 获取删除Api地址
      */
     private getDeleteUrl(url) {
-        let result = this.getUrl(url) || this.getUrl(this.deleteUrl);
-        if (result)
-            return result;
-        if (this.url.startsWith("/"))
-            return this.getUrl(this.url);
-        url = this.util.helper.trimEnd(this.url, "/");
-        return this.getUrl(`${url}/delete`);
+        return this.getUrl(url) || this.getUrl(this.deleteUrl) || this.getUrl(this.url, "delete");
     }
 
     /**
@@ -487,18 +492,6 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      */
     isSelected(row) {
         return this.selectedSelection.isSelected(row);
-    }
-
-    /**
-     * 清理
-     */
-    clear() {
-        this.dataSource = [];
-        this.queryParam.page = 1;
-        this.total = 0;
-        this.checkedSelection.clear();
-        this.selectedSelection.clear();
-        this.checkedKeys = null;
     }
 
     /**

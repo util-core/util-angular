@@ -14,9 +14,6 @@ export * from "./lib/core/state-code";
 
 //导出config
 export * from "./lib/config/app-config";
-export * from "./lib/config/validation-config";
-export * from "./lib/config/text-config";
-export * from "./lib/config/table-config";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
@@ -39,9 +36,13 @@ export * from "./lib/base/query-component-base";
 export * from "./lib/base/table-query-component-base";
 export * from "./lib/base/edit-component-base";
 export * from "./lib/base/dialog-edit-component-base";
+export * from "./lib/base/table-edit-component-base";
 
 //导出ng-zorro
 export * from "./lib/zorro/table.extend.directive";
+export * from "./lib/zorro/edit-table.directive";
+export * from "./lib/zorro/edit-row.directive";
+export * from "./lib/zorro/edit-control.directive";
 export * from "./lib/zorro/button.extend.directive";
 export * from "./lib/zorro/validation.extend.directive";
 export * from "./lib/zorro/select.extend.directive";

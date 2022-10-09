@@ -2,7 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //====================================================
-import { Injector, OnInit } from '@angular/core';
+import { Injector, OnInit, Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ViewModel } from "../core/view-model";
 import { EditComponentBase } from "./edit-component-base";
@@ -10,6 +10,9 @@ import { EditComponentBase } from "./edit-component-base";
 /**
  * Crud弹出层编辑组件基类
  */
+@Component({
+    template: ''
+})
 export abstract class DialogEditComponentBase<TViewModel extends ViewModel> extends EditComponentBase<TViewModel> implements OnInit {
     /**
      * 初始化组件

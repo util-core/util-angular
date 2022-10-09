@@ -5,10 +5,6 @@ import { ViewModel } from "util-angular";
  */
 export class ApplicationViewModel extends ViewModel {
     /**
-     * 应用程序类型
-     */
-    applicationType;
-    /**
      * 应用程序编码
      */
     code;

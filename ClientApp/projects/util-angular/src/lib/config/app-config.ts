@@ -22,7 +22,7 @@ export class AppConfig {
     /**
      * 分页大小
      */
-    pageSize?: number;
+    pageSize?:number;
     /**
      * 文本配置
      */
@@ -43,8 +43,7 @@ export class AppConfig {
  */
 export function initAppConfig(config: AppConfig) {
     if (!config)
-        config = new AppConfig();
-    config.pageSize = config.pageSize || 10;
+        return;
     config.text = config.text || DefaultTextConfig;
     config.validation = config.validation || DefaultValidationConfig;
     config.table = config.table || DefaultTableConfig;

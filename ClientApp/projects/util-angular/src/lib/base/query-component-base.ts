@@ -2,13 +2,15 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Input, Injector,Injectable } from '@angular/core';
+import { Input, Injector, Component } from '@angular/core';
 import { Util } from "../util";
 
 /**
  * 查询组件基类
  */
-@Injectable()
+@Component({
+    template: ''
+})
 export abstract class QueryComponentBase {
     /**
      * 公共操作
@@ -137,6 +139,7 @@ export abstract class QueryComponentBase {
     openEditDialog(data) {
         this.util.dialog.open({
             component: this.getEditDialogComponent(),
+            centered: true,
             title: this.getEditDialogTitle(),
             data: this.getEditDialogData(data),
             width: this.getEditDialogWidth(),
@@ -214,6 +217,7 @@ export abstract class QueryComponentBase {
     openDetailDialog(data) {
         this.util.dialog.open({
             component: this.getDetailDialogComponent(),
+            centered: true,
             title: this.getDetailDialogTitle(),
             data: this.getDetailDialogData(data),
             width: this.getDetailDialogWidth(),

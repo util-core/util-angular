@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder( args );
 
 //ÅäÖÃUtil·þÎñ
 builder.Host.AddUtil( options => options
-    .UseNgZorro()
+    .UseNgZorro(t=> t.RootPath="ClientApp/dist/util")
     .UseSerilog()
 );
 

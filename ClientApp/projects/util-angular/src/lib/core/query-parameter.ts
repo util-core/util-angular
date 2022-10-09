@@ -2,6 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //=================================================
+import { DefaultConfig } from "../config/default-config";
 
 /**
  * 查询参数
@@ -12,7 +13,7 @@ export class QueryParameter {
      */
     constructor() {
         this.page = 1;
-        this.pageSize = null;
+        this.pageSize = DefaultConfig.pageSize;
     }
 
     /**

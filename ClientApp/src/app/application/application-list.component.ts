@@ -1,6 +1,6 @@
-import { Component, Injector, ViewChild, forwardRef } from '@angular/core';
+import { Component, Injector  } from '@angular/core';
 import { environment } from "environment";
-import { TableQueryComponentBase, TableExtendDirective } from "util-angular";
+import { TableQueryComponentBase } from "util-angular";
 import { ApplicationQuery } from './model/application-query';
 import { ApplicationViewModel } from './model/application-view-model';
 import { ApplicationEditComponent } from './application-edit.component';
@@ -17,7 +17,7 @@ export class ApplicationListComponent extends TableQueryComponentBase<Applicatio
      * 初始化应用程序列表页
      * @param injector 注入器
      */
-    constructor( injector: Injector ) {
+    constructor(injector: Injector ) {
         super( injector );
     }
 

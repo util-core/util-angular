@@ -3,10 +3,11 @@
 //Licensed under the MIT license
 //================================================
 import {
-    trimEnd as trimEnd2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
+    trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
     hasIn, cloneDeep, assign as assign2
 } from "lodash";
 import * as moment from 'moment';
+import { UUID } from './internal/uuid';
 
 /**
  * 是否未定义
@@ -60,6 +61,13 @@ export let toNumber = (value, precision?, isTruncate?: boolean) => {
 }
 
 /**
+ * 创建唯一标识
+ */
+export let uuid = (): string => {
+    return UUID.UUID();
+}
+
+/**
  * 从数组中移除子集
  * @param source 源数组
  * @param predicate 条件
@@ -69,20 +77,45 @@ export let remove = <T>(source: Array<T>, predicate: (value: T) => boolean): Arr
 }
 
 /**
+ * 移除起始字符串
+ * @param source 值
+ * @param start 要移除的值
+ */
+export let trimStart = (value: string, start: string) => {
+    return trimStart2(value, start);
+}
+
+/**
  * 移除末尾字符串
  * @param source 值
- * @param predicate 要移除的值
+ * @param end 要移除的值
  */
 export let trimEnd = (value: string, end: string) => {
     return trimEnd2(value, end);
 }
 
 /**
- * 获取请求地址
+ * 获取地址
  * @param url 请求地址
  * @param host 主机
+ * @param path 路径
  */
-export function getUrl(url: string, host: string = null) {
+export function getUrl(url: string, host: string = null, path: string = null) {
+    url = getHostUrl(url, host);
+    if (!url)
+        return null;
+    if (path) {
+        url = trimEnd(url, "/");
+        path = trimStart(path, "/");
+        return `${url}/${path}`;
+    }
+    return url;
+}
+
+/**
+ * 获取地址
+ */
+function getHostUrl(url: string, host: string) {
     if (!url)
         return null;
     if (url.startsWith("http"))
@@ -157,4 +190,20 @@ export let formatDate = (datetime, format: string = 'YYYY-MM-DD HH:mm:ss'): stri
     if (!date.isValid())
         return "";
     return date.format(format);
+}
+
+/**
+ * 转换为json字符串
+ * @param value 值
+ */
+export let toJson = (value): string => {
+    return JSON.stringify(value);
+}
+
+/**
+ * json字符串转换为对象
+ * @param json json字符串
+ */
+export let toObjectFromJson = <T>(json: string): T => {
+    return JSON.parse(json);
 }

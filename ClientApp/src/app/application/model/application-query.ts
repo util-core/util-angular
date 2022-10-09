@@ -21,9 +21,9 @@ export class ApplicationQuery extends QueryParameter {
      */
     enabled;
     /**
-     * 启用注册
-     */
-    registerEnabled;
+    * 应用程序类型
+    */
+    type;
     /**
      * 备注
      */
@@ -36,20 +36,4 @@ export class ApplicationQuery extends QueryParameter {
      * 结束创建时间
      */
     endCreationTime;
-    /**
-     * 创建人编号
-     */
-    creatorId;
-    /**
-     * 起始最后修改时间
-     */
-    beginLastModificationTime;
-    /**
-     * 结束最后修改时间
-     */
-    endLastModificationTime;
-    /**
-     * 最后修改人编号
-     */
-    lastModifierId;
 }

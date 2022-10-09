@@ -11,7 +11,6 @@ import { HttpRequest } from "../http/http-request";
 import { WebApiHandleOptions } from "./web-api-handle-options";
 import { Util } from "../util";
 import { NzSpinComponent } from 'ng-zorro-antd/spin';
-import { AppConfig,initAppConfig } from '../config/app-config';
 
 /**
  * WebApi请求操作
@@ -96,37 +95,12 @@ export class WebApiRequest<T> {
     param(name: string, value: string): WebApiRequest<T>;
     param(data, value?: string): WebApiRequest<T> {
         if (typeof data === "object") {
-            this.initParam(data);
             this.request.param(data);
             return this;
         }
         if (typeof data === "string" && value)
             this.request.param(data, value);
         return this;
-    }
-
-    /**
-     * 初始化参数
-     * @param data
-     */
-    private initParam( data ) {
-        if (!data)
-            return;
-        this.initPageSize(data);
-    }
-
-    /**
-     * 初始化分页大小
-     * @param data
-     */
-    private initPageSize(data) {
-        if (data.pageSize)
-            return;
-        if (!this.util.helper.hasProperty(data, "pageSize"))
-            return;
-        let config = this.util.ioc.get(AppConfig);
-        initAppConfig(config);
-        data.pageSize = config.pageSize;
     }
 
     /**
@@ -280,8 +254,10 @@ export class WebApiRequest<T> {
      * 关闭加载状态
      */
     private closeLoading() {
-        if ( this.btn )
+        if (this.btn) {
             this.btn.nzLoading = false;
+            this.btn.cdr.detectChanges();
+        }
         if (this.isShowLoading)
             this.util.dialog.close();
     }

@@ -58,6 +58,10 @@ describe('util.helper', () => {
         expect(helper.getUrl("test/b", "http://a.com/")).toEqual("http://a.com/api/test/b");
         expect(helper.getUrl("/test/b", "http://a.com/")).toEqual("http://a.com/test/b");
         expect(helper.getUrl("", "http://a.com")).toBeNull();
+        expect(helper.getUrl("a", null, "b")).toEqual("/api/a/b");
+        expect(helper.getUrl("/test", "http://a.com/", "b")).toEqual("http://a.com/test/b");
+        expect(helper.getUrl("/test/", "http://a.com/", "b")).toEqual("http://a.com/test/b");
+        expect(helper.getUrl("/test/b/", "http://a.com/", "/c")).toEqual("http://a.com/test/b/c");
     });
     it("hasProperty", () => {
         let query = new TestQuery();

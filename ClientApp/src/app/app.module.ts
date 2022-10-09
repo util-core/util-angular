@@ -15,7 +15,8 @@ import { ShareModule } from "./share.module";
 import { WelcomeComponent } from "./welcome/welcome.component"
 import { ApplicationListComponent } from "./application/application-list.component"
 import { ApplicationEditComponent } from "./application/application-edit.component"
-import { Util, AppConfig,TextConfig } from 'util-angular';
+import { ClaimListComponent } from './claim/claim-list.component';
+import { Util, AppConfig } from 'util-angular';
 import { appConfig } from './app-config';
 
 registerLocaleData(zh);
@@ -24,7 +25,8 @@ registerLocaleData(zh);
 
 @NgModule({
     declarations: [
-        AppComponent, WelcomeComponent, ApplicationListComponent, ApplicationEditComponent
+        AppComponent, WelcomeComponent, ApplicationListComponent, ApplicationEditComponent,
+        ClaimListComponent
     ],
     imports: [
         BrowserModule,
@@ -47,6 +49,6 @@ export class AppModule {
      * @param injector 注入器
      */
     constructor(injector: Injector) {
-        Util.injector = injector;
+        Util.init(injector);
     }
 }

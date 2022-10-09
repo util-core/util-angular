@@ -18,7 +18,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2017",
+    "target": "es2020",
     "module": "es2020",
     "lib": [
       "es2020",
@@ -27,7 +27,6 @@
     "paths": {
       "environment": [ "src/environments/environment" ],
       "util-angular": [
-        "dist/util-angular/util-angular",
         "dist/util-angular"
       ]
     }
@@ -36,6 +35,6 @@
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": false
   }
 }

@@ -1,0 +1,55 @@
+<nz-card [nzBorderless]="true">
+    
+<form class="search__form" nz-form="" nzLayout="inline">
+    <div nz-row="" [nzGutter]="32">
+        <nz-form-item><nz-form-label>声明名称</nz-form-label><nz-form-control><input name="name" nz-input="" [(ngModel)]="queryParam.name" /></nz-form-control></nz-form-item>
+        <nz-form-item><nz-form-label>备注</nz-form-label><nz-form-control><input name="remark" nz-input="" [(ngModel)]="queryParam.remark" /></nz-form-control></nz-form-item>
+        <div nz-col="">
+            <button #btnQuery="" (click)="query(btnQuery)" nz-button="" nzType="primary">查询<i nz-icon="" nzType="search"></i></button>
+            <button #btnRefresh="" (click)="refresh(btnRefresh)" nz-button="">刷新<i nz-icon="" nzType="sync"></i></button>
+        </div>
+    </div>
+</form>
+
+
+    <button (click)="add()" nz-button="" nzType="primary">新建<i nz-icon="" nzType="plus"></i></button>
+    <button #btnSave="" (click)="save(btnSave)" nz-button="" nzType="primary">保存<i nz-icon="" nzType="save"></i></button>
+    <button (click)="delete()" nz-button="" [nzDanger]="true">删除<i nz-icon="" nzType="delete"></i></button>
+    <nz-alert class="my-md" nzType="info" [nzMessage]="t_c9d8163f13034cd096d6b983ae09707f" [nzShowIcon]="true"><ng-template #t_c9d8163f13034cd096d6b983ae09707f="">
+        已选择<strong class="text-primary mx-md">{{getCheckedLength()}}</strong>行
+    </ng-template></nz-alert>
+    <nz-table #e_tb_claim="xEditTable" #tb_claim="" #x_tb_claim="xTableExtend" (nzPageIndexChange)="x_tb_claim.pageIndexChange($event)" (nzPageSizeChange)="x_tb_claim.pageSizeChange($event)" order="SortId" url="claim" x-edit-table="" x-table-extend="" [(nzPageIndex)]="x_tb_claim.queryParam.page" [(nzPageSize)]="x_tb_claim.queryParam.pageSize" [(queryParam)]="queryParam" [nzData]="x_tb_claim.dataSource" [nzFrontPagination]="false" [nzLoading]="x_tb_claim.loading" [nzShowQuickJumper]="true" [nzShowSizeChanger]="true" [nzShowTotal]="total_tb_claim" [nzTotal]="x_tb_claim.total"><thead><tr><th (nzCheckedChange)="x_tb_claim.masterToggle()" [nzChecked]="x_tb_claim.isMasterChecked()" [nzDisabled]="!x_tb_claim.dataSource.length" [nzIndeterminate]="x_tb_claim.isMasterIndeterminate()" [nzShowCheckbox]="x_tb_claim.multiple" [nzWidth]="x_tb_claim.config.table.checkboxWidth"></th><th [nzWidth]="x_tb_claim.config.table.lineNumberWidth">{{x_tb_claim.config.text.lineNumber}}</th><th nzWidth="30%">声明名称</th><th>启用</th><th>排序号</th><th nzWidth="30%">备注</th><th>操作</th></tr></thead><tbody><tr #tb_claim_row="xEditRow" (click)="e_tb_claim.clickEdit(row.id)" (dblclick)="e_tb_claim.dblClickEdit(row.id)" *ngFor="let row of x_tb_claim.dataSource;index as index" [x-edit-row]="row">
+        <td (click)="$event.stopPropagation()" (nzCheckedChange)="x_tb_claim.checkedSelection.toggle(row)" [nzChecked]="x_tb_claim.checkedSelection.isSelected(row)" [nzShowCheckbox]="x_tb_claim.multiple"></td>
+        <td>{{row.lineNumber}}</td>
+        <td><ng-container *ngIf="e_tb_claim.editId !== row.id;else e_tb_claim_name">{{row.name}}</ng-container><ng-template #e_tb_claim_name="">
+            <nz-form-item>
+                <nz-form-control [nzErrorTip]="v_f42c6de3f47a49b68fe58254dadc6c9e.getErrorMessage()">
+                    <input #v_f42c6de3f47a49b68fe58254dadc6c9e="xValidationExtend" displayName="声明名称" name="name" nz-input="" x-validation-extend="" [(ngModel)]="row.name" [maxlength]="200" [required]="true" [x-edit-control]="tb_claim_row"/>
+                </nz-form-control>
+            </nz-form-item>
+        </ng-template></td>
+        <td>
+            <ng-container *ngIf="e_tb_claim.editId !== row.id;else e_tb_claim_enabled">
+                <nz-tag *ngIf="row.enabled" nzColor="geekblue">
+                    启用
+                </nz-tag>
+                <nz-tag *ngIf="!row.enabled" nzColor="red">
+                    未启用
+                </nz-tag>
+            </ng-container>
+            <ng-template #e_tb_claim_enabled="">
+                <nz-form-item><nz-form-control><label name="enabled" nz-checkbox="" [(ngModel)]="row.enabled" [x-edit-control]="tb_claim_row"></label></nz-form-control></nz-form-item>
+            </ng-template>
+        </td>
+        <td><ng-container *ngIf="e_tb_claim.editId !== row.id;else e_tb_claim_sortId">{{row.sortId}}</ng-container><ng-template #e_tb_claim_sortId="">
+            <nz-form-item><nz-form-control><input name="sortId" nz-input="" [(ngModel)]="row.sortId" [x-edit-control]="tb_claim_row" /></nz-form-control></nz-form-item>
+        </ng-template></td>
+        <td><ng-container *ngIf="e_tb_claim.editId !== row.id;else e_tb_claim_remark">{{row.remark}}</ng-container><ng-template #e_tb_claim_remark="">
+            <nz-form-item><nz-form-control [nzErrorTip]="v_81211ba1575547f289be1cd29f4b49a4.getErrorMessage()"><input #v_81211ba1575547f289be1cd29f4b49a4="xValidationExtend" displayName="备注" name="remark" nz-input="" x-validation-extend="" [(ngModel)]="row.remark" [maxlength]="500" [x-edit-control]="tb_claim_row" /></nz-form-control></nz-form-item>
+        </ng-template></td>
+        <td>
+            <button (click)="edit(row.id)" nz-button="" nzShape="circle" nzType="primary">编辑<i nz-icon="" nzType="edit"></i></button>
+            <button (click)="delete(row.id)" nz-button="" nzShape="circle" [nzDanger]="true">删除<i nz-icon="" nzType="delete"></i></button>
+        </td>
+    </tr></tbody></nz-table><ng-template #total_tb_claim="" let-range="range" let-total="">{{ range[0] }}-{{ range[1] }} 共 {{ total }} 条</ng-template>
+</nz-card>

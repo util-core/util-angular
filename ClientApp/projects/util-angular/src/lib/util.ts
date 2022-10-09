@@ -2,7 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector } from '@angular/core';
+import { Injector, InjectFlags } from '@angular/core';
 import * as Helper from './common/helper';
 import { Ioc } from './common/ioc';
 import { Message } from './message/message';
@@ -11,6 +11,8 @@ import { Dialog } from "./dialog/dialog";
 import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
+import { AppConfig } from './config/app-config';
+import { DefaultConfig } from "./config/default-config";
 
 /**
  * 操作入口
@@ -67,7 +69,7 @@ export class Util {
      */
     get ioc() {
         if (!this._ioc)
-            this._ioc = new Ioc(Util.injector,this.componentInjector);
+            this._ioc = new Ioc(Util.injector, this.componentInjector);
         return this._ioc;
     };
 
@@ -124,4 +126,24 @@ export class Util {
             this._form = new Form(this);
         return this._form;
     };
+
+    /**
+     * 初始化
+     * @param injector 全局注入器
+     */
+    static init(injector: Injector) {
+        this.injector = injector;
+        this.initPageSize();
+    }
+
+    /**
+     * 初始化分页大小
+     */
+    private static initPageSize() {
+        let config = this.injector.get<AppConfig>(AppConfig, null, InjectFlags.Optional);
+        if (!config)
+            return;
+        if (config.pageSize > 0)
+            DefaultConfig.pageSize = config.pageSize;
+    }
 }

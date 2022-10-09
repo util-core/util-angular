@@ -2,7 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector, Injectable, ViewChild, Input, OnInit } from '@angular/core';
+import { Injector, Component, ViewChild, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Util } from "../util";
 import { AppConfig } from '../config/app-config';
@@ -11,7 +11,9 @@ import { ViewModel } from "../core/view-model";
 /**
  * Crud编辑组件基类
  */
-@Injectable()
+@Component({
+    template: ''
+})
 export abstract class EditComponentBase<TViewModel extends ViewModel> implements OnInit {
     /**
      * 公共操作
@@ -26,7 +28,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      */
     @ViewChild(NgForm) protected form: NgForm;
     /**
-     * 参数
+     * 模型
      */
     model: TViewModel;
     /**
@@ -54,7 +56,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
     }
 
     /**
-     * 创建参数
+     * 创建模型
      */
     protected createModel(): TViewModel {
         return <TViewModel>{};
@@ -69,27 +71,63 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
 
     /**
      * 通过标识加载
+     * @param id 标识
      */
-    protected loadById( id = null ) {
-        if ( this.isRequestLoad() === false && this.data ) {
-            this.loadModel( this.data );
+    protected loadById(id = null) {
+        if (this.loadBefore() === false)
+            return;
+        if (this.isRequestLoad() === false && this.data) {
+            let model = this.toModel(this.data);
+            this.loadModel(model);
             return;
         }
-        id = id || this.id || this.util.router.getParam( "id" );
-        if ( !id )
+        id = id || this.id || this.util.router.getParam("id");
+        if (!id)
             return;
-        this.util.webapi.get<TViewModel>( this.getLoadUrl( id ) ).handle( {
+        this.util.webapi.get<TViewModel>(this.getLoadUrl(id)).handle({
             ok: result => {
-                this.loadModel( result );
+                let model = this.toModel(result);
+                this.loadModel(model);
+                this.loadAfter(model);
             }
-        } );
+        });
     }
 
     /**
-     * 是否发送请求进行加载
+     * 加载前操作,返回false阻止加载
+     * @param id 标识
+     */
+    protected loadBefore(id = null) {
+        return true;
+    }
+
+    /**
+     * 是否远程加载
      */
     protected isRequestLoad() {
         return true;
+    }
+
+    /**
+     * 转换为模型
+     * @param data 数据
+     */
+    protected toModel(data) {
+        return data;
+    }
+
+    /**
+     * 加载模型
+     */
+    private loadModel(model) {
+        this.isNew = false;
+        this.model = model;
+    }
+
+    /**
+     * 加载后操作
+     */
+    protected loadAfter(result) {
     }
 
     /**
@@ -113,34 +151,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param path 路径
      */
     protected getUrl(url: string, path?: string) {
-        let result = this.util.helper.getUrl(url, this.appConfig.apiEndpoint);
-        if (this.util.helper.isEmpty(path))
-            return result;
-        result = this.util.helper.trimEnd(result, "/");
-        return `${result}/${path}`;
-    }
-
-    /**
-     * 加载模型
-     */
-    private loadModel( data ) {
-        let result = this.loadBefore( data );
-        this.isNew = false;
-        this.model = result;
-        this.loadAfter( result );
-    }
-
-    /**
-     * 加载完成前操作
-     */
-    protected loadBefore( result ) {
-        return result;
-    }
-
-    /**
-     * 加载完成后操作
-     */
-    protected loadAfter( result ) {
+        return this.util.helper.getUrl(url, this.appConfig.apiEndpoint, path);
     }
 
     /**
@@ -148,14 +159,14 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param form 表单
      * @param button 按钮
      */
-    submit( form?: NgForm, button?) {
-        this.util.form.submit( {
+    submit(form?: NgForm, button?) {
+        this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,
             form: form,
             button: button,
             back: true
-        } );
+        });
     }
 
     /**
