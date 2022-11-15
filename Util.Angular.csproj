@@ -32,13 +32,6 @@
 		<None Remove="$(SpaRoot)dist\**" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Include="Pages\Application\Edit.cshtml" />
-	  <None Include="Pages\Application\Index.cshtml" />
-	  <None Include="Pages\Claim\Index.cshtml" />
-	  <None Include="Pages\Claim\Index.Query.cshtml" />
-	</ItemGroup>
-
 	<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod" />
 		<ItemGroup>

@@ -13,9 +13,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IconsProviderModule } from './icons-provider.module';
 import { ShareModule } from "./share.module";
 import { WelcomeComponent } from "./welcome/welcome.component"
-import { ApplicationListComponent } from "./application/application-list.component"
-import { ApplicationEditComponent } from "./application/application-edit.component"
-import { ClaimListComponent } from './claim/claim-list.component';
 import { Util, AppConfig } from 'util-angular';
 import { appConfig } from './app-config';
 
@@ -25,8 +22,7 @@ registerLocaleData(zh);
 
 @NgModule({
     declarations: [
-        AppComponent, WelcomeComponent, ApplicationListComponent, ApplicationEditComponent,
-        ClaimListComponent
+        AppComponent, WelcomeComponent
     ],
     imports: [
         BrowserModule,
