@@ -140,7 +140,7 @@ export class Util {
      * 初始化分页大小
      */
     private static initPageSize() {
-        let config = this.injector.get<AppConfig>(AppConfig, null, InjectFlags.Optional);
+        let config = this.injector.get<AppConfig>(AppConfig, <AppConfig>null, InjectFlags.Optional);
         if (!config)
             return;
         if (config.pageSize > 0)

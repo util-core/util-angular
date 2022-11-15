@@ -21,7 +21,7 @@ export abstract class QueryComponentBase {
      */
     expand;
     /**
-     * 复选框选中的标识列表
+     * 复选框或单选框选中的标识列表
      */
     checkedIds;
     /**
@@ -62,11 +62,11 @@ export abstract class QueryComponentBase {
             width: this.getCreateDialogWidth(),
             disableClose: true,
             showFooter: false,
-            onBeforeOpen: () => {
-                return this.onCreateBeforeOpen();
+            onOpenBefore: () => {
+                return this.onCreateOpenBefore();
             },
-            onBeforeClose: result => {
-                return this.onCreateBeforeClose(result);
+            onCloseBefore: result => {
+                return this.onCreateCloseBefore(result);
             },
             onClose: result => {
                 this.onCreateClose(result);
@@ -112,7 +112,7 @@ export abstract class QueryComponentBase {
     /**
      * 创建弹出框打开前回调函数，返回 false 阻止打开
      */
-    protected onCreateBeforeOpen() {
+    protected onCreateOpenBefore() {
         return true;
     }
 
@@ -120,7 +120,7 @@ export abstract class QueryComponentBase {
      * 创建弹出框关闭前回调函数，返回 false 阻止关闭
      * @param result 返回结果
      */
-    protected onCreateBeforeClose(result) {
+    protected onCreateCloseBefore(result) {
         return true;
     }
 
@@ -145,11 +145,11 @@ export abstract class QueryComponentBase {
             width: this.getEditDialogWidth(),
             disableClose: true,
             showFooter: false,
-            onBeforeOpen: () => {
-                return this.onEditBeforeOpen();
+            onOpenBefore: () => {
+                return this.onEditOpenBefore();
             },
-            onBeforeClose: result => {
-                return this.onEditBeforeClose(result);
+            onCloseBefore: result => {
+                return this.onEditCloseBefore(result);
             },
             onClose: result => {
                 this.onEditClose(result);
@@ -190,7 +190,7 @@ export abstract class QueryComponentBase {
     /**
      * 更新弹出框打开前回调函数，返回 false 阻止打开
      */
-    protected onEditBeforeOpen() {
+    protected onEditOpenBefore() {
         return true;
     }
 
@@ -198,7 +198,7 @@ export abstract class QueryComponentBase {
      * 更新弹出框关闭前回调函数，返回 false 阻止关闭
      * @param result 返回结果
      */
-    protected onEditBeforeClose(result) {
+    protected onEditCloseBefore(result) {
         return true;
     }
 

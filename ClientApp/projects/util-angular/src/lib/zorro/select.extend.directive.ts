@@ -4,12 +4,12 @@
 //=========================================================
 import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
 import { Util } from "../util";
-import { AppConfig,initAppConfig } from '../config/app-config';
 import { SelectItem } from "../core/select-item";
 import { SelectOption } from '../core/select-option';
 import { SelectOptionGroup } from "../core/select-option-group";
 import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
+import { AppConfig } from '../config/app-config';
 
 /**
  * NgZorro选择框扩展指令
@@ -73,14 +73,17 @@ export class SelectExtendDirective implements OnInit {
      * 下拉加载
      */
     @Input() isScrollLoad: boolean;
+    /**
+     * 加载完成事件
+     */
+    @Output() onLoad = new EventEmitter<any>();
 
     /**
      * 初始化选择框扩展指令
      * @param config 应用配置
      */
-    constructor(@Optional() protected config: AppConfig) {
+    constructor(@Optional() public config: AppConfig) {
         this.util = new Util();
-        initAppConfig(this.config);
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
@@ -148,36 +151,49 @@ export class SelectExtendDirective implements OnInit {
          */
         param?,
         /**
-         * 成功加载回调函数
+         * 请求前处理函数，返回false则取消提交
          */
-        handler?: (value) => void;
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         * @param result 结果
+         */
+        ok?: (result) => void;
+        /**
+         * 请求完成处理函数
+         */
+        complete?: () => void;
     }) {
         options = options || {};
-        let url = this.getUrl(options.url) || this.getUrl(this.url);
+        let url = options.url || this.url;
         if (!url)
             return;
         let param = options.param || this.queryParam;
         this.util.webapi.get<SelectItem[]>(url).param(param).handle({
             before: () => {
                 this.loading = true;
+                if (options.before)
+                    return options.before();
                 return true;
             },
             ok: result => {
-                if (options.handler) {
-                    options.handler(result);
-                    return;
-                }
                 this.loadData(result);
+                options.ok && options.ok(result);
+                this.loadAfter(result);
+                this.onLoad.emit(result);
             },
-            complete: () => this.loading = false
+            complete: () => {
+                this.loading = false;
+                options.complete && options.complete();
+            }
         });
     }
 
     /**
-     * 获取请求地址
+     * 加载完成操作
+     * @param result
      */
-    private getUrl(url) {
-        return this.util.helper.getUrl(url, this.config.apiEndpoint);
+    loadAfter(result) {
     }
 }
 

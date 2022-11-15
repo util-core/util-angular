@@ -2,7 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Component,Injector, ViewChild, forwardRef } from '@angular/core';
+import { Component,Injector, ViewChild } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { EditTableDirective } from "../zorro/edit-table.directive";
@@ -18,7 +18,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
     /**
      * 表格编辑扩展指令
      */
-    @ViewChild(forwardRef(() => EditTableDirective), { "static": true }) protected editTable: EditTableDirective;
+    @ViewChild(EditTableDirective) protected editTable: EditTableDirective;
 
     /**
      * 初始化表格编辑组件
@@ -36,7 +36,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
             return;
         this.editTable.addRow({
             row: this.createModel(),
-            before: row => this.addBefore(row)
+            before: row => this.onAddBefore(row)
         });
     }
 
@@ -51,7 +51,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      * 添加前操作，返回 false 阻止添加
      * @param row 行参数
      */
-    addBefore(row): boolean {
+    onAddBefore(row): boolean {
         return true;
     }
 
@@ -102,8 +102,8 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
             confirm: this.getConfirm(),
             createData: data => this.createData(data),
             isDirty: (data) => this.isDirty(data),
-            before: data => this.saveBefore(data),
-            ok: result => this.saveAfter(result),
+            before: data => this.onSaveBefore(data),
+            ok: result => this.onSave(result),
             url: this.getSaveUrl()
         });
     }
@@ -135,7 +135,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      * 保存前操作，返回 false 阻止添加
      * @param data 保存参数
      */
-    protected saveBefore(data) {
+    protected onSaveBefore(data) {
         return true;
     }
 
@@ -143,7 +143,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      * 保存成功操作
      * @param result 结果
      */
-    protected saveAfter(result) {
+    protected onSave(result) {
     }
 
     /**

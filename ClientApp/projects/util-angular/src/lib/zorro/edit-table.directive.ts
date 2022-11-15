@@ -327,9 +327,9 @@ export class EditTableDirective {
             return;
         if (!this.validate())
             return;
-        let url = this.getUrl(options.url) || this.getUrl(this.saveUrl) || this.getUrl(this.table.url, "save" );
+        let url = options.url || this.saveUrl || this.getUrl(this.table.url, "save" );
         if (!url) {
-            console.error("表格编辑saveUrl未设置");
+            console.log("表格编辑saveUrl未设置");
             return;
         }
         let data = this.createSaveData(options.createData);
@@ -352,7 +352,7 @@ export class EditTableDirective {
                 this.clear();
                 options.ok && options.ok( result );
                 this.table.query( {
-                    handler: result => {
+                    ok: result => {
                         if ( result.page > result.pageCount ) {
                             this.table.query( {
                                 page: result.page - 1
@@ -368,7 +368,7 @@ export class EditTableDirective {
      * 获取地址
      */
     private getUrl(url: string, path: string = null) {
-        return this.table.getUrl(url, path);
+        return this.util.helper.getUrl(url, null, path);
     }
 
     /**

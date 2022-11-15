@@ -1,15 +1,14 @@
-﻿//============== Crud编辑组件基类=================
+﻿//============== 编辑组件基类=====================
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Injector, Component, ViewChild, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Util } from "../util";
-import { AppConfig } from '../config/app-config';
 import { ViewModel } from "../core/view-model";
 
 /**
- * Crud编辑组件基类
+ * 编辑组件基类
  */
 @Component({
     template: ''
@@ -19,10 +18,6 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * 公共操作
      */
     protected util: Util;
-    /**
-     * 应用配置
-     */
-    protected appConfig: AppConfig;
     /**
      * 表单
      */
@@ -50,9 +45,16 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      */
     constructor(injector: Injector) {
         this.util = new Util(injector);
-        this.appConfig = this.util.ioc.get(AppConfig);
         this.isNew = true;
+        this.model = <TViewModel>{};
+    }
+
+    /**
+     * 初始化
+     */
+    ngOnInit() {
         this.model = this.createModel();
+        this.loadById();
     }
 
     /**
@@ -63,18 +65,11 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
     }
 
     /**
-     * 初始化
-     */
-    ngOnInit() {
-        this.loadById();
-    }
-
-    /**
      * 通过标识加载
      * @param id 标识
      */
     protected loadById(id = null) {
-        if (this.loadBefore() === false)
+        if (this.onLoadBefore(id) === false)
             return;
         if (this.isRequestLoad() === false && this.data) {
             let model = this.toModel(this.data);
@@ -88,7 +83,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
             ok: result => {
                 let model = this.toModel(result);
                 this.loadModel(model);
-                this.loadAfter(model);
+                this.onLoad(model);
             }
         });
     }
@@ -97,7 +92,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * 加载前操作,返回false阻止加载
      * @param id 标识
      */
-    protected loadBefore(id = null) {
+    protected onLoadBefore(id) {
         return true;
     }
 
@@ -127,7 +122,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
     /**
      * 加载后操作
      */
-    protected loadAfter(result) {
+    protected onLoad(result) {
     }
 
     /**
@@ -150,20 +145,20 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param url Api地址
      * @param path 路径
      */
-    protected getUrl(url: string, path?: string) {
-        return this.util.helper.getUrl(url, this.appConfig.apiEndpoint, path);
+    protected getUrl(url: string, path: string) {
+        return this.util.helper.getUrl(url,null, path);
     }
 
     /**
      * 提交表单
-     * @param form 表单
      * @param button 按钮
+     * @param form 表单
      */
-    submit(form?: NgForm, button?) {
+    submit(button?, form?: NgForm ) {
         this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,
-            form: form,
+            form: form || this.form,
             button: button,
             back: true
         });
@@ -183,7 +178,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * 获取创建地址
      */
     protected getCreateUrl() {
-        return this.getUrl(this.getBaseUrl());
+        return this.getBaseUrl();
     }
 
     /**

@@ -8,6 +8,7 @@ import { Util } from "../util";
 import { IKey } from "../core/key";
 import { QueryParameter } from "../core/query-parameter";
 import { PageList } from "../core/page-list";
+import { FailResult } from "../core/fail-result";
 import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
@@ -17,7 +18,7 @@ import { AppConfig, initAppConfig } from '../config/app-config';
     selector: '[x-table-extend]',
     exportAs: 'xTableExtend'
 })
-export class TableExtendDirective<T extends IKey> implements OnInit {
+export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 操作入口
      */
@@ -31,17 +32,13 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      */
     total = 0;
     /**
-     * checkbox选中列表
+     * 选择框选中列表
      */
-    checkedSelection: SelectionModel<T>;
+    checkedSelection: SelectionModel<TModel>;
     /**
      * 点击行选中列表
      */
-    selectedSelection: SelectionModel<T>;
-    /**
-     * 是否多选，以复选框进行多选，否则以单选框选择，默认为true
-     */
-    @Input() multiple;
+    selectedSelection: SelectionModel<TModel>;
     /**
      * 查询延迟
      */
@@ -73,7 +70,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     /**
      * 查询参数
      */
-    @Input() queryParam: QueryParameter;
+    @Input() queryParam;
     /**
      * 初始排序条件
      */
@@ -83,11 +80,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      */
     @Input() checkedKeys: string | string[];
     /**
-     * 查询参数变化事件
-     */
-    @Output() queryParamChange = new EventEmitter<QueryParameter>();
-    /**
-     * 加载完成后事件
+     * 加载完成事件
      */
     @Output() onLoad = new EventEmitter<any>();
 
@@ -100,11 +93,10 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
         this.initAppConfig();
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
-        this.checkedSelection = new SelectionModel<T>(true, []);
-        this.selectedSelection = new SelectionModel<T>(false, []);
+        this.checkedSelection = new SelectionModel<TModel>(true, []);
+        this.selectedSelection = new SelectionModel<TModel>(false, []);
         this.pageSizeOptions = [];
         this.autoLoad = true;
-        this.multiple = true;
         this.delay = 500;
     }
 
@@ -125,7 +117,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
             this.initPageSize();
             this.initOrder();
             if (this.autoLoad)
-                this.query();
+                this.load();
         }, 0);
     }
 
@@ -147,7 +139,14 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
-     * 发送查询请求
+     * 加载
+     */
+    protected load() {
+        this.query();
+    }
+
+    /**
+     * 查询
      * @param options 配置
      */
     query(options?: {
@@ -168,12 +167,25 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
          */
         page?,
         /**
-         * 成功回调函数
+         * 请求前处理函数，返回false则取消提交
          */
-        handler?: (result) => void;
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         * @param result 结果
+         */
+        ok?: (result) => void;
+        /**
+         * 请求失败处理函数
+         */
+        fail?: (result: FailResult) => void;
+        /**
+         * 请求完成处理函数
+         */
+        complete?: () => void;
     }) {
         options = options || {};
-        let url = this.getUrl(options.url) || this.getUrl(this.url);
+        let url = options.url || this.url;
         if (!url)
             return;
         let param = options.param || this.queryParam;
@@ -184,15 +196,21 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
         this.util.webapi.get<any>(url).param(param).button(options.button).handle({
             before: () => {
                 this.loading = true;
+                if (options.before)
+                    return options.before();
                 return true;
             },
             ok: result => {
                 this.loadData(result);
-                options.handler && options.handler(result);
+                options.ok && options.ok(result);
                 this.loadAfter(result);
                 this.onLoad.emit(result);
             },
-            complete: () => this.loading = false
+            fail: options.fail,
+            complete: () => {
+                this.loading = false;
+                options.complete && options.complete();
+            }
         });
     }
 
@@ -201,15 +219,15 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * @param url 地址
      * @param path 路径
      */
-    getUrl(url: string, path: string = null) {
-        return this.util.helper.getUrl(url, this.config.apiEndpoint, path);
+    private getUrl(url: string, path: string) {
+        return this.util.helper.getUrl(url, null, path);
     }
 
     /**
      * 加载数据
      */
-    protected loadData(result) {
-        result = new PageList<T>(result);
+    loadData(result) {
+        result = new PageList<TModel>(result);
         result.initLineNumbers();
         this.dataSource = result.data || [];
         this.total = result.total;
@@ -225,41 +243,6 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
-     * 延迟搜索
-     * @param options 配置
-     */
-    search(options?: {
-        /**
-         * 按钮
-         */
-        button?,
-        /**
-         * 查询延迟间隔，单位：毫秒，默认500
-         */
-        delay?: number,
-        /**
-         * 请求地址
-         */
-        url?: string,
-        /**
-         * 查询参数
-         */
-        param?: null;
-    }) {
-        options = options || {};
-        let delay = options.delay || this.delay;
-        if (this.timeout)
-            clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-            this.query({
-                button: options.button,
-                url: this.getUrl(options.url),
-                param: options.param
-            });
-        }, delay);
-    }
-
-    /**
      * 刷新
      * @param queryParam 查询参数
      * @param button 按钮
@@ -268,12 +251,11 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     refresh(queryParam, button?, handler?: (result) => void) {
         this.clear();
         this.queryParam = queryParam;
-        this.queryParamChange.emit(queryParam);
         this.initPageSize();
         this.queryParam.order = this.order;
         this.query({
             button: button,
-            handler: handler
+            ok: handler
         });
     }
 
@@ -303,9 +285,13 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
          */
         url?: string,
         /**
-         * 删除成功回调函数
+         * 请求前处理函数，返回false则取消提交
          */
-        handler?: () => void;
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         */
+        ok?: () => void;
     }) {
         options = options || {};
         let ids = options.ids || this.getCheckedIds();
@@ -315,14 +301,14 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
         }
         this.util.message.confirm({
             content: this.config.text.deleteConfirm,
-            onOk: () => this.deleteRequest(ids, options.handler, options.url)
+            onOk: () => this.deleteRequest(ids, options.before, options.ok, options.url)
         });
     }
 
     /**
      * 发送删除请求
      */
-    private async deleteRequest(ids?: string, handler?: () => void, url?: string) {
+    private async deleteRequest(ids?: string, before?: () => boolean, ok?: () => void, url?: string) {
         url = this.getDeleteUrl(url);
         if (!url)
             return;
@@ -330,21 +316,20 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
             ok: () => {
                 this.util.message.success(this.config.text.deleteSuccessed);
                 this.query({
-                    handler: result => {
+                    before: before,
+                    ok: result => {
                         if (result.page <= 1) {
-                            handler && handler();
+                            ok && ok();
                             return;
                         }
                         if (result.page > result.pageCount) {
                             this.query({
                                 page: result.page - 1,
-                                handler: () => {
-                                    handler && handler();
-                                }
+                                ok: ok
                             });
                             return;
                         }
-                        handler && handler();
+                        ok && ok();
                     }
                 });
             }
@@ -355,20 +340,20 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * 获取删除Api地址
      */
     private getDeleteUrl(url) {
-        return this.getUrl(url) || this.getUrl(this.deleteUrl) || this.getUrl(this.url, "delete");
+        return url || this.deleteUrl || this.getUrl(this.url, "delete");
     }
 
     /**
      * 获取勾选的实体列表
      */
-    getChecked(): T[] {
+    getChecked(): TModel[] {
         return this.dataSource.filter(data => this.checkedSelection.isSelected(data));
     }
 
     /**
      * 获取勾选的实体列表
      */
-    getCheckedNodes(): T[] {
+    getCheckedNodes(): TModel[] {
         return this.getChecked();
     }
 
@@ -389,7 +374,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     /**
      * 获取勾选的单个节点
      */
-    getCheckedNode(): T {
+    getCheckedNode(): TModel {
         let list = this.getChecked();
         if (!list || list.length === 0)
             return null;
@@ -400,7 +385,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * 通过标识列表查找
      * @param ids 标识列表
      */
-    getByIds(ids: string[]): T[] {
+    getByIds(ids: string[]): TModel[] {
         if (!ids || ids.length === 0)
             return [];
         return this.dataSource.filter(item => ids.some(id => id === item.id));
@@ -410,7 +395,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * 通过标识查找
      * @param id 标识
      */
-    getById(id: string): T {
+    getById(id: string): TModel {
         if (!id)
             return null;
         return this.dataSource.find(data => data.id === id);
@@ -434,7 +419,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     /**
      * 切换勾选状态
      */
-    toggleRow(row) {
+    toggle(row) {
         this.checkedSelection.toggle(row);
     }
 
@@ -522,6 +507,14 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
     }
 
     /**
+     * 是否选中状态
+     * @param row 行
+     */
+    isChecked(row) {
+        return this.checkedSelection.isSelected(row);
+    }
+
+    /**
      * 表头主复选框切换选中状态
      */
     masterToggle() {
@@ -573,7 +566,7 @@ export class TableExtendDirective<T extends IKey> implements OnInit {
      * 初始化行号
      */
     private initLineNumbers(data) {
-        let result = new PageList<T>(data, this.queryParam.page, this.queryParam.pageSize);
+        let result = new PageList<TModel>(data, this.queryParam.page, this.queryParam.pageSize);
         result.initLineNumbers();
     }
 

@@ -9,5 +9,7 @@ import { TableConfig } from "./table-config";
  */
 export const DefaultTableConfig: TableConfig = {
     lineNumberWidth: "70px",
-    checkboxWidth: "30px"
+    checkboxWidth: "30px",
+    radioWidth: "36px",
+    indentUnitWidth: "20"
 };

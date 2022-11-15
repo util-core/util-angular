@@ -2,7 +2,7 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector, ViewChild, Component, AfterViewInit, forwardRef } from '@angular/core';
+import { Injector, ViewChild, Component, AfterViewInit } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { QueryComponentBase } from "./query-component-base";
@@ -22,7 +22,7 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     /**
      * 表格扩展指令
      */
-    @ViewChild(forwardRef(() => TableExtendDirective), { "static": true }) protected table: TableExtendDirective<TViewModel>;
+    @ViewChild(TableExtendDirective) protected table: TableExtendDirective<TViewModel>;
 
     /**
      * 初始化组件
@@ -30,6 +30,13 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
      */
     constructor(injector: Injector) {
         super(injector);
+        this.queryParam = <TQuery>new QueryParameter();
+    }
+
+    /**
+     * 初始化
+     */
+    ngOnInit() {
         this.queryParam = this.createQuery();
     }
 
@@ -47,15 +54,15 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
         if (!this.table)
             return;
         this.table.loadAfter = result => {
-            this.loadAfter(result);
+            this.onLoad(result);
         }
     }
 
     /**
      * 数据加载完成操作
-     * @param result
+     * @param result 结果
      */
-    loadAfter(result) {
+    onLoad(result) {
     }
 
     /**
@@ -72,19 +79,6 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     }
 
     /**
-     * 延迟搜索
-     * @param button 按钮
-     */
-    search(button?) {
-        if (!this.table)
-            return;
-        this.table.search({
-            button: button,
-            delay: this.getDelay()
-        });
-    }
-
-    /**
      * 删除
      * @param id 标识
      */
@@ -93,8 +87,8 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
             return;
         this.table.delete({
             ids: id,
-            handler: () => {
-                this.deleteAfter();
+            ok: () => {
+                this.onDelete();
             }
         });
     }
@@ -102,7 +96,7 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     /**
      * 删除后操作
      */
-    protected deleteAfter = () => {
+    protected onDelete = () => {
     }
 
     /**
@@ -113,15 +107,16 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     refresh(button?, handler?: (data) => void) {
         if (!this.table)
             return;
-        handler = handler || this.refreshAfter;
+        handler = handler || this.onRefresh;
         this.queryParam = this.createQuery();
         this.table.refresh(this.queryParam, button, handler);
     }
 
     /**
      * 刷新完成操作
+     * @param data 数据
      */
-    protected refreshAfter = data => {
+    protected onRefresh = data => {
     }
 
     /**

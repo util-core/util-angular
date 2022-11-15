@@ -11,6 +11,8 @@ import { ButtonExtendDirective } from "./zorro/button.extend.directive";
 import { ValidationExtendDirective } from "./zorro/validation.extend.directive";
 import { InputExtendDirective } from "./zorro/input.extend.directive";
 import { SelectExtendDirective } from "./zorro/select.extend.directive";
+import { TreeTableExtendDirective } from "./zorro/tree.table.extend.directive";
+import { TreeExtendDirective } from "./zorro/tree.extend.directive";
 
 /**
  * utilÄ£¿é
@@ -20,7 +22,8 @@ import { SelectExtendDirective } from "./zorro/select.extend.directive";
         TableExtendDirective,
         EditTableDirective, EditRowDirective, EditControlDirective,
         ButtonExtendDirective,
-        ValidationExtendDirective,InputExtendDirective, SelectExtendDirective
+        ValidationExtendDirective, InputExtendDirective, SelectExtendDirective,
+        TreeTableExtendDirective, TreeExtendDirective
     ],
     imports: [
     ],
@@ -28,7 +31,8 @@ import { SelectExtendDirective } from "./zorro/select.extend.directive";
         TableExtendDirective,
         EditTableDirective, EditRowDirective, EditControlDirective,
         ButtonExtendDirective,
-        ValidationExtendDirective,InputExtendDirective, SelectExtendDirective
+        ValidationExtendDirective, InputExtendDirective, SelectExtendDirective,
+        TreeTableExtendDirective, TreeExtendDirective
     ]
 })
 export class UtilModule {

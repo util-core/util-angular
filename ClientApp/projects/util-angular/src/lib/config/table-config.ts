@@ -14,5 +14,13 @@ export class TableConfig {
     /**
      * 复选框宽度
      */
-    checkboxWidth?:string;
+    checkboxWidth?: string;
+    /**
+     * 单选框宽度
+     */
+    radioWidth?: string;
+    /**
+     * 树形表格单元格缩进单位宽度
+     */
+    indentUnitWidth?:string;
 }

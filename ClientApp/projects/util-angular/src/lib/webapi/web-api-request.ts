@@ -104,6 +104,17 @@ export class WebApiRequest<T> {
     }
 
     /**
+     * 根据条件添加http参数
+     * @param name 名称
+     * @param value 值
+     */
+    paramIf(data, value: string, condition: boolean): WebApiRequest<T> {
+        if (condition)
+            this.param(data, value);
+        return this;
+    }
+
+    /**
      * 设置按钮
      * @param btn 按钮实例
      */
@@ -185,8 +196,7 @@ export class WebApiRequest<T> {
     private handleHttpException(options: WebApiHandleOptions<T>, failResult: FailResult) {
         if (failResult.errorResponse)
             console.log(this.getHttpExceptionMessage(failResult));
-        if (options.complete)
-            options.complete();
+        options.complete && options.complete();
     }
 
     /**
@@ -198,8 +208,8 @@ export class WebApiRequest<T> {
         let error = failResult.errorResponse;
         if (!error)
             return "";
-        return `Http请求异常：\nUrl:${error.url}\n状态码:${error.status},${error.statusText}\n`
-            + `错误消息:${error.message}\n错误响应:\n ${error.error && error.error.text}\n`;
+        return `Http Exception：\nUrl:${error.url}\nstatus:${error.status},${error.statusText}\n`
+            + `error message:${error.message}\nerrortext:\n ${error.error && error.error.text}\n`;
     }
 
     /**
@@ -208,7 +218,7 @@ export class WebApiRequest<T> {
     private handleBusinessException(result: Result<T>) {
         if (result.code === StateCode.Fail) {
             this.util.message.error(result.message);
-            console.log(`业务异常:\n${result.message}`);
+            console.log(`error message:\n${result.message}`);
         }
     }
 

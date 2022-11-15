@@ -114,7 +114,7 @@ export interface IDialogOptions {
     /**
      * 打开前事件，返回 false 阻止弹出
      */
-    onBeforeOpen?: () => boolean,
+    onOpenBefore?: () => boolean,
     /**
      * 打开后事件
      */
@@ -122,7 +122,7 @@ export interface IDialogOptions {
     /**
      * 关闭前事件，返回 false 阻止关闭
      */
-    onBeforeClose?: ( result ) => ( false | void | {} ) | Promise<false | void | {}>,
+    onCloseBefore?: ( result ) => ( false | void | {} ) | Promise<false | void | {}>,
     /**
      * 关闭后事件
      * @param result 返回结果

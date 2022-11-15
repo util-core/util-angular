@@ -207,3 +207,15 @@ export let toJson = (value): string => {
 export let toObjectFromJson = <T>(json: string): T => {
     return JSON.parse(json);
 }
+
+/**
+ * 获取标识列表
+ * @param data 数据
+ */
+export function getIds(data) {
+    if (!data)
+        return null;
+    if (!data.map)
+        return data.id;
+    return data.map(t => t.id);
+}

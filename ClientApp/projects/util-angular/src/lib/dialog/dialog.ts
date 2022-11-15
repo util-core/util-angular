@@ -24,7 +24,7 @@ export class Dialog {
      */
     open(options?: IDialogOptions): NzModalRef {
         options = options || {};
-        if (options.onBeforeOpen && options.onBeforeOpen() === false)
+        if (options.onOpenBefore && options.onOpenBefore() === false)
             return null;
         this.initOptions(options);
         let dialog: NzModalService = this.getModalService();
@@ -78,10 +78,10 @@ export class Dialog {
             nzOnOk: options.onOk,
             nzOnCancel: data => {
                 if (data.tag === true) {
-                    options.onBeforeClose && options.onBeforeClose(data.result);
+                    options.onCloseBefore && options.onCloseBefore(data.result);
                     return;
                 }
-                options.onBeforeClose && options.onBeforeClose(null);
+                options.onCloseBefore && options.onCloseBefore(null);
             }
         };
     }
