@@ -6,13 +6,13 @@
 /**
  * 状态码
  */
-export class StateCode {
+export enum StateCode {
     /**
      * 失败
      */
-    static Fail = "0";
+    Fail = "0",
     /**
      * 成功
      */
-    static  Ok = "1";
+    Ok = "1"
 }

@@ -13,6 +13,7 @@ export * from "./lib/core/page-list";
 export * from "./lib/core/result";
 export * from "./lib/core/fail-result";
 export * from "./lib/core/state-code";
+export * from "./lib/core/load-mode";
 
 //导出config
 export * from "./lib/config/app-config";

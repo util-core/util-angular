@@ -44,6 +44,21 @@ export abstract class QueryComponentBase {
     abstract query(button?);
 
     /**
+     * 刷新
+     * @param button 按钮
+     * @param handler 刷新后回调函数
+     */
+    abstract refresh(button?, handler?: (data) => void);
+
+    /**
+     * 路由复用标签刷新
+     */
+    _onReuseInit(type?): void {
+        if (type === "refresh")
+            this.refresh();
+    }
+
+    /**
      * 获取查询延迟间隔，单位：毫秒，默认500
      */
     protected getDelay() {

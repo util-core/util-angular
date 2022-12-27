@@ -2,10 +2,12 @@
 //Copyright 2022 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { NzTreeNodeOptions, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
+import { Directive, Input, Output, OnInit, EventEmitter,Inject,Optional } from '@angular/core';
+import { NzTreeNodeOptions, NzTreeNode, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
+import { NzTreeSelectComponent } from "ng-zorro-antd/tree-select";
 import { Util } from "../util";
 import { FailResult } from "../core/fail-result";
+import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
 
 /**
@@ -21,13 +23,9 @@ export class TreeExtendDirective implements OnInit {
      */
     protected util: Util;
     /**
-     * 是否显示进度条
+     * 树组件实例
      */
-    loading: boolean;
-    /**
-     * 展开节点的标识列表
-     */
-    expandedKeys: string[];
+    public tree: NzTreeComponent | NzTreeSelectComponent;
     /**
      * 复选框选中节点的标识列表
      */
@@ -40,6 +38,26 @@ export class TreeExtendDirective implements OnInit {
      * 数据源
      */
     @Input() dataSource: NzTreeNodeOptions[];
+    /**
+     * 加载模式
+     */
+    @Input() loadMode: LoadMode;
+    /**
+     * 根节点异步加载模式是否展开子节点
+     */
+    @Input() isExpandForRootAsync: boolean;
+    /**
+     * 是否默认展开所有节点 - Tree组件
+     */
+    @Input() nzExpandAll: boolean;
+    /**
+     * 是否默认展开所有节点 - TreeSelect组件
+     */
+    @Input() nzDefaultExpandAll: boolean;
+    /**
+     * 是否异步加载
+     */
+    @Input() nzAsyncData: boolean;
     /**
      * 初始化时是否自动加载数据，默认为true,设置成false则手工加载
      */
@@ -69,6 +87,22 @@ export class TreeExtendDirective implements OnInit {
      */
     @Output() queryParamChange = new EventEmitter<TreeQueryParameter>();
     /**
+     * 展开事件
+     */
+    @Output() onExpand = new EventEmitter<any>();
+    /**
+     * 折叠事件
+     */
+    @Output() onCollapse: EventEmitter<any> = new EventEmitter();
+    /**
+     * 子节点加载前事件,返回false停止加载
+     */
+    @Input() onLoadChildrenBefore: (node) => boolean;
+    /**
+     * 子节点加载完成事件
+     */
+    @Output() onLoadChildren: EventEmitter<any> = new EventEmitter();
+    /**
      * 加载完成事件
      */
     @Output() onLoad = new EventEmitter<any>();
@@ -76,11 +110,14 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 初始化树形扩展指令
      */
-    constructor( public tree:NzTreeComponent ) {
+    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent) {
         this.util = new Util();
+        this.tree = treeComponent || treeSelectComponent;
         this.dataSource = new Array<any>();
         this.autoLoad = true;
         this.queryParam = new TreeQueryParameter();
+        this.checkedKeys = [];
+        this.selectedKeys = [];
     }
 
     /**
@@ -94,7 +131,7 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 加载,对于异步请求,仅加载第一级节点
      */
-    private load() {
+    load() {
         this.query({
             isSearch: false,
             url: this.loadUrl
@@ -145,25 +182,38 @@ export class TreeExtendDirective implements OnInit {
         if (!url)
             return;
         let param = options.param || this.queryParam;
-        this.util.webapi.get<any>(url).paramIf("is_search", "false", options.isSearch === false).param(param).button(options.button).handle({
-            before: () => {
-                this.loading = true;
-                if (options.before)
-                    return options.before();
-                return true;
-            },
-            ok: result => {
-                this.loadData(result);
-                options.ok && options.ok(result);
-                this.loadAfter(result);
-                this.onLoad.emit(result);
-            },
-            fail: options.fail,
-            complete: () => {
-                this.loading = false;
-                options.complete && options.complete();
-            }
-        });
+        this.util.webapi.get<any>(url)
+            .paramIf("is_search", "false", options.isSearch === false)
+            .paramIf("is_expand_all", "true", this.nzExpandAll || this.nzDefaultExpandAll)
+            .paramIf("loadMode", this.getLoadMode(), !this.util.helper.isUndefined(this.getLoadMode()))
+            .param(param).button(options.button).handle({
+                before: () => {
+                    if (options.before)
+                        return options.before();
+                    return true;
+                },
+                ok: result => {
+                    this.loadData(result);
+                    options.ok && options.ok(result);
+                    this.loadAfter(result);
+                    this.onLoad.emit(result);
+                },
+                fail: options.fail,
+                complete: () => {
+                    options.complete && options.complete();
+                }
+            });
+    }
+
+    /**
+     * 获取加载模式
+     */
+    private getLoadMode() {
+        if (this.loadMode)
+            return this.loadMode;
+        if (this.nzAsyncData)
+            return LoadMode.Async;
+        return undefined;
     }
 
     /**
@@ -180,9 +230,8 @@ export class TreeExtendDirective implements OnInit {
         if (!result)
             return;
         this.dataSource = result.nodes || [];
-        this.expandedKeys = this.expandedKeys ? [...this.expandedKeys] : result.expandedKeys || [];
-        this.checkedKeys = this.checkedKeys ? [...this.checkedKeys] : result.checkedKeys || [];
-        this.selectedKeys = this.selectedKeys ? [...this.selectedKeys] : result.selectedKeys || [];
+        this.checkedKeys = result.checkedKeys || [];
+        this.selectedKeys = result.selectedKeys || [];
     }
 
     /**
@@ -203,44 +252,99 @@ export class TreeExtendDirective implements OnInit {
      */
     clear() {
         this.dataSource = [];
+        this.checkedKeys = [];
+        this.selectedKeys = [];
     }
 
     /**
-     * 展开事件处理
-     * @param event
+     * 折叠展开事件处理
+     * @param event 节点展开事件
      */
-    expandChange(event) {
-        this.loadChildren(event);
-    }
-
-    /**
-     * 加载子节点列表
-     */
-    private loadChildren(event: NzFormatEmitEvent) {
+    expandChange(event: NzFormatEmitEvent) {
         if (!event)
             return;
         let node = event.node;
         if (!node)
             return;
+        let expand = event.node.isExpanded;
+        this.loadChildren(node, expand);
+        if (expand) {
+            this.onExpand.emit(node);
+            return;
+        }
+        this.onCollapse.emit(node);
+    }
+
+    /**
+     * 加载下级节点
+     */
+    private loadChildren(node: NzTreeNode, expand) {
+        if (!node)
+            return;
+        if (!expand)
+            return;
+        if (this.isLeaf(node))
+            return;
+        if (this.hasChildren(node))
+            return;
+        this.requestLoadChildren(node);
+    }
+
+    /**
+     * 是否存在子节点
+     */
+    private hasChildren(node: NzTreeNode) {
         let children = node.getChildren();
         if (children && children.length > 0)
-            return;
-        this.queryParam.operation = "LoadChild";
+            return true;
+        return false;
+    }
+
+    /**
+     * 是否叶节点
+     * @param node 节点
+     */
+    isLeaf(node: NzTreeNode) {
+        if (!node)
+            return false;
+        return node.isLeaf;
+    }
+
+    /**
+     * 请求加载下级节点
+     */
+    private requestLoadChildren(node: NzTreeNode) {
         this.queryParam.parentId = node.key;
-        this.query({
-            ok: result => {
-                if (result && result.nodes && result.nodes.length > 0) {
-                    node.addChildren(result.nodes);
-                    return;
+        let url = this.loadChildrenUrl || this.url;
+        this.util.webapi.get<any>(url).param(this.queryParam)
+            .paramIf("loadMode", this.getLoadMode(), !this.util.helper.isUndefined(this.getLoadMode()))
+            .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
+            .handle({
+                before: () => {
+                    if (this.onLoadChildrenBefore)
+                        return this.onLoadChildrenBefore(node);
+                    return true;
+                },
+                ok: result => {
+                    this.handleLoadChildren(node, result);
+                    this.onLoadChildren.emit({ node: node, result: result });
+                },
+                complete: () => {
+                    node.isLoading = false;
+                    this.queryParam.parentId = null;
                 }
-                node.isLoading = false;
-                node.isLeaf = true;
-            },
-            complete: () => {
-                this.queryParam.operation = null;
-                this.queryParam.parentId = null;
-            }
         });
+    }
+
+    /**
+     * 请求加载下级节点成功回调处理
+     */
+    private handleLoadChildren(node: NzTreeNode, result) {
+        if (result && result.nodes && result.nodes.length > 0) {
+            node.addChildren(result.nodes);
+            return;
+        }
+        node.isLeaf = true;
     }
 
     /**

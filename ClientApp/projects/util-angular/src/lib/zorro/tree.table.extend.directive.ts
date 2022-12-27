@@ -8,6 +8,7 @@ import { TreeNode } from "../core/tree-node";
 import { PageList } from "../core/page-list";
 import { AppConfig } from '../config/app-config';
 import { FailResult } from "../core/fail-result";
+import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
 
 /**
@@ -18,6 +19,14 @@ import { TableExtendDirective } from "./table.extend.directive";
     exportAs: 'xTreeTableExtend'
 })
 export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDirective<TModel> {
+    /**
+     * 加载模式
+     */
+    @Input() loadMode: LoadMode;
+    /**
+     * 根节点异步加载模式是否展开子节点
+     */
+    @Input() isExpandForRootAsync: boolean;
     /**
      * 是否展开所有节点
      */
@@ -66,7 +75,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     /**
      * 加载,对于异步请求,仅加载第一级节点
      */
-    protected load() {
+    load() {
         this.query({
             isSearch: false,
             url: this.loadUrl
@@ -125,34 +134,29 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
             param.page = options.page;
         if (!param.page)
             param.page = 1;
-        this.util.webapi.get<any>(url).paramIf("is_search", "false", options.isSearch === false).param(param).button(options.button).handle({
-            before: () => {
-                this.loading = true;
-                if (options.before)
-                    return options.before();
-                return true;
-            },
-            ok: result => {
-                this.loadData(result);
-                options.ok && options.ok(result);
-                this.loadAfter(result);
-                this.onLoad.emit(result);
-            },
-            fail: options.fail,
-            complete: () => {
-                this.loading = false;
-                options.complete && options.complete();
-            }
+        this.util.webapi.get<any>(url)
+            .paramIf("is_search", "false", options.isSearch === false)
+            .paramIf("is_expand_all", "true", this.isExpandAll)
+            .paramIf("loadMode", this.loadMode, !this.util.helper.isUndefined(this.loadMode))
+            .param(param).button(options.button).handle({
+                before: () => {
+                    this.loading = true;
+                    if (options.before)
+                        return options.before();
+                    return true;
+                },
+                ok: result => {
+                    this.loadData(result);
+                    options.ok && options.ok(result);
+                    this.loadAfter(result);
+                    this.onLoad.emit(result);
+                },
+                fail: options.fail,
+                complete: () => {
+                    this.loading = false;
+                    options.complete && options.complete();
+                }
         });
-    }
-
-    /**
-     * 加载数据
-     */
-    loadData(result) {
-        super.loadData(result);
-        if (this.isExpandAll)
-            this.dataSource.forEach(item => item.expanded = true);
     }
 
     /**
@@ -269,21 +273,24 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     private requestLoadChildren(node: TreeNode) {
         this.queryParam.parentId = node.id;
         let url = this.loadChildrenUrl || this.url;
-        this.util.webapi.get<any>(url).param(this.queryParam).handle({
-            before: () => {
-                this.loading = true;
-                if (this.onLoadChildrenBefore)
-                    return this.onLoadChildrenBefore(node);
-                return true;
-            },
-            ok: result => {
-                this.handleLoadChildren(node, result);
-                this.onLoadChildren.emit({ node: node, result: result });
-            },
-            complete: () => {
-                this.loading = false;
-                this.queryParam.parentId = null;
-            }
+        this.util.webapi.get<any>(url).param(this.queryParam)
+            .paramIf("loadMode", this.loadMode, !this.util.helper.isUndefined(this.loadMode))
+            .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
+            .handle({
+                before: () => {
+                    this.loading = true;
+                    if (this.onLoadChildrenBefore)
+                        return this.onLoadChildrenBefore(node);
+                    return true;
+                },
+                ok: result => {
+                    this.handleLoadChildren(node, result);
+                    this.onLoadChildren.emit({ node: node, result: result });
+                },
+                complete: () => {
+                    this.loading = false;
+                    this.queryParam.parentId = null;
+                }
         });
     }
 

@@ -80,6 +80,10 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     @Input() checkedKeys: string | string[];
     /**
+     * 查询参数变更事件
+     */
+    @Output() queryParamChange = new EventEmitter<QueryParameter>();
+    /**
      * 加载完成事件
      */
     @Output() onLoad = new EventEmitter<any>();
@@ -141,7 +145,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 加载
      */
-    protected load() {
+    load() {
         this.query();
     }
 
@@ -248,9 +252,12 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * @param button 按钮
      * @param handler 刷新成功回调函数
      */
-    refresh(queryParam, button?, handler?: (result) => void) {
+    refresh(queryParam?: QueryParameter, button?, handler?: (result) => void) {
         this.clear();
-        this.queryParam = queryParam;
+        if (queryParam) {
+            this.queryParam = queryParam;
+            this.queryParamChange.emit(queryParam);
+        }
         this.initPageSize();
         this.queryParam.order = this.order;
         this.query({
