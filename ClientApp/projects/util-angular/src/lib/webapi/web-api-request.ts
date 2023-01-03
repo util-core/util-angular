@@ -1,5 +1,5 @@
 ﻿//============== WebApi请求操作 =========================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=======================================================
 import { HttpErrorResponse } from '@angular/common/http';

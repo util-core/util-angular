@@ -17,6 +17,7 @@ export * from "./lib/core/load-mode";
 
 //导出config
 export * from "./lib/config/app-config";
+export * from "./lib/config/module-config";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
@@ -51,7 +52,6 @@ export * from "./lib/zorro/edit-control.directive";
 export * from "./lib/zorro/button.extend.directive";
 export * from "./lib/zorro/validation.extend.directive";
 export * from "./lib/zorro/select.extend.directive";
-export * from "./lib/zorro/input.extend.directive";
 export * from "./lib/zorro/tree.table.extend.directive";
 export * from "./lib/zorro/tree.extend.directive";
 

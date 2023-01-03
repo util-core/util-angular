@@ -1,5 +1,5 @@
 ﻿//============== Crud弹出层编辑组件基类===============
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //====================================================
 import { Injector, OnInit, Component } from '@angular/core';

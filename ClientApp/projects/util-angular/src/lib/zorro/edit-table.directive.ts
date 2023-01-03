@@ -1,5 +1,5 @@
 ﻿//============== NgZorro表格编辑扩展指令 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
 import { Directive, HostListener, Input } from '@angular/core';

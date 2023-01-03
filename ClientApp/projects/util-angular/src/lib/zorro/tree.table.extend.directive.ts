@@ -1,12 +1,11 @@
 ﻿//============== NgZorro树形表格扩展指令 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, Input, Output, EventEmitter, Optional } from '@angular/core';
+import { Directive, Input, Output, EventEmitter } from '@angular/core';
 import { IKey } from "../core/key";
 import { TreeNode } from "../core/tree-node";
 import { PageList } from "../core/page-list";
-import { AppConfig } from '../config/app-config';
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
@@ -66,10 +65,9 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
 
     /**
      * 初始化树形表格扩展指令
-     * @param appConfig 应用配置
      */
-    constructor(@Optional() public config: AppConfig) {
-        super(config);
+    constructor() {
+        super();
     }
 
     /**

@@ -1,5 +1,5 @@
 //============== util操作入口 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Injector, InjectFlags } from '@angular/core';
@@ -12,6 +12,7 @@ import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
 import { AppConfig } from './config/app-config';
+import { ModuleCofig } from './config/module-config';
 import { DefaultConfig } from "./config/default-config";
 
 /**
@@ -145,5 +146,15 @@ export class Util {
             return;
         if (config.pageSize > 0)
             DefaultConfig.pageSize = config.pageSize;
+    }
+
+    /**
+     * 获取应用配置
+     */
+    getAppConfig() {
+        let result = this.ioc.get(ModuleCofig);
+        if (result)
+            return result;
+        return this.ioc.get(AppConfig);
     }
 }

@@ -1,5 +1,5 @@
 ﻿//============== WebApi操作=========================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
 import { HttpMethod } from "../http/http-method";
@@ -23,7 +23,7 @@ export class WebApi {
      * @param message 消息操作
      */
     constructor(private util: Util) {
-        this.config = util.ioc.get(AppConfig);
+        this.config = util.getAppConfig();
     }
 
     /**

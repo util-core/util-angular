@@ -1,5 +1,5 @@
 ﻿//================ 表格编辑基类 ==================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Component,Injector, ViewChild } from '@angular/core';

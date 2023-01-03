@@ -1,5 +1,5 @@
 //================ 查询组件基类 ==================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Input, Injector, Component } from '@angular/core';
@@ -53,7 +53,7 @@ export abstract class QueryComponentBase {
     /**
      * 路由复用标签刷新
      */
-    _onReuseInit(type?): void {
+    _onReuseInit(type?) {
         if (type === "refresh")
             this.refresh();
     }
@@ -71,7 +71,7 @@ export abstract class QueryComponentBase {
     openCreateDialog(data?) {
         this.util.dialog.open({
             component: this.getCreateDialogComponent(),
-            centered:true,
+            centered: true,
             title: this.getCreateDialogTitle(),
             data: this.getCreateDialogData(data),
             width: this.getCreateDialogWidth(),

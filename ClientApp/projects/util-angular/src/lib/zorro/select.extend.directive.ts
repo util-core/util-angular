@@ -1,5 +1,5 @@
 ﻿//============== NgZorro选择框扩展指令 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=========================================================
 import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
@@ -9,7 +9,7 @@ import { SelectOption } from '../core/select-option';
 import { SelectOptionGroup } from "../core/select-option-group";
 import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
-import { AppConfig } from '../config/app-config';
+import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
  * NgZorro选择框扩展指令
@@ -23,6 +23,10 @@ export class SelectExtendDirective implements OnInit {
      * 操作入口
      */
     protected util: Util;
+    /**
+     * 应用配置
+     */
+    config: AppConfig
     /**
      * 加载状态
      */
@@ -70,9 +74,13 @@ export class SelectExtendDirective implements OnInit {
      */
     @Input() autoLoad: boolean;
     /**
-     * 下拉加载
+     * 是否下拉加载
      */
     @Input() isScrollLoad: boolean;
+    /**
+     * 查询参数变更事件
+     */
+    @Output() queryParamChange = new EventEmitter<any>();
     /**
      * 加载完成事件
      */
@@ -80,13 +88,23 @@ export class SelectExtendDirective implements OnInit {
 
     /**
      * 初始化选择框扩展指令
-     * @param config 应用配置
      */
-    constructor(@Optional() public config: AppConfig) {
+    constructor() {
         this.util = new Util();
+        this.config = this.util.getAppConfig();
+        this.initAppConfig();
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
     }
 
     /**
@@ -194,6 +212,19 @@ export class SelectExtendDirective implements OnInit {
      * @param result
      */
     loadAfter(result) {
+    }
+
+    /**
+     * 刷新
+     * @param queryParam 查询参数
+     */
+    refresh(queryParam?: QueryParameter) {
+        if (queryParam) {
+            this.queryParam = queryParam;
+            this.queryParamChange.emit(queryParam);
+        }
+        this.queryParam.order = null;
+        this.loadUrl();
     }
 }
 

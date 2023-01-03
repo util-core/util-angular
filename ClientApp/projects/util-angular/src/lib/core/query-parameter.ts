@@ -1,5 +1,5 @@
 //============== 查询参数 =========================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=================================================
 import { DefaultConfig } from "../config/default-config";

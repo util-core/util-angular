@@ -1,5 +1,5 @@
 ﻿//============== WebApi响应处理配置=========================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=========================================================
 import { FailResult } from "../core/fail-result";

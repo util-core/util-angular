@@ -1,5 +1,5 @@
 ﻿//================ 应用配置 ==============================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //========================================================
 import { Injectable } from '@angular/core';
@@ -9,6 +9,7 @@ import { TableConfig } from "./table-config";
 import { DefaultTextConfig } from "./default-text-config";
 import { DefaultValidationConfig } from "./default-validation-config";
 import { DefaultTableConfig } from "./default-table-config";
+
 
 /**
  * 应用配置

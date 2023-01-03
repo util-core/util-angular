@@ -1,5 +1,5 @@
 ﻿//============== 表单操作 ========================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
 import { HttpMethod } from "../http/http-method";
@@ -21,7 +21,7 @@ export class Form {
      * @param util 公共操作
      */
     constructor(private util: Util) {
-        this.config = util.ioc.get(AppConfig);
+        this.config = util.getAppConfig();
         initAppConfig(this.config);
     }
 

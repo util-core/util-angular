@@ -1,5 +1,5 @@
 ﻿//============== NgZorro表格扩展指令 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=======================================================
 import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
@@ -23,6 +23,10 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 操作入口
      */
     protected util: Util;
+    /**
+     * 应用配置
+     */
+    config: AppConfig
     /**
      * 是否显示进度条
      */
@@ -90,10 +94,10 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
 
     /**
      * 初始化表格扩展指令
-     * @param appConfig 应用配置
      */
-    constructor(@Optional() public config: AppConfig) {
+    constructor() {
         this.util = new Util();
+        this.config = this.util.getAppConfig();
         this.initAppConfig();
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();

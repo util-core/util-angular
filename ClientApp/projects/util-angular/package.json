@@ -1,12 +1,12 @@
 {
   "name": "util-angular",
-  "version": "0.3.3",
+  "version": "0.3.7",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/utilcore/util-angular"
+    "url": "https://github.com/util-core/util-angular"
   },
-  "homepage": "https://github.com/utilcore/util-angular",
+  "homepage": "https://github.com/util-core/util-angular",
   "license": "MIT",
   "keywords": [
     "util",

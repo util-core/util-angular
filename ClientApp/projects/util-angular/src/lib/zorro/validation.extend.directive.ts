@@ -1,5 +1,5 @@
 ﻿//============== NgZorro验证扩展指令 ====================
-//Copyright 2022 何镇汐
+//Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=======================================================
 import { Directive, Input, Optional } from '@angular/core';
@@ -19,6 +19,10 @@ export class ValidationExtendDirective {
      * 操作入口
      */
     protected util: Util;
+    /**
+     * 应用配置 
+     */
+    config: AppConfig;
     /**
      * 显示名称
      */
@@ -61,8 +65,9 @@ export class ValidationExtendDirective {
      * @param config 应用配置
      * @param controlModel 组件模型 
      */
-    constructor(@Optional() public config: AppConfig, @Optional() protected controlModel: NgModel ) {
+    constructor( @Optional() protected controlModel: NgModel ) {
         this.util = new Util();
+        this.config = this.util.getAppConfig();
         initAppConfig(this.config);
     }
 
