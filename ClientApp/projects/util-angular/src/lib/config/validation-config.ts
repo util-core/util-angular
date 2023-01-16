@@ -40,6 +40,14 @@ export class ValidationConfig {
      */
     emailMessage?;
     /**
+     * 手机号验证消息
+     */
+    phoneMessage?;
+    /**
+     * 身份证验证消息
+     */
+    idCardMessage?;
+    /**
      * 文件类型过滤消息
      */
     fileTypeMessage?;

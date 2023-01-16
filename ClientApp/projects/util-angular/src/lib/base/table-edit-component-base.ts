@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Component,Injector, ViewChild } from '@angular/core';
+import { Component, Injector, ViewChild } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { EditTableDirective } from "../zorro/edit-table.directive";
@@ -24,7 +24,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      * 初始化表格编辑组件
      * @param injector 注入器
      */
-    constructor(injector: Injector ) {
+    constructor(injector: Injector) {
         super(injector);
     }
 

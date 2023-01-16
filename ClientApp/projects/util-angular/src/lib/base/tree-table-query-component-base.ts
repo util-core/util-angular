@@ -75,7 +75,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
         handler = handler || this.onQuery;
         this.table.query({
             isSearch: false,
-            url:this.table.loadUrl,
+            url: this.table.loadUrl,
             button: button,
             ok: handler
         });
@@ -124,6 +124,30 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     }
 
     /**
+     * 启用
+     * @param ids 标识列表
+     */
+    enable(ids?) {
+        if (!this.table)
+            return;
+        this.table.enable({
+            ids: ids
+        });
+    }
+
+    /**
+     * 禁用
+     * @param ids 标识列表
+     */
+    disable(ids?) {
+        if (!this.table)
+            return;
+        this.table.disable({
+            ids: ids
+        });
+    }
+
+    /**
      * 勾选标识列表
      * @param checkedIds 要勾选的标识列表
      */
@@ -163,7 +187,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     selectRow(node, event?) {
         if (!this.table)
             return;
-        this.table.selectRow( node );
+        this.table.selectRow(node);
         event && event.stopPropagation();
     }
 

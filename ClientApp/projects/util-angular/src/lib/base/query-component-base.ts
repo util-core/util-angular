@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { Input, Injector, Component } from '@angular/core';
-import { Util } from "../util";
+import { ComponentBase } from './component-base';
 
 /**
  * 查询组件基类
@@ -11,11 +11,7 @@ import { Util } from "../util";
 @Component({
     template: ''
 })
-export abstract class QueryComponentBase {
-    /**
-     * 公共操作
-     */
-    protected util: Util;
+export abstract class QueryComponentBase extends ComponentBase {
     /**
      * 是否展开
      */
@@ -34,7 +30,7 @@ export abstract class QueryComponentBase {
      * @param injector 注入器
      */
     constructor(injector: Injector) {
-        this.util = new Util(injector);
+        super(injector);
     }
 
     /**
@@ -92,7 +88,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取创建弹出框组件
      */
-    protected getCreateDialogComponent(): any {
+    protected getCreateDialogComponent() {
         return {};
     }
 
@@ -106,7 +102,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取创建弹出框数据
      */
-    protected getCreateDialogData(data?): any {
+    protected getCreateDialogData(data?) {
         return {};
     }
 
@@ -175,7 +171,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取更新弹出框组件
      */
-    protected getEditDialogComponent(): any {
+    protected getEditDialogComponent() {
         return this.getCreateDialogComponent();
     }
 
@@ -189,7 +185,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取更新弹出框数据
      */
-    protected getEditDialogData(data): any {
+    protected getEditDialogData(data) {
         if (!data)
             return null;
         return { id: data.id, data: data };
@@ -243,7 +239,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取详情弹出框组件
      */
-    protected getDetailDialogComponent(): any {
+    protected getDetailDialogComponent() {
         return {};
     }
 
@@ -257,7 +253,7 @@ export abstract class QueryComponentBase {
     /**
      * 获取详情弹出框数据
      */
-    protected getDetailDialogData(data): any {
+    protected getDetailDialogData(data) {
         return this.getEditDialogData(data);
     }
 

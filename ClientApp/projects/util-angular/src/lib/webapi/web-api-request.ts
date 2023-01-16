@@ -179,7 +179,8 @@ export class WebApiRequest<T> {
      */
     private handleFail(options: WebApiHandleOptions<T>, result?: Result<T>, errorResponse?: HttpErrorResponse) {
         let failResult = new FailResult(result, errorResponse);
-        this.handleHttpException(options, failResult);
+        this.handleHttpException(failResult);
+        this.handleComplete(options);
         if (options.fail) {
             options.fail(failResult);
             return;
@@ -193,10 +194,9 @@ export class WebApiRequest<T> {
     /**
      * 处理Http异常
      */
-    private handleHttpException(options: WebApiHandleOptions<T>, failResult: FailResult) {
+    private handleHttpException( failResult: FailResult) {
         if (failResult.errorResponse)
             console.log(this.getHttpExceptionMessage(failResult));
-        options.complete && options.complete();
     }
 
     /**

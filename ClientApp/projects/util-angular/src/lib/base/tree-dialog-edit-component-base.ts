@@ -23,8 +23,8 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
      * 初始化组件
      * @param injector 注入器
      */
-    constructor( injector: Injector ) {
-        super( injector );
+    constructor(injector: Injector) {
+        super(injector);
     }
 
     /**
@@ -39,15 +39,15 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
      * 初始化父节点
      */
     protected initParent() {
-        this.setParent( this.getParent() );
+        this.setParent(this.getParent());
     }
 
     /**
      * 设置父节点
      * @param parent 父节点
      */
-    protected setParent( parent?) {
-        if ( !parent ) {
+    protected setParent(parent?) {
+        if (!parent) {
             this.parent = null;
             this.model.parentId = null;
             this.model.parentName = null;
@@ -55,16 +55,16 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
         }
         this.parent = parent;
         this.model.parentId = parent.id;
-        this.model.parentName = this.getParentName( parent );
+        this.model.parentName = this.getParentName(parent);
     }
 
     /**
      * 获取父节点
      */
     protected getParent() {
-        if ( this.parent )
+        if (this.parent)
             return this.parent;
-        if ( this.data && this.data.parentId )
+        if (this.data && this.data.parentId)
             return { id: this.data.parentId, name: this.data.parentName };
         return null;
     }
@@ -72,15 +72,15 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
     /**
      * 获取父节点名称
      */
-    protected getParentName( parent ) {
+    protected getParentName(parent) {
         return parent && parent.name;
     }
 
     /**
      * 加载完成操作
      */
-    protected onLoad( result ) {
-        this.setParent( this.getParent() );
+    protected onLoad(result) {
+        this.setParent(this.getParent());
     }
 
     /**
@@ -89,12 +89,12 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
      * @param form 表单
      */
     submit(button?, form?: NgForm) {
-        this.util.form.submit( {
+        this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,
             form: form || this.form,
             button: button,
             closeDialog: true
-        } );
+        });
     }
 }

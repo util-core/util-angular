@@ -18,8 +18,8 @@ export abstract class DialogEditComponentBase<TViewModel extends ViewModel> exte
      * 初始化组件
      * @param injector 注入器
      */
-    constructor( injector: Injector ) {
-        super( injector );
+    constructor(injector: Injector) {
+        super(injector);
     }
 
     /**
@@ -28,22 +28,22 @@ export abstract class DialogEditComponentBase<TViewModel extends ViewModel> exte
      * @param form 表单
      */
     submit(button?, form?: NgForm) {
-        this.util.form.submit( {
+        this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,
             form: form || this.form,
             button: button,
             closeDialog: true,
-            before: data => this.onSubmitBefore( data ),
-            ok: result => this.onSubmit( result )
-        } );
+            before: data => this.onSubmitBefore(data),
+            ok: result => this.onSubmit(result)
+        });
     }
 
     /**
      * 提交前操作
      * @param data 参数
      */
-    protected onSubmitBefore( data ) {
+    protected onSubmitBefore(data) {
         return true;
     }
 
@@ -51,6 +51,6 @@ export abstract class DialogEditComponentBase<TViewModel extends ViewModel> exte
      * 提交后操作
      * @param result 结果
      */
-    protected onSubmit( result ) {
+    protected onSubmit(result) {
     }
 }

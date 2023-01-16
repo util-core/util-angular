@@ -20,10 +20,6 @@ export class ValidationExtendDirective {
      */
     protected util: Util;
     /**
-     * 应用配置 
-     */
-    config: AppConfig;
-    /**
      * 显示名称
      */
     @Input() displayName: string;
@@ -59,15 +55,39 @@ export class ValidationExtendDirective {
      * 最大值验证消息
      */
     @Input() maxMessage: string;
+    /**
+     * 电子邮件验证消息
+     */
+    @Input() emailMessage: string;
+    /**
+     * 正则表达式验证消息
+     */
+    @Input() patternMessage: string;
+    /**
+     * 是否无效手机号
+     */
+    @Input() isInvalidPhone: boolean;
+    /**
+     * 是否无效身份证
+     */
+    @Input() isInvalidIdCard: boolean;
 
     /**
-     * 初始化输入框扩展指令
+     * 初始化验证扩展指令
+     * @param controlModel 组件模型
      * @param config 应用配置
-     * @param controlModel 组件模型 
      */
-    constructor( @Optional() protected controlModel: NgModel ) {
-        this.util = new Util();
-        this.config = this.util.getAppConfig();
+    constructor(@Optional() protected controlModel: NgModel, @Optional() public config: AppConfig) {
+        this.initAppConfig();
+        this.util = new Util(null, config);
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
         initAppConfig(this.config);
     }
 
@@ -85,6 +105,14 @@ export class ValidationExtendDirective {
             return this.getMinMessage();
         if (this.controlModel.hasError('max'))
             return this.getMaxMessage();
+        if (this.controlModel.hasError('email'))
+            return this.getEmailMessage();
+        if (this.isInvalidPhone)
+            return this.getPhoneMessage();
+        if (this.isInvalidIdCard)
+            return this.getIdCardMessage();
+        if (this.controlModel.hasError('pattern'))
+            return this.getPatternMessage();
         return "";
     }
 
@@ -143,6 +171,45 @@ export class ValidationExtendDirective {
         if (this.maxMessage)
             result = this.maxMessage;
         return this.replace(result, this.max);
+    }
+
+    /**
+     * 获取电子邮件验证消息
+     */
+    private getEmailMessage() {
+        let result = this.config.validation.emailMessage;
+        if (this.emailMessage)
+            result = this.emailMessage;
+        return this.replace(result);
+    }
+
+    /**
+     * 获取手机号验证消息
+     */
+    private getPhoneMessage() {
+        let result = this.config.validation.phoneMessage;
+        if (this.patternMessage)
+            result = this.patternMessage;
+        return this.replace(result);
+    }
+
+    /**
+     * 获取身份证验证消息
+     */
+    private getIdCardMessage() {
+        let result = this.config.validation.idCardMessage;
+        if (this.patternMessage)
+            result = this.patternMessage;
+        return this.replace(result);
+    }
+
+    /**
+     * 获取正则表达式验证消息
+     */
+    private getPatternMessage() {
+        if (this.patternMessage)
+            return this.replace(this.patternMessage);
+        return null;
     }
 }
 

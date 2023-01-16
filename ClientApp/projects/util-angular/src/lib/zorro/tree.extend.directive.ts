@@ -2,13 +2,14 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, OnInit, EventEmitter,Inject,Optional } from '@angular/core';
+import { Directive, Input, Output, OnInit, EventEmitter,Optional } from '@angular/core';
 import { NzTreeNodeOptions, NzTreeNode, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
 import { NzTreeSelectComponent } from "ng-zorro-antd/tree-select";
 import { Util } from "../util";
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
+import { AppConfig } from '../config/app-config';
 
 /**
  * NgZorro树形扩展指令
@@ -110,8 +111,8 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 初始化树形扩展指令
      */
-    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent) {
-        this.util = new Util();
+    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent, @Optional() config: AppConfig) {
+        this.util = new Util(null, config);
         this.tree = treeComponent || treeSelectComponent;
         this.dataSource = new Array<any>();
         this.autoLoad = true;

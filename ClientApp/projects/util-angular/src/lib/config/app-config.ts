@@ -3,13 +3,13 @@
 //Licensed under the MIT license
 //========================================================
 import { Injectable } from '@angular/core';
+import { assign } from "../common/helper";
 import { TextConfig } from "./text-config";
 import { ValidationConfig } from "./validation-config";
 import { TableConfig } from "./table-config";
 import { DefaultTextConfig } from "./default-text-config";
 import { DefaultValidationConfig } from "./default-validation-config";
 import { DefaultTableConfig } from "./default-table-config";
-
 
 /**
  * 应用配置
@@ -45,7 +45,7 @@ export class AppConfig {
 export function initAppConfig(config: AppConfig) {
     if (!config)
         return;
-    config.text = config.text || DefaultTextConfig;
-    config.validation = config.validation || DefaultValidationConfig;
-    config.table = config.table || DefaultTableConfig;
+    config.text = assign(DefaultTextConfig, config.text);
+    config.validation = assign(DefaultValidationConfig,config.validation);
+    config.table = assign(DefaultTableConfig,config.table);
 }

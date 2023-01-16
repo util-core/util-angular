@@ -17,7 +17,6 @@ export * from "./lib/core/load-mode";
 
 //导出config
 export * from "./lib/config/app-config";
-export * from "./lib/config/module-config";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
@@ -36,6 +35,7 @@ export * from "./lib/webapi/web-api-handle-options";
 export * from "./lib/form/form-submit-option";
 
 //导出base
+export * from "./lib/base/component-base";
 export * from "./lib/base/query-component-base";
 export * from "./lib/base/table-query-component-base";
 export * from "./lib/base/edit-component-base";

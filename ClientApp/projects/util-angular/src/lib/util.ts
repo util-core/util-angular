@@ -11,8 +11,8 @@ import { Dialog } from "./dialog/dialog";
 import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
+import { I18n } from "./common/i18n";
 import { AppConfig } from './config/app-config';
-import { ModuleCofig } from './config/module-config';
 import { DefaultConfig } from "./config/default-config";
 
 /**
@@ -47,13 +47,23 @@ export class Util {
     * Form操作
     */
     private _form: Form;
+    /**
+    * 国际化操作
+    */
+    private _i18n: I18n;
 
     /**
      * 初始化操作入口
      * @param componentInjector 组件注入器
+     * @param appConfig 应用配置
      */
-    constructor(private componentInjector: Injector = null) {
+    constructor(private componentInjector: Injector = null, private appConfig: AppConfig = null) {
     }
+
+    /**
+     * 跟踪号
+     */
+    static traceId: string = Helper.uuid();
 
     /**
      * 全局注入器
@@ -129,6 +139,15 @@ export class Util {
     };
 
     /**
+    * 国际化操作
+    */
+    get i18n() {
+        if (!this._i18n)
+            this._i18n = new I18n(this);
+        return this._i18n;
+    };
+
+    /**
      * 初始化
      * @param injector 全局注入器
      */
@@ -152,9 +171,8 @@ export class Util {
      * 获取应用配置
      */
     getAppConfig() {
-        let result = this.ioc.get(ModuleCofig);
-        if (result)
-            return result;
+        if (this.appConfig)
+            return this.appConfig;
         return this.ioc.get(AppConfig);
     }
 }

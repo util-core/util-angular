@@ -4,8 +4,8 @@
 //================================================
 import { Injector, Component, ViewChild, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Util } from "../util";
 import { ViewModel } from "../core/view-model";
+import { ComponentBase } from './component-base';
 
 /**
  * 编辑组件基类
@@ -13,11 +13,7 @@ import { ViewModel } from "../core/view-model";
 @Component({
     template: ''
 })
-export abstract class EditComponentBase<TViewModel extends ViewModel> implements OnInit {
-    /**
-     * 公共操作
-     */
-    protected util: Util;
+export abstract class EditComponentBase<TViewModel extends ViewModel> extends ComponentBase implements OnInit {
     /**
      * 表单
      */
@@ -44,7 +40,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param injector 注入器
      */
     constructor(injector: Injector) {
-        this.util = new Util(injector);
+        super(injector);
         this.isNew = true;
         this.model = <TViewModel>{};
     }
@@ -70,12 +66,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      */
     protected loadById(id = null) {
         if (this.onLoadBefore(id) === false)
-            return;
-        if (this.isRequestLoad() === false && this.data) {
-            let model = this.toModel(this.data);
-            this.loadModel(model);
-            return;
-        }
+            return;       
         id = id || this.id || this.util.router.getParam("id");
         if (!id)
             return;
@@ -93,13 +84,6 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param id 标识
      */
     protected onLoadBefore(id) {
-        return true;
-    }
-
-    /**
-     * 是否远程加载
-     */
-    protected isRequestLoad() {
         return true;
     }
 
@@ -146,7 +130,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param path 路径
      */
     protected getUrl(url: string, path: string) {
-        return this.util.helper.getUrl(url,null, path);
+        return this.util.helper.getUrl(url, null, path);
     }
 
     /**
@@ -154,7 +138,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> implements
      * @param button 按钮
      * @param form 表单
      */
-    submit(button?, form?: NgForm ) {
+    submit(button?, form?: NgForm) {
         this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,

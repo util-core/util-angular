@@ -2,11 +2,12 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, HostListener, Input } from '@angular/core';
+import { Directive, HostListener, Input, Optional } from '@angular/core';
 import { TableExtendDirective } from "./table.extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
 import { HttpMethod } from '../http/http-method';
+import { AppConfig } from '../config/app-config';
 
 /**
  * NgZorro表格编辑扩展指令
@@ -56,9 +57,10 @@ export class EditTableDirective {
     /**
      * 初始化编辑表格扩展指令
      * @param table 表格扩展指令
+     * @param config 应用配置
      */
-    constructor(private table: TableExtendDirective<any>) {
-        this.util = new Util();
+    constructor(private table: TableExtendDirective<any>, @Optional() config: AppConfig) {
+        this.util = new Util(null, config);
         this.dblClickStartEdit = true;
         this.rows = new Map<string, EditRowDirective>();
         this.creationIds = [];

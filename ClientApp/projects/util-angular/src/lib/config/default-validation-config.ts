@@ -15,6 +15,8 @@ export const DefaultValidationConfig: ValidationConfig = {
     minMessage: "{0}最小值为 {1}",
     maxMessage: "{0}最大值为 {1}",
     emailMessage: "请输入有效的电子邮件",
+    phoneMessage: "请输入有效的手机号",
+    idCardMessage:"请输入有效的身份证号",
     fileTypeMessage: "{0} 文件格式不正确",
     fileSizeMessage: "{0} 文件过大，单个文件不能超过 {1} KB",
     fileLimitMessage: "您选择的文件过多，单次上传文件最多不能超过 {0} 个"

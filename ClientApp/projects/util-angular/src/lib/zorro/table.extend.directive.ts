@@ -24,10 +24,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     protected util: Util;
     /**
-     * 应用配置
-     */
-    config: AppConfig
-    /**
      * 是否显示进度条
      */
     loading: boolean;
@@ -94,11 +90,11 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
 
     /**
      * 初始化表格扩展指令
+     * @param config 应用配置
      */
-    constructor() {
-        this.util = new Util();
-        this.config = this.util.getAppConfig();
+    constructor(@Optional() public config: AppConfig) {
         this.initAppConfig();
+        this.util = new Util(null, config);        
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
@@ -227,7 +223,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * @param url 地址
      * @param path 路径
      */
-    private getUrl(url: string, path: string) {
+    protected getUrl(url: string, path: string) {
         return this.util.helper.getUrl(url, null, path);
     }
 

@@ -2,13 +2,14 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, Input, Output, EventEmitter } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, Optional } from '@angular/core';
 import { IKey } from "../core/key";
 import { TreeNode } from "../core/tree-node";
 import { PageList } from "../core/page-list";
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
+import { AppConfig } from '../config/app-config';
 
 /**
  * NgZorro树形表格扩展指令
@@ -65,9 +66,10 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
 
     /**
      * 初始化树形表格扩展指令
+     * @param config 应用配置
      */
-    constructor() {
-        super();
+    constructor(@Optional() config: AppConfig) {
+        super(config);
     }
 
     /**
@@ -154,7 +156,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                     this.loading = false;
                     options.complete && options.complete();
                 }
-        });
+            });
     }
 
     /**
@@ -289,7 +291,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                     this.loading = false;
                     this.queryParam.parentId = null;
                 }
-        });
+            });
     }
 
     /**
@@ -413,6 +415,96 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         let isChecked = children.some(item => this.checkedSelection.isSelected(item));
         let isAllChecked = children.every(item => this.checkedSelection.isSelected(item));
         return isChecked && !isAllChecked;
+    }
+
+    /**
+     * 启用
+     * @param options 参数
+     */
+    enable(options?: {
+        /**
+         * 待启用的Id列表，多个Id用逗号分隔，范例：1,2,3
+         */
+        ids?: string,
+        /**
+         * 服务端Api地址
+         */
+        url?: string,
+        /**
+         * 请求前处理函数，返回false则取消提交
+         */
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         */
+        ok?: () => void;
+    }) {
+        options = options || {};
+        let ids = options.ids || this.getCheckedIds();
+        if (!ids) {
+            this.util.message.warn(this.config.text.notSelected);
+            return;
+        }
+        let url = options.url || this.getUrl(this.url, "enable");
+        this.util.message.confirm({
+            content: this.config.text.enableConfirm,
+            onOk: () => this.enableRequest(ids, options.before, options.ok, url)
+        });
+    }
+
+    /**
+     * 发送启用请求
+     */
+    private async enableRequest(ids?: string, before?: () => boolean, ok?: () => void, url?: string) {
+        if (!url)
+            return;
+        await this.util.webapi.post(url, ids).handleAsync({
+            ok: () => {
+                this.util.message.success(this.config.text.successed);
+                this.query({
+                    before: before,
+                    ok: result => {
+                        this.loadData(result);
+                        ok && ok();
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 禁用
+     * @param options 参数
+     */
+    disable(options?: {
+        /**
+         * 待禁用的Id列表，多个Id用逗号分隔，范例：1,2,3
+         */
+        ids?: string,
+        /**
+         * 服务端Api地址
+         */
+        url?: string,
+        /**
+         * 请求前处理函数，返回false则取消提交
+         */
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         */
+        ok?: () => void;
+    }) {
+        options = options || {};
+        let ids = options.ids || this.getCheckedIds();
+        if (!ids) {
+            this.util.message.warn(this.config.text.notSelected);
+            return;
+        }
+        let url = options.url || this.getUrl(this.url, "disable");
+        this.util.message.confirm({
+            content: this.config.text.disableConfirm,
+            onOk: () => this.enableRequest(ids, options.before, options.ok, url)
+        });
     }
 }
 

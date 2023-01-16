@@ -72,6 +72,14 @@ export class TextConfig {
      */
     deleteNotSelected?;
     /**
+     * 请选择待启用的记录
+     */
+    enableNotSelected?;
+    /**
+     * 请选择待禁用的记录
+     */
+    disableNotSelected?;
+    /**
      * 操作成功
      */
     successed?;
