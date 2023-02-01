@@ -88,7 +88,7 @@ export class SelectExtendDirective implements OnInit {
      */
     constructor(@Optional() public config: AppConfig) {
         this.initAppConfig();
-        this.util = new Util(null, config);
+        this.util = new Util(null, this.config);
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;

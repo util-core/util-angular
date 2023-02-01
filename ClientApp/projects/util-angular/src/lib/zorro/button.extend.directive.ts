@@ -6,6 +6,7 @@ import { Directive, Input, Optional } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { Util } from "../util";
+import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
  * NgZorro按钮扩展指令
@@ -26,12 +27,22 @@ export class ButtonExtendDirective  {
 
     /**
      * 初始化按钮扩展指令
-     * @param config 文本配置
      * @param form 表单
      * @param button 按钮
+     * @param config 配置
      */
-    constructor( @Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent ) {
-        this.util = new Util();
+    constructor(@Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent, @Optional() protected config: AppConfig) {
+        this.initAppConfig();
+        this.util = new Util(null,this.config);
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
     }
 
     /**

@@ -55,6 +55,9 @@ export * from "./lib/zorro/select.extend.directive";
 export * from "./lib/zorro/tree.table.extend.directive";
 export * from "./lib/zorro/tree.extend.directive";
 
+//导出tinymce
+export * from "./lib/tinymce/tinymce.extend.directive";
+
 //导出util入口
 export * from "./lib/util";
 export * from "./lib/util.module";

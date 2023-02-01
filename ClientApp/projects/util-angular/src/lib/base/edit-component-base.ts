@@ -64,7 +64,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * 通过标识加载
      * @param id 标识
      */
-    protected loadById(id = null) {
+    protected loadById(id?) {
         if (this.onLoadBefore(id) === false)
             return;       
         id = id || this.id || this.util.router.getParam("id");
@@ -83,7 +83,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * 加载前操作,返回false阻止加载
      * @param id 标识
      */
-    protected onLoadBefore(id) {
+    protected onLoadBefore(id?) {
         return true;
     }
 
@@ -130,6 +130,8 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * @param path 路径
      */
     protected getUrl(url: string, path: string) {
+        if (!url)
+            return null;
         return this.util.helper.getUrl(url, null, path);
     }
 

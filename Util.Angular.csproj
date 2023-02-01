@@ -1,17 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<SpaRoot>ClientApp\</SpaRoot>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.9" />
-		<PackageReference Include="Util.Data.Core" Version="6.0.127" />
-		<PackageReference Include="Util.Logging.Serilog.Exceptionless" Version="6.0.127" />
-		<PackageReference Include="Util.Ui.NgZorro" Version="6.0.127" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.2" />
+		<PackageReference Include="Util.Data.Core" Version="7.0.12" />
+		<PackageReference Include="Util.Domain.Biz" Version="7.0.12" />
+		<PackageReference Include="Util.Logging.Serilog.Exceptionless" Version="7.0.12" />
+		<PackageReference Include="Util.Ui.NgAlain" Version="7.0.12" />
+		<PackageReference Include="Util.Ui.NgZorro" Version="7.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -43,6 +45,4 @@
 			</ResolvedFileToPublish>
 		</ItemGroup>
 	</Target>
-
-	<ProjectExtensions><VisualStudio><UserProperties clientapp_4angular_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

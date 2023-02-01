@@ -62,6 +62,9 @@ import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzTreeModule } from 'ng-zorro-antd/tree';
+import { NgxTinymceModule } from 'ngx-tinymce';
+import { AlainThemeModule } from '@delon/theme';
 //µº»Îutil
 import { UtilModule } from "util-angular";
 
@@ -75,8 +78,9 @@ import { UtilModule } from "util-angular";
         NzMentionModule, NzRateModule, NzSwitchModule, NzTransferModule, NzTreeSelectModule, NzBadgeModule, NzCalendarModule, NzCarouselModule,
         NzCollapseModule, NzCommentModule, NzEmptyModule, NzImageModule, NzListModule, NzTableModule, NzTimelineModule, NzTreeViewModule,
         NzAlertModule, NzDrawerModule, NzModalModule, NzPopconfirmModule, NzProgressModule, NzResultModule, NzSkeletonModule, NzSpinModule, NzAnchorModule,
-        NzMessageModule,
-        UtilModule]
+        NzMessageModule, NzTreeModule,
+        AlainThemeModule,
+        NgxTinymceModule,UtilModule]
 })
 export class ShareModule {
 }

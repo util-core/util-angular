@@ -10,6 +10,7 @@ import { QueryParameter } from "../core/query-parameter";
 import { PageList } from "../core/page-list";
 import { FailResult } from "../core/fail-result";
 import { AppConfig, initAppConfig } from '../config/app-config';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro表格扩展指令
@@ -64,6 +65,10 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     @Input() url: string;
     /**
+     * 通过标识加载地址
+     */
+    @Input() loadByIdUrl: string;
+    /**
      * 删除地址，注意：由于支持批量删除，所以采用Post提交，范例：/api/test/delete
      */
     @Input() deleteUrl: string;
@@ -94,7 +99,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     constructor(@Optional() public config: AppConfig) {
         this.initAppConfig();
-        this.util = new Util(null, config);        
+        this.util = new Util(null, this.config);
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
@@ -128,7 +133,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 初始化分页大小
      */
-    private initPageSize() {
+    protected initPageSize() {
         if (this.pageSizeOptions && this.pageSizeOptions.length > 0)
             this.queryParam.pageSize = this.pageSizeOptions[0];
     }
@@ -224,6 +229,8 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * @param path 路径
      */
     protected getUrl(url: string, path: string) {
+        if (!url)
+            return null;
         return this.util.helper.getUrl(url, null, path);
     }
 
@@ -244,38 +251,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * @param result
      */
     loadAfter(result) {
-    }
-
-    /**
-     * 刷新
-     * @param queryParam 查询参数
-     * @param button 按钮
-     * @param handler 刷新成功回调函数
-     */
-    refresh(queryParam?: QueryParameter, button?, handler?: (result) => void) {
-        this.clear();
-        if (queryParam) {
-            this.queryParam = queryParam;
-            this.queryParamChange.emit(queryParam);
-        }
-        this.initPageSize();
-        this.queryParam.order = this.order;
-        this.query({
-            button: button,
-            ok: handler
-        });
-    }
-
-    /**
-     * 清理
-     */
-    clear() {
-        this.dataSource = [];
-        this.queryParam.page = 1;
-        this.total = 0;
-        this.checkedSelection.clear();
-        this.selectedSelection.clear();
-        this.checkedKeys = null;
     }
 
     /**
@@ -303,11 +278,11 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         options = options || {};
         let ids = options.ids || this.getCheckedIds();
         if (!ids) {
-            this.util.message.warn(this.config.text.deleteNotSelected);
+            this.util.message.warn(I18nKeys.noDeleteItemSelected);
             return;
         }
         this.util.message.confirm({
-            content: this.config.text.deleteConfirm,
+            content: I18nKeys.deleteConfirmation,
             onOk: () => this.deleteRequest(ids, options.before, options.ok, options.url)
         });
     }
@@ -321,7 +296,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
             return;
         await this.util.webapi.post(url, ids).handleAsync({
             ok: () => {
-                this.util.message.success(this.config.text.deleteSuccessed);
+                this.util.message.success(I18nKeys.deleteSuccessed);
                 this.query({
                     before: before,
                     ok: result => {
@@ -585,7 +560,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         if (!ids || ids.length === 0)
             ids = this.getChecked().map(value => value.id);
         if (!ids || ids.length === 0) {
-            this.util.message.warn(this.config.text.deleteNotSelected);
+            this.util.message.warn(I18nKeys.noDeleteItemSelected);
             return null;
         }
         let result = this.util.helper.remove(this.dataSource, row => ids.findIndex(id => row.id === id) > -1);
@@ -594,6 +569,116 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         this.initLineNumbers(this.dataSource);
         this.checkedSelection.deselect(...result);
         return result;
+    }
+
+    /**
+     * 刷新
+     * @param queryParam 查询参数
+     * @param button 按钮
+     * @param handler 刷新成功回调函数
+     */
+    refresh(queryParam?: QueryParameter, button?, handler?: (result) => void) {
+        this.clear();
+        if (queryParam) {
+            this.queryParam = queryParam;
+            this.queryParamChange.emit(queryParam);
+        }
+        this.initPageSize();
+        this.queryParam.order = this.order;
+        this.query({
+            button: button,
+            ok: handler
+        });
+    }
+
+    /**
+     * 通过标识刷新
+     * @param options 配置
+     */
+    refreshById(options?: {
+        /**
+         * 标识或单个对象
+         */
+        id?,
+        /**
+         * 请求地址
+         */
+        url?: string,
+        /**
+         * 请求前处理函数，返回false则取消提交
+         */
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         * @param result 结果
+         */
+        ok?: (result) => void;
+        /**
+         * 请求失败处理函数
+         */
+        fail?: (result: FailResult) => void;
+        /**
+         * 请求完成处理函数
+         */
+        complete?: () => void;
+    }) {
+        options = options || {};
+        if (options.id.id) {
+            this.refreshNode(options.id);
+            return;
+        }
+        let url = options.url || this.getUrl(this.loadByIdUrl, options.id) || this.getUrl(this.url, options.id);
+        if (!url)
+            return;
+        this.util.webapi.get<any>(url).handle({
+            before: () => {
+                this.loading = true;
+                if (options.before)
+                    return options.before();
+                return true;
+            },
+            ok: result => {
+                this.refreshNode(result);
+                options.ok && options.ok(result);
+            },
+            fail: options.fail,
+            complete: () => {
+                this.loading = false;
+                options.complete && options.complete();
+            }
+        });
+    }
+
+    /**
+     * 刷新单个节点
+     * @param data 单个对象数据
+     */
+    protected refreshNode(data) {
+        if (!data)
+            return;
+        if (!data.id)
+            return;
+        for (var i = 0; i < this.dataSource.length; i++) {
+            let item = this.dataSource[i];
+            if (item.id === data.id) {
+                let index = this.dataSource.indexOf(item);
+                data["lineNumber"] = item["lineNumber"];
+                this.dataSource[index] = data;
+                return;
+            }
+        }
+    }
+
+    /**
+     * 清理
+     */
+    clear() {
+        this.dataSource = [];
+        this.queryParam.page = 1;
+        this.total = 0;
+        this.checkedSelection.clear();
+        this.selectedSelection.clear();
+        this.checkedKeys = null;
     }
 }
 

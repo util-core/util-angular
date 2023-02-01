@@ -50,6 +50,15 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     }
 
     /**
+     * 创建弹出框关闭回调函数
+     * @param result 返回结果
+     */
+    protected onCreateClose(result) {
+        if (result)
+            this.refreshById(result);
+    }
+
+    /**
      * 加载勾选的复选框标识
      */
     protected loadCheckedIds() {
@@ -90,7 +99,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
         if (!this.table)
             return;
         handler = handler || this.onQuery;
-        this.table.query({
+        this.table.search({
             button: button,
             ok: handler
         });
@@ -177,6 +186,20 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
      */
     protected onRefresh = data => {
         this.checkIds();
+    }
+
+    /**
+     * 通过标识刷新单个节点
+     * @param id 标识
+     * @param handler 刷新后回调函数
+     */
+    refreshById(id, handler?: (data) => void) {
+        if (!this.table)
+            return;
+        this.table.refreshById({
+            id: id,
+            ok: handler
+        });
     }
 
     /**

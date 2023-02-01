@@ -5,7 +5,8 @@
 import { Directive, Input, Optional } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Util } from "../util";
-import { AppConfig,initAppConfig } from '../config/app-config';
+import { AppConfig, initAppConfig } from '../config/app-config';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro验证扩展指令
@@ -79,7 +80,7 @@ export class ValidationExtendDirective {
      */
     constructor(@Optional() protected controlModel: NgModel, @Optional() public config: AppConfig) {
         this.initAppConfig();
-        this.util = new Util(null, config);
+        this.util = new Util(null, this.config);
     }
 
     /**
@@ -120,10 +121,17 @@ export class ValidationExtendDirective {
      * 获取必填项验证消息
      */
     private getRequiredMessage() {
-        let result = this.config.validation.requiredMessage;
+        let result = this.getDefaultMessage(I18nKeys.requiredMessage);
         if (this.requiredMessage)
             result = this.requiredMessage;
         return this.replace(result);
+    }
+
+    /**
+     * 获取默认验证消息
+     */
+    private getDefaultMessage(key) {
+        return this.util.i18n.get(key);
     }
 
     /**
@@ -138,16 +146,14 @@ export class ValidationExtendDirective {
      * 获取显示名称
      */
     private getDisplayName() {
-        if (this.displayName)
-            return this.displayName;
-        return this.config.text.defaultDisplayName;
+        return this.util.i18n.get(this.displayName);
     }
 
     /**
      * 获取最小长度验证消息
      */
     private getMinLengthMessage() {
-        let result = this.config.validation.minLengthMessage;
+        let result = this.getDefaultMessage(I18nKeys.minLengthMessage);
         if (this.minLengthMessage)
             result = this.minLengthMessage;
         return this.replace(result, this.minlength);
@@ -157,7 +163,7 @@ export class ValidationExtendDirective {
      * 获取最小值验证消息
      */
     private getMinMessage() {
-        let result = this.config.validation.minMessage;
+        let result = this.getDefaultMessage(I18nKeys.minMessage);
         if (this.minMessage)
             result = this.minMessage;
         return this.replace(result, this.min);
@@ -167,7 +173,7 @@ export class ValidationExtendDirective {
      * 获取最大值验证消息
      */
     private getMaxMessage() {
-        let result = this.config.validation.maxMessage;
+        let result = this.getDefaultMessage(I18nKeys.maxMessage);
         if (this.maxMessage)
             result = this.maxMessage;
         return this.replace(result, this.max);
@@ -177,7 +183,7 @@ export class ValidationExtendDirective {
      * 获取电子邮件验证消息
      */
     private getEmailMessage() {
-        let result = this.config.validation.emailMessage;
+        let result = this.getDefaultMessage(I18nKeys.emailMessage);
         if (this.emailMessage)
             result = this.emailMessage;
         return this.replace(result);
@@ -187,7 +193,7 @@ export class ValidationExtendDirective {
      * 获取手机号验证消息
      */
     private getPhoneMessage() {
-        let result = this.config.validation.phoneMessage;
+        let result = this.getDefaultMessage(I18nKeys.phoneMessage);
         if (this.patternMessage)
             result = this.patternMessage;
         return this.replace(result);
@@ -197,7 +203,7 @@ export class ValidationExtendDirective {
      * 获取身份证验证消息
      */
     private getIdCardMessage() {
-        let result = this.config.validation.idCardMessage;
+        let result = this.getDefaultMessage(I18nKeys.idCardMessage);
         if (this.patternMessage)
             result = this.patternMessage;
         return this.replace(result);

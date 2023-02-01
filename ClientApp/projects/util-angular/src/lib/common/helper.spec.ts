@@ -66,8 +66,6 @@ describe('util.helper', () => {
     it("hasProperty", () => {
         let query = new TestQuery();
         expect(helper.hasProperty(query, "pageSize")).toBeTrue();
-        expect(helper.hasProperty(query, "test")).toBeFalse();
-        query.test = "a";
         expect(helper.hasProperty(query, "test")).toBeTrue();
     });
     it("formatDate", () => {

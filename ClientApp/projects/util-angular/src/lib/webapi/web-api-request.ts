@@ -10,7 +10,6 @@ import { HttpContentType } from "../http/http-content-type";
 import { HttpRequest } from "../http/http-request";
 import { WebApiHandleOptions } from "./web-api-handle-options";
 import { Util } from "../util";
-import { NzSpinComponent } from 'ng-zorro-antd/spin';
 
 /**
  * WebApi请求操作
@@ -31,6 +30,24 @@ export class WebApiRequest<T> {
      * @param message 消息操作
      */
     constructor(private request: HttpRequest<Result<T>>, private util: Util) {
+    }
+
+    /**
+     * 设置请求重试次数
+     * @param value 请求重试次数,默认值: 3
+     */
+    retry(value: number): WebApiRequest<T> {
+        this.request.retry(value);
+        return this;
+    }
+
+    /**
+     * 设置跨域是否允许携带cookie
+     * @param value 设置为true则允许携带,默认值: true
+     */
+    withCredentials(value: boolean = true): WebApiRequest<T> {
+        this.request.withCredentials(value);
+        return this;
     }
 
     /**
@@ -126,8 +143,8 @@ export class WebApiRequest<T> {
     /**
      * 请求时显示进度条
      */
-    loading(isShowLoading?: boolean): WebApiRequest<T> {
-        this.isShowLoading = isShowLoading === undefined ? true : isShowLoading;
+    loading(isShowLoading: boolean = true): WebApiRequest<T> {
+        this.isShowLoading = isShowLoading;
         return this;
     }
 
@@ -239,17 +256,8 @@ export class WebApiRequest<T> {
     private showLoading() {
         if ( this.btn )
             this.btn.nzLoading = true;
-        if (this.isShowLoading) {
-            this.util.dialog.open({
-                component: NzSpinComponent,
-                centered: true,
-                showClose: false,
-                showOk: false,
-                showCancel: false,
-                showFooter: false,
-                disableClose: true
-            });
-        }
+        if (this.isShowLoading)
+            this.util.loading.open();        
     }
 
     /**
@@ -269,6 +277,6 @@ export class WebApiRequest<T> {
             this.btn.cdr.detectChanges();
         }
         if (this.isShowLoading)
-            this.util.dialog.close();
+            this.util.loading.close();
     }
 }

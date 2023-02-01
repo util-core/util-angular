@@ -6,6 +6,7 @@ import { HttpMethod } from "../http/http-method";
 import { Util } from "../util";
 import { AppConfig,initAppConfig } from "../config/app-config";
 import { IFormSubmitOptions } from "./form-submit-option";
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * 表单操作
@@ -114,8 +115,8 @@ export class Form {
      */
     private okHandler( options: IFormSubmitOptions, result ) {
         options.ok && options.ok( result );
-        if ( options.showMessage !== false )
-            this.util.message.success( options.message || this.config.text.successed );
+        if (options.showMessage !== false)
+            this.util.message.success(options.message || I18nKeys.succeeded);
         if ( options.back )
             this.util.router.back();
         if ( options.closeDialog ) {

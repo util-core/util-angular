@@ -47,18 +47,18 @@ export abstract class QueryComponentBase extends ComponentBase {
     abstract refresh(button?, handler?: (data) => void);
 
     /**
+     * 通过标识刷新单个节点
+     * @param id 标识
+     * @param handler 刷新后回调函数
+     */
+    abstract refreshById(id, handler?: (data) => void);
+
+    /**
      * 路由复用标签刷新
      */
     _onReuseInit(type?) {
         if (type === "refresh")
             this.refresh();
-    }
-
-    /**
-     * 获取查询延迟间隔，单位：毫秒，默认500
-     */
-    protected getDelay() {
-        return 500;
     }
 
     /**
@@ -219,7 +219,7 @@ export abstract class QueryComponentBase extends ComponentBase {
      */
     protected onEditClose(result) {
         if (result)
-            this.query();
+            this.refreshById(result);
     }
 
     /**

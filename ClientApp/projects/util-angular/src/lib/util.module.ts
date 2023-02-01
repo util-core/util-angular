@@ -12,6 +12,7 @@ import { ValidationExtendDirective } from "./zorro/validation.extend.directive";
 import { SelectExtendDirective } from "./zorro/select.extend.directive";
 import { TreeTableExtendDirective } from "./zorro/tree.table.extend.directive";
 import { TreeExtendDirective } from "./zorro/tree.extend.directive";
+import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
 
 /**
  * utilÄ£¿é
@@ -22,7 +23,8 @@ import { TreeExtendDirective } from "./zorro/tree.extend.directive";
         EditTableDirective, EditRowDirective, EditControlDirective,
         ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
-        TreeTableExtendDirective, TreeExtendDirective
+        TreeTableExtendDirective, TreeExtendDirective,
+        TinymceExtendDirective
     ],
     imports: [
     ],
@@ -31,7 +33,8 @@ import { TreeExtendDirective } from "./zorro/tree.extend.directive";
         EditTableDirective, EditRowDirective, EditControlDirective,
         ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
-        TreeTableExtendDirective, TreeExtendDirective
+        TreeTableExtendDirective, TreeExtendDirective,
+        TinymceExtendDirective
     ]
 })
 export class UtilModule {

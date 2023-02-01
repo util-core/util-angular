@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //====================================================
-import { NzI18nInterface, NzI18nService, zh_CN, en_US } from 'ng-zorro-antd/i18n';
+import { NzI18nService } from 'ng-zorro-antd/i18n';
 import { ALAIN_I18N_TOKEN, AlainI18NService } from '@delon/theme';
 import { Util } from "../util";
 
@@ -29,40 +29,21 @@ export class I18n {
     }
 
     /**
-     * 获取NgZorro国际化标识
-     * @param lang 语言文化标识
-     */
-    getNzI18n(lang: string): NzI18nInterface {
-        if (!lang)
-            return zh_CN;
-        lang = this.getSafeLang(lang);
-        switch (lang) {
-            case 'zh':
-            case 'zh-cn':
-                return zh_CN;
-            case 'en':
-            case 'en-us':
-                return en_US;
-            default:
-                return zh_CN;
-        }
-    }
-
-    /**
-     * 获取安全语言文化标识
-     */
-    private getSafeLang(lang: string) {
-        if (!lang)
-            return null;
-        lang = lang.replace("_", "-");
-        return lang.toLowerCase();
-    }
-
-    /**
      * 获取当前语言文化标识
      */
     getCurrentLang() {
-        return this.nzI18nService.getLocaleId();
+        let lang = this.nzI18nService.getLocaleId();
+        if (lang.indexOf("-") <= 0) {
+            switch (lang) {
+                case "en":
+                    return "en-US";
+                case "zh":
+                    return "zh-CN";
+            }
+            return lang;
+        }
+        let list = lang.split("-");
+        return `${list[0]}-${list[1].toUpperCase()}`;
     }
 
     /**
@@ -71,6 +52,22 @@ export class I18n {
      * @param args 参数列表
      */
     get(key: string, args?: Record<string, unknown>) {
-        return this.alainI18nService.fanyi(key, args);
+        if (!key)
+            return key;
+        if (!this.alainI18nService)
+            return key;
+        try {
+            return this.alainI18nService.fanyi(key, args);
+        }
+        catch {
+            return key;
+        }
+    }
+
+    /**
+     * 设置.AspNetCore.Culture Cookie
+     */
+    setAspNetCultureCookie() {
+        this.util.cookie.set(".AspNetCore.Culture", `c=${this.getCurrentLang()}|uic=${this.getCurrentLang()}`, { expires: 360000 });
     }
 }

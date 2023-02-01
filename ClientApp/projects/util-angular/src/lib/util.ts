@@ -11,7 +11,11 @@ import { Dialog } from "./dialog/dialog";
 import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
+import { Cookie } from './common/cookie';
 import { I18n } from "./common/i18n";
+import { Sanitizer } from "./common/sanitizer";
+import { Loading } from "./common/loading";
+import { Url } from "./common/url";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 
@@ -24,12 +28,12 @@ export class Util {
      */
     private _ioc: Ioc;
     /**
-    * 消息操作
-    */
+     * 消息操作
+     */
     private _message: Message;
     /**
-    * 路由操作
-    */
+     * 路由操作
+     */
     private _router: Router;
     /**
      * 弹出层操作
@@ -44,13 +48,29 @@ export class Util {
      */
     private _webapi: WebApi;
     /**
-    * Form操作
-    */
+     * Form操作
+     */
     private _form: Form;
     /**
-    * 国际化操作
-    */
+     * Cookie操作
+     */
+    private _cookie: Cookie;
+    /**
+     * 国际化操作
+     */
     private _i18n: I18n;
+    /**
+     * 清理操作
+     */
+    private _sanitizer: Sanitizer;
+    /**
+     * 加载操作
+     */
+    private _loading: Loading;
+    /**
+     * Url操作
+     */
+    private _url: Url;
 
     /**
      * 初始化操作入口
@@ -139,12 +159,48 @@ export class Util {
     };
 
     /**
+    * Cookie操作
+    */
+    get cookie() {
+        if (!this._cookie)
+            this._cookie = new Cookie(this);
+        return this._cookie;
+    };
+
+    /**
+    * 清理操作
+    */
+    get sanitizer() {
+        if (!this._sanitizer)
+            this._sanitizer = new Sanitizer(this);
+        return this._sanitizer;
+    };
+
+    /**
     * 国际化操作
     */
     get i18n() {
         if (!this._i18n)
             this._i18n = new I18n(this);
         return this._i18n;
+    };
+
+    /**
+    * 加载操作
+    */
+    get loading() {
+        if (!this._loading)
+            this._loading = new Loading(this);
+        return this._loading;
+    };
+
+    /**
+    * Url操作
+    */
+    get url() {
+        if (!this._url)
+            this._url = new Url(this);
+        return this._url;
     };
 
     /**

@@ -120,6 +120,20 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     }
 
     /**
+     * 通过标识刷新单个节点
+     * @param id 标识
+     * @param handler 刷新后回调函数
+     */
+    refreshById(id, handler?: (data) => void) {
+        if (!this.table)
+            return;
+        this.table.refreshById({
+            id: id,
+            ok: handler
+        });
+    }
+
+    /**
      * 清空复选框
      */
     clearCheckboxs() {

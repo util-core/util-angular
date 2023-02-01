@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, retry } from 'rxjs';
 import { HttpMethod } from "./http-method";
 import { HttpContentType } from "./http-content-type";
 import { Ioc } from '../common/ioc';
@@ -29,6 +29,14 @@ export class HttpRequest<T> {
      * 响应类型
      */
     private httpResponseType;
+    /**
+     * 跨域是否允许携带cookie
+     */
+    private credentials: boolean;
+    /**
+    * 请求重试次数
+    */
+    private retryTimes: number;
 
     /**
      * 初始化Http请求操作
@@ -40,6 +48,26 @@ export class HttpRequest<T> {
     constructor(private ioc: Ioc, private httpMethod: HttpMethod, private url: string, private body?) {
         this.headers = new HttpHeaders();
         this.parameters = new HttpParams();
+        this.credentials = true;
+        this.retryTimes = 3;
+    }
+
+    /**
+     * 设置请求重试次数
+     * @param value 请求重试次数,默认值: 3
+     */
+    retry( value: number ): HttpRequest<T> {
+        this.retryTimes = value;
+        return this;
+    }
+
+    /**
+     * 设置跨域是否允许携带cookie
+     * @param value 设置为true则允许携带,默认值: true
+     */
+    withCredentials(value: boolean): HttpRequest<T>{
+        this.credentials = value;
+        return this;
     }
 
     /**
@@ -129,7 +157,11 @@ export class HttpRequest<T> {
     handle( handler: ( value: T ) => void, errorHandler?: ( error: HttpErrorResponse ) => void, beforeHandler?: () => boolean, completeHandler?: () => void ) {
         if ( beforeHandler && beforeHandler() === false )
             return;
-        this.request().subscribe( handler, errorHandler, completeHandler );
+        this.request()
+            .pipe(
+                retry(this.retryTimes)
+            )
+            .subscribe(handler, errorHandler, completeHandler);
     }
 
     /**
@@ -142,16 +174,20 @@ export class HttpRequest<T> {
     async handleAsync( handler: ( value: T ) => void, errorHandler?: ( error: HttpErrorResponse ) => void, beforeHandler?: () => boolean, completeHandler?: () => void ) {
         if ( beforeHandler && beforeHandler() === false )
             return;
-        await this.request().toPromise().then( handler ).catch( errorHandler ).then( completeHandler );
+        await this.request()
+            .pipe(
+                retry(this.retryTimes)
+            )
+            .toPromise().then(handler).catch(errorHandler).then(completeHandler);
     }
 
     /**
      * 发送请求
      */
     request() : Observable<T>{
-        this.setContentType();
-        let httpClient = this.ioc.get<HttpClient>( HttpClient );
-        let options = { headers: this.headers, params: this.parameters, responseType: this.httpResponseType };
+        this.initContentType();
+        let httpClient = this.ioc.get<HttpClient>(HttpClient);
+        let options = { headers: this.headers, params: this.parameters, responseType: this.httpResponseType, withCredentials: this.credentials };
         switch ( this.httpMethod ) {
             case HttpMethod.Get:
                 return httpClient.get<T>( this.url, options );
@@ -163,6 +199,28 @@ export class HttpRequest<T> {
                 return httpClient.delete<T>( this.url, options );
             default:
                 return httpClient.get<T>( this.url, options );
+        }
+    }
+
+    /**
+     * 初始化内容类型
+     */
+    private initContentType() {
+        return this.header("Content-Type", this.getContentType(this.httpContentType));
+    }
+
+    /**
+     * 获取内容类型
+     * @param contentType
+     */
+    private getContentType(contentType: HttpContentType) {
+        switch (contentType) {
+            case HttpContentType.FormUrlEncoded:
+                return "application/x-www-form-urlencoded";
+            case HttpContentType.Json:
+                return "application/json";
+            default:
+                return "application/json";
         }
     }
 
@@ -189,28 +247,6 @@ export class HttpRequest<T> {
                 continue;;
             }
             this.body[key] = this.getValue( this.body[key] );
-        }
-    }
-
-    /**
-     * 设置内容类型
-     */
-    private setContentType() {
-        return this.header( "Content-Type", this.getContentType( this.httpContentType ) );
-    }
-
-    /**
-     * 获取内容类型
-     * @param contentType
-     */
-    private getContentType( contentType: HttpContentType ) {
-        switch ( contentType ) {
-            case HttpContentType.FormUrlEncoded:
-                return "application/x-www-form-urlencoded";
-            case HttpContentType.Json:
-                return "application/json";
-            default:
-                return "application/json";
         }
     }
 }

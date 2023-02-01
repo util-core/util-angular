@@ -10,6 +10,7 @@ import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
 import { AppConfig } from '../config/app-config';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro树形表格扩展指令
@@ -19,6 +20,10 @@ import { AppConfig } from '../config/app-config';
     exportAs: 'xTreeTableExtend'
 })
 export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDirective<TModel> {
+    /**
+     * 是否搜索 
+     */
+    private isSearch: boolean;
     /**
      * 加载模式
      */
@@ -83,6 +88,53 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     }
 
     /**
+     * 搜索
+     */
+    search(options?: {
+        /**
+         * 按钮
+         */
+        button?,
+        /**
+         * 请求地址
+         */
+        url?: string,
+        /**
+         * 查询参数
+         */
+        param?,
+        /**
+         * 请求前处理函数，返回false则取消提交
+         */
+        before?: () => boolean;
+        /**
+         * 请求成功处理函数
+         * @param result 结果
+         */
+        ok?: (result) => void;
+        /**
+         * 请求失败处理函数
+         */
+        fail?: (result: FailResult) => void;
+        /**
+         * 请求完成处理函数
+         */
+        complete?: () => void;
+    }) {
+        this.query({
+            isSearch: true,
+            page: 1,
+            button: options.button,
+            url: options.url,
+            param: options.param,
+            before: options.before,
+            ok: options.ok,
+            fail: options.fail,
+            complete: options.complete            
+        });
+    }
+
+    /**
      * 查询
      * @param options 配置
      */
@@ -129,13 +181,14 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         let url = options.url || this.queryUrl || this.url;
         if (!url)
             return;
+        this.initIsSearch(options.isSearch);
         let param = options.param || this.queryParam;
         if (options.page)
             param.page = options.page;
         if (!param.page)
             param.page = 1;
         this.util.webapi.get<any>(url)
-            .paramIf("is_search", "false", options.isSearch === false)
+            .paramIf("is_search", "false", this.isSearch ===false)
             .paramIf("is_expand_all", "true", this.isExpandAll)
             .paramIf("loadMode", this.loadMode, !this.util.helper.isUndefined(this.loadMode))
             .param(param).button(options.button).handle({
@@ -157,6 +210,28 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                     options.complete && options.complete();
                 }
             });
+    }
+
+    /**
+     * 初始化是否查询
+     */
+    private initIsSearch(isSearch) {
+        if (this.util.helper.isUndefined(isSearch))
+            return;
+        this.isSearch = isSearch;
+    }
+
+    /**
+     * 加载数据
+     */
+    loadData(result) {
+        result = new PageList<TModel>(result);
+        this.dataSource = result.data || [];
+        this.total = result.total;
+        if (this.queryParam.pageSize != result.pageSize)
+            this.queryParam.pageSize = result.pageSize;        
+        this.checkedSelection.clear();
+        this.checkIds(this.checkedKeys);
     }
 
     /**
@@ -235,10 +310,10 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      */
     collapse(node: TreeNode, expand) {
         if (!node)
-            return;
-        this.loadChildren(node, expand);
+            return;        
         node.expanded = !!expand;
         if (expand) {
+            this.loadChildren(node);
             this.onExpand.emit(node);
             return;
         }
@@ -247,17 +322,17 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
 
     /**
      * 加载下级节点
+     * @param node 节点
+     * @param handler 成功加载回调函数
      */
-    private loadChildren(node: TreeNode, expand) {
+    loadChildren(node: TreeNode, handler?: (node: TreeNode, result) => void) {
         if (!node)
-            return;
-        if (!expand)
             return;
         if (this.isLeaf(node))
             return;
         if (this.hasChildren(node))
             return;
-        this.requestLoadChildren(node);
+        this.requestLoadChildren(node, handler);
     }
 
     /**
@@ -270,7 +345,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     /**
      * 请求加载下级节点
      */
-    private requestLoadChildren(node: TreeNode) {
+    private requestLoadChildren(node: TreeNode, handler?: (node: TreeNode, result) => void) {
         this.queryParam.parentId = node.id;
         let url = this.loadChildrenUrl || this.url;
         this.util.webapi.get<any>(url).param(this.queryParam)
@@ -285,6 +360,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                 },
                 ok: result => {
                     this.handleLoadChildren(node, result);
+                    handler && handler(node,result);
                     this.onLoadChildren.emit({ node: node, result: result });
                 },
                 complete: () => {
@@ -315,6 +391,17 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         if (!node)
             return false;
         return node.leaf;
+    }
+
+    /**
+     * 是否根节点
+     * @param node 节点
+     */
+    isRoot(node: TreeNode) {
+        if (!node)
+            return false;
+        let parent = this.getParent(node);
+        return !parent;
     }
 
     /**
@@ -354,6 +441,16 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         if (this.isLeaf(node))
             return true;
         return false;
+    }
+
+    /**
+     * 展开节点
+     * @param node 节点
+     */
+    expand(node) {
+        if (!node)
+            return;
+        node.expanded = true;
     }
 
     /**
@@ -442,12 +539,12 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         options = options || {};
         let ids = options.ids || this.getCheckedIds();
         if (!ids) {
-            this.util.message.warn(this.config.text.notSelected);
+            this.util.message.warn(I18nKeys.notSelected);
             return;
         }
         let url = options.url || this.getUrl(this.url, "enable");
         this.util.message.confirm({
-            content: this.config.text.enableConfirm,
+            content: I18nKeys.enableConfirmation,
             onOk: () => this.enableRequest(ids, options.before, options.ok, url)
         });
     }
@@ -460,7 +557,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
             return;
         await this.util.webapi.post(url, ids).handleAsync({
             ok: () => {
-                this.util.message.success(this.config.text.successed);
+                this.util.message.success(I18nKeys.succeeded);
                 this.query({
                     before: before,
                     ok: result => {
@@ -497,14 +594,101 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         options = options || {};
         let ids = options.ids || this.getCheckedIds();
         if (!ids) {
-            this.util.message.warn(this.config.text.notSelected);
+            this.util.message.warn(I18nKeys.notSelected);
             return;
         }
         let url = options.url || this.getUrl(this.url, "disable");
         this.util.message.confirm({
-            content: this.config.text.disableConfirm,
+            content: I18nKeys.disableConfirmation,
             onOk: () => this.enableRequest(ids, options.before, options.ok, url)
         });
+    }
+
+    /**
+     * 刷新
+     * @param queryParam 查询参数
+     * @param button 按钮
+     * @param handler 刷新成功回调函数
+     */
+    refresh(queryParam?, button?, handler?: (result) => void) {
+        this.isSearch = false;
+        super.refresh(queryParam, button, handler);
+    }
+
+    /**
+     * 刷新单个节点
+     * @param data 单个对象数据
+     */
+    protected refreshNode(data) {
+        if (!data)
+            return;
+        if (!data.id)
+            return;
+        if (this.isNew(data)) {
+            this.refreshNewNode(data);
+            return;
+        }
+        this.refreshUpdateNode(data);
+    }
+
+    /**
+     * 是否新增
+     */
+    private isNew(data) {
+        return !this.dataSource.some(t => t.id === data.id);
+    }
+
+    /**
+     * 刷新新增节点
+     */
+    private refreshNewNode(data) {
+        if (this.isRoot(data)) {
+            this.load();
+            return;
+        }
+        let lastIndex = 0;
+        for (var i = 0; i < this.dataSource.length; i++) {
+            let item = this.dataSource[i];
+            if (item.parentId === data.parentId || item.id === data.parentId) {
+                lastIndex = i;
+            }
+        }
+        let parent = this.getParent(data);
+        this.expand(parent);
+        this.initNewNode(data);
+        if (this.hasChildren(parent) || this.isLeaf(parent)) {
+            this.dataSource.splice(lastIndex + 1, 0, data);
+            this.dataSource = this.dataSource;
+            return;
+        }
+        this.loadChildren(parent, (node, result) => {
+            let item = this.dataSource.find(t => t.id === data.id);
+            this.initNewNode(item);
+        });        
+    }
+
+    /**
+     * 初始化新增节点
+     */
+    private initNewNode(data) {
+        this.expand(data);
+        data.leaf = true;
+    }
+
+    /**
+     * 刷新更新节点
+     */
+    private refreshUpdateNode(data) {
+        for (var i = 0; i < this.dataSource.length; i++) {
+            let item = this.dataSource[i];
+            if (item.id === data.id) {
+                let index = this.dataSource.indexOf(item);
+                data.leaf = item.leaf;
+                data.expanded = item.expanded;
+                this.dataSource[index] = data;
+                return;
+            }
+        }
     }
 }
 

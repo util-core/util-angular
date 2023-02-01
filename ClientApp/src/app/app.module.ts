@@ -13,16 +13,31 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IconsProviderModule } from './icons-provider.module';
 import { ShareModule } from "./share.module";
 import { WelcomeComponent } from "./welcome/welcome.component"
+import { ApplicationListComponent } from "./application/application-list.component"
+import { ApplicationEditComponent } from "./application/application-edit.component"
+import { ApplicationSelectComponent } from './application/application-select.component';
+import { ClaimListComponent } from './claim/claim-list.component';
+import { ModuleListComponent } from "./module/module-list.component";
+import { ModuleEditComponent } from "./module/module-edit.component";
 import { Util, AppConfig } from 'util-angular';
 import { appConfig } from './app-config';
 
 registerLocaleData(zh);
 
+// #region ngx-tinymce(富文本设置)
+import { NgxTinymceModule, TinymceOptions } from 'ngx-tinymce';
+const tinymceOptions: TinymceOptions = {
+    baseURL: './assets/tinymce/'   
+};
+// #endregion
 
 
 @NgModule({
     declarations: [
-        AppComponent, WelcomeComponent
+        AppComponent, WelcomeComponent,
+        ApplicationListComponent, ApplicationEditComponent, ApplicationSelectComponent,
+        ClaimListComponent,
+        ModuleListComponent, ModuleEditComponent
     ],
     imports: [
         BrowserModule,
@@ -31,7 +46,8 @@ registerLocaleData(zh);
         HttpClientModule,
         BrowserAnimationsModule,
         IconsProviderModule,
-        ShareModule
+        ShareModule,
+        NgxTinymceModule.forRoot(tinymceOptions)
     ],
     providers: [
         { provide: NZ_I18N, useValue: zh_CN },

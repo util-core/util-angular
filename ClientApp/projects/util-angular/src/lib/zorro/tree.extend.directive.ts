@@ -6,10 +6,11 @@ import { Directive, Input, Output, OnInit, EventEmitter,Optional } from '@angula
 import { NzTreeNodeOptions, NzTreeNode, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
 import { NzTreeSelectComponent } from "ng-zorro-antd/tree-select";
 import { Util } from "../util";
+import { isUndefined } from "../common/helper";
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
-import { AppConfig } from '../config/app-config';
+import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
  * NgZorro树形扩展指令
@@ -43,6 +44,10 @@ export class TreeExtendDirective implements OnInit {
      * 加载模式
      */
     @Input() loadMode: LoadMode;
+    /**
+     * 需要加载的标识列表
+     */
+    @Input() loadKeys: string;
     /**
      * 根节点异步加载模式是否展开子节点
      */
@@ -111,14 +116,24 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 初始化树形扩展指令
      */
-    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent, @Optional() config: AppConfig) {
-        this.util = new Util(null, config);
+    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent, @Optional() public config: AppConfig) {
+        this.initAppConfig();
+        this.util = new Util(null, this.config);
         this.tree = treeComponent || treeSelectComponent;
         this.dataSource = new Array<any>();
         this.autoLoad = true;
         this.queryParam = new TreeQueryParameter();
         this.checkedKeys = [];
         this.selectedKeys = [];
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
     }
 
     /**
@@ -184,9 +199,10 @@ export class TreeExtendDirective implements OnInit {
             return;
         let param = options.param || this.queryParam;
         this.util.webapi.get<any>(url)
+            .paramIf("load_keys", this.loadKeys, !isUndefined(this.loadKeys))
             .paramIf("is_search", "false", options.isSearch === false)
             .paramIf("is_expand_all", "true", this.nzExpandAll || this.nzDefaultExpandAll)
-            .paramIf("loadMode", this.getLoadMode(), !this.util.helper.isUndefined(this.getLoadMode()))
+            .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
             .param(param).button(options.button).handle({
                 before: () => {
                     if (options.before)
@@ -318,7 +334,7 @@ export class TreeExtendDirective implements OnInit {
         this.queryParam.parentId = node.key;
         let url = this.loadChildrenUrl || this.url;
         this.util.webapi.get<any>(url).param(this.queryParam)
-            .paramIf("loadMode", this.getLoadMode(), !this.util.helper.isUndefined(this.getLoadMode()))
+            .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
             .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
             .handle({
                 before: () => {

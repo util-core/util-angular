@@ -7,7 +7,8 @@ import { TableExtendDirective } from "./table.extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
 import { HttpMethod } from '../http/http-method';
-import { AppConfig } from '../config/app-config';
+import { AppConfig, initAppConfig } from '../config/app-config';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro表格编辑扩展指令
@@ -59,13 +60,23 @@ export class EditTableDirective {
      * @param table 表格扩展指令
      * @param config 应用配置
      */
-    constructor(private table: TableExtendDirective<any>, @Optional() config: AppConfig) {
-        this.util = new Util(null, config);
+    constructor(private table: TableExtendDirective<any>, @Optional() protected config: AppConfig) {
+        this.initAppConfig();
+        this.util = new Util(null, this.config);
         this.dblClickStartEdit = true;
         this.rows = new Map<string, EditRowDirective>();
         this.creationIds = [];
         this.updateIds = [];
         this.removeRows = [];
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
     }
 
     /**
@@ -338,7 +349,7 @@ export class EditTableDirective {
         if (!data)
             return;
         if (!this.isDirty(data, options.isDirty)) {
-            this.util.message.warn(this.table.config.text.noNeedSave);
+            this.util.message.warn(I18nKeys.noNeedSave);
             return;
         }
         if (options.before && !options.before(data))

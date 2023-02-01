@@ -4,12 +4,11 @@
 //========================================================
 import { Injectable } from '@angular/core';
 import { assign } from "../common/helper";
-import { TextConfig } from "./text-config";
-import { ValidationConfig } from "./validation-config";
 import { TableConfig } from "./table-config";
-import { DefaultTextConfig } from "./default-text-config";
-import { DefaultValidationConfig } from "./default-validation-config";
+import { TinymceConfig } from "./tinymce-config";
+import { LoadingConfig } from "./loading-config";
 import { DefaultTableConfig } from "./default-table-config";
+import { DefaultTinymceConfig } from "./default-tinymce-config";
 
 /**
  * 应用配置
@@ -25,17 +24,17 @@ export class AppConfig {
      */
     pageSize?:number;
     /**
-     * 文本配置
-     */
-    text?: TextConfig;
-    /**
-     * 验证配置
-     */
-    validation?: ValidationConfig;
-    /**
      * 表格配置
      */
     table?: TableConfig;
+    /**
+     * Tinymce富文本编辑器配置
+     */
+    tinymce?: TinymceConfig
+    /**
+     * 加载状态配置
+     */
+    loading?: LoadingConfig
 }
 
 /**
@@ -45,7 +44,6 @@ export class AppConfig {
 export function initAppConfig(config: AppConfig) {
     if (!config)
         return;
-    config.text = assign(DefaultTextConfig, config.text);
-    config.validation = assign(DefaultValidationConfig,config.validation);
-    config.table = assign(DefaultTableConfig,config.table);
+    config.table = assign(DefaultTableConfig, config.table);
+    config.tinymce = assign(DefaultTinymceConfig, config.tinymce);
 }
