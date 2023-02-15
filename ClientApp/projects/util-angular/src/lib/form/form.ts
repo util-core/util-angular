@@ -40,7 +40,7 @@ export class Form {
         this.util.message.confirm( {
             title: options.confirmTitle,
             content: options.confirm,
-            onOk: () => this.submitForm( options ),
+            onOk: () => this.submitFormAsync( options ),
             onCancel: options.complete
         } );
     }
@@ -87,6 +87,27 @@ export class Form {
                 },
                 complete: options.complete
             } );
+    }
+
+    /**
+     * 提交表单
+     */
+    private async submitFormAsync(options: IFormSubmitOptions) {
+        this.initHttpMethod(options);
+        await this.util.webapi.send(options.url, options.httpMethod, options.data)
+            .header(options.header)
+            .handleAsync({
+                before: () => {
+                    return options.before && options.before(options.data);
+                },
+                ok: result => {
+                    this.okHandler(options, result);
+                },
+                fail: result => {
+                    this.failHandler(options, result);
+                },
+                complete: options.complete
+            });
     }
 
     /**

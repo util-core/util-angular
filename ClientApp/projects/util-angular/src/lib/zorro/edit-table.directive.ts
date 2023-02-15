@@ -2,12 +2,11 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, HostListener, Input, Optional } from '@angular/core';
+import { Directive, HostListener, Input } from '@angular/core';
 import { TableExtendDirective } from "./table.extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
 import { HttpMethod } from '../http/http-method';
-import { AppConfig, initAppConfig } from '../config/app-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -58,25 +57,14 @@ export class EditTableDirective {
     /**
      * 初始化编辑表格扩展指令
      * @param table 表格扩展指令
-     * @param config 应用配置
      */
-    constructor(private table: TableExtendDirective<any>, @Optional() protected config: AppConfig) {
-        this.initAppConfig();
-        this.util = new Util(null, this.config);
+    constructor(private table: TableExtendDirective<any>) {
+        this.util = table.util;
         this.dblClickStartEdit = true;
         this.rows = new Map<string, EditRowDirective>();
         this.creationIds = [];
         this.updateIds = [];
         this.removeRows = [];
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
     }
 
     /**

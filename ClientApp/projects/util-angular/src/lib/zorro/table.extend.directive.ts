@@ -23,7 +23,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 操作入口
      */
-    protected util: Util;
+    util: Util;
     /**
      * 是否显示进度条
      */
@@ -145,6 +145,204 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         if (!this.order)
             return;
         this.queryParam.order = this.order;
+    }
+
+    /**
+     * 获取勾选的实体列表
+     */
+    getChecked(): TModel[] {
+        return this.dataSource.filter(data => this.checkedSelection.isSelected(data));
+    }
+
+    /**
+     * 获取勾选的实体列表
+     */
+    getCheckedNodes(): TModel[] {
+        return this.getChecked();
+    }
+
+    /**
+     * 获取勾选的实体列表长度
+     */
+    getCheckedLength(): number {
+        return this.getChecked().length;
+    }
+
+    /**
+     * 获取勾选的实体标识列表
+     */
+    getCheckedIds(): string {
+        return this.getChecked().map(value => value.id).join(",");
+    }
+
+    /**
+     * 获取勾选的单个节点
+     */
+    getCheckedNode(): TModel {
+        let list = this.getChecked();
+        if (!list || list.length === 0)
+            return null;
+        return list[0];
+    }
+
+    /**
+     * 通过标识列表查找
+     * @param ids 标识列表
+     */
+    getByIds(ids: string[]): TModel[] {
+        if (!ids || ids.length === 0)
+            return [];
+        return this.dataSource.filter(item => ids.some(id => id === item.id));
+    }
+
+    /**
+     * 通过标识查找
+     * @param id 标识
+     */
+    getById(id: string): TModel {
+        if (!id)
+            return null;
+        return this.dataSource.find(data => data.id === id);
+    }
+
+    /**
+     * 仅勾选一行
+     */
+    checkRowOnly(row) {
+        this.clearChecked();
+        this.checkRow(row);
+    }
+
+    /**
+     * 勾选一行
+     */
+    checkRow(row) {
+        this.checkedSelection.select(row);
+    }
+
+    /**
+     * 切换勾选状态
+     */
+    toggle(row) {
+        this.checkedSelection.toggle(row);
+    }
+
+    /**
+     * 勾选标识列表
+     */
+    checkIds(ids) {
+        if (!ids)
+            return;
+        if (!ids.some) {
+            let item = this.dataSource.find(data => data.id === ids);
+            this.checkedSelection.select(item);
+            return;
+        }
+        let list = this.dataSource.filter(data => ids.indexOf(data.id) > -1);
+        list.forEach(item => {
+            if (this.checkedSelection.isSelected(item))
+                return;
+            this.checkedSelection.select(item);
+        });
+    }
+
+    /**
+     * 清空勾选的行
+     */
+    clearChecked() {
+        this.checkedSelection.clear();
+    }
+
+    /**
+     * 仅选中一行
+     */
+    selectRowOnly(row) {
+        this.clearSelected();
+        this.selectRow(row);
+    }
+
+    /**
+     * 单击选中一行
+     */
+    selectRow(row) {
+        this.selectedSelection.select(row);
+    }
+
+    /**
+     * 清空选中的行
+     */
+    clearSelected() {
+        this.selectedSelection.clear();
+    }
+
+    /**
+     * 是否被选中
+     * @param row 行
+     */
+    isSelected(row) {
+        return this.selectedSelection.isSelected(row);
+    }
+
+    /**
+     * 是否选中状态
+     * @param row 行
+     */
+    isChecked(row) {
+        return this.checkedSelection.isSelected(row);
+    }
+
+    /**
+     * 表头主复选框的选中状态
+     */
+    isMasterChecked() {
+        return this.checkedSelection.hasValue() &&
+            this.isAllChecked() &&
+            this.checkedSelection.selected.length >= this.dataSource.length;
+    }
+
+    /**
+     * 是否所有行复选框被选中
+     */
+    isAllChecked() {
+        return this.dataSource.every(data => this.checkedSelection.isSelected(data));
+    }
+
+    /**
+     * 表头主复选框的确定状态
+     */
+    isMasterIndeterminate() {
+        return this.checkedSelection.hasValue() && (!this.isAllChecked() || !this.dataSource.length);
+    }
+
+    /**
+     * 移除行
+     * @param ids 行标识列表
+     */
+    removeRows(ids?: string[]) {
+        if (!ids || ids.length === 0)
+            ids = this.getChecked().map(value => value.id);
+        if (!ids || ids.length === 0) {
+            this.util.message.warn(I18nKeys.noDeleteItemSelected);
+            return null;
+        }
+        let result = this.util.helper.remove(this.dataSource, row => ids.findIndex(id => row.id === id) > -1);
+        this.dataSource = [...this.dataSource];
+        this.total = this.total - result.length;
+        this.initLineNumbers(this.dataSource);
+        this.checkedSelection.deselect(...result);
+        return result;
+    }
+
+    /**
+     * 清理
+     */
+    clear() {
+        this.dataSource = [];
+        this.queryParam.page = 1;
+        this.total = 0;
+        this.checkedSelection.clear();
+        this.selectedSelection.clear();
+        this.checkedKeys = null;
     }
 
     /**
@@ -323,143 +521,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     private getDeleteUrl(url) {
         return url || this.deleteUrl || this.getUrl(this.url, "delete");
-    }
-
-    /**
-     * 获取勾选的实体列表
-     */
-    getChecked(): TModel[] {
-        return this.dataSource.filter(data => this.checkedSelection.isSelected(data));
-    }
-
-    /**
-     * 获取勾选的实体列表
-     */
-    getCheckedNodes(): TModel[] {
-        return this.getChecked();
-    }
-
-    /**
-     * 获取勾选的实体列表长度
-     */
-    getCheckedLength(): number {
-        return this.getChecked().length;
-    }
-
-    /**
-     * 获取勾选的实体标识列表
-     */
-    getCheckedIds(): string {
-        return this.getChecked().map(value => value.id).join(",");
-    }
-
-    /**
-     * 获取勾选的单个节点
-     */
-    getCheckedNode(): TModel {
-        let list = this.getChecked();
-        if (!list || list.length === 0)
-            return null;
-        return list[0];
-    }
-
-    /**
-     * 通过标识列表查找
-     * @param ids 标识列表
-     */
-    getByIds(ids: string[]): TModel[] {
-        if (!ids || ids.length === 0)
-            return [];
-        return this.dataSource.filter(item => ids.some(id => id === item.id));
-    }
-
-    /**
-     * 通过标识查找
-     * @param id 标识
-     */
-    getById(id: string): TModel {
-        if (!id)
-            return null;
-        return this.dataSource.find(data => data.id === id);
-    }
-
-    /**
-     * 仅勾选一行
-     */
-    checkRowOnly(row) {
-        this.clearChecked();
-        this.checkRow(row);
-    }
-
-    /**
-     * 勾选一行
-     */
-    checkRow(row) {
-        this.checkedSelection.select(row);
-    }
-
-    /**
-     * 切换勾选状态
-     */
-    toggle(row) {
-        this.checkedSelection.toggle(row);
-    }
-
-    /**
-     * 勾选标识列表
-     */
-    checkIds(ids) {
-        if (!ids)
-            return;
-        if (!ids.some) {
-            let item = this.dataSource.find(data => data.id === ids);
-            this.checkedSelection.select(item);
-            return;
-        }
-        let list = this.dataSource.filter(data => ids.indexOf(data.id) > -1);
-        list.forEach(item => {
-            if (this.checkedSelection.isSelected(item))
-                return;
-            this.checkedSelection.select(item);
-        });
-    }
-
-    /**
-     * 清空勾选的行
-     */
-    clearChecked() {
-        this.checkedSelection.clear();
-    }
-
-    /**
-     * 仅选中一行
-     */
-    selectRowOnly(row) {
-        this.clearSelected();
-        this.selectRow(row);
-    }
-
-    /**
-     * 单击选中一行
-     */
-    selectRow(row) {
-        this.selectedSelection.select(row);
-    }
-
-    /**
-     * 清空选中的行
-     */
-    clearSelected() {
-        this.selectedSelection.clear();
-    }
-
-    /**
-     * 是否被选中
-     * @param row 行
-     */
-    isSelected(row) {
-        return this.selectedSelection.isSelected(row);
-    }
+    }    
 
     /**
      * 页索引变化事件处理
@@ -480,21 +542,40 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     }
 
     /**
+     * 排序变化事件处理
+     * @param column 排序列
+     * @param direction 排序方向
+     */
+    sortChange(column: string, direction: 'ascend' | 'descend' | null) {
+        let order = this.getOrder(column, direction);
+        this.sort(order);
+    }
+
+    /**
+     * 获取排序条件
+     */
+    private getOrder(column: string, direction: 'ascend' | 'descend' | null) {
+        if (!column)
+            return null;
+        if (direction === null)
+            return null;
+        column = column.replace(/ ascend/i, "").replace(/ descend/i, "").replace(/ asc/i, "").replace(/ desc/i, "");
+        if (direction === "descend")
+            return `${column} desc`;
+        return column;
+    }
+
+    /**
      * 排序
      * @param order 排序条件
      */
     sort(order: string) {
-        this.queryParam.order = order;
+        if (order)
+            this.queryParam.order = order;
+        else 
+            this.queryParam.order = this.order;
         this.query();
-    }
-
-    /**
-     * 是否选中状态
-     * @param row 行
-     */
-    isChecked(row) {
-        return this.checkedSelection.isSelected(row);
-    }
+    }    
 
     /**
      * 表头主复选框切换选中状态
@@ -505,29 +586,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
             return;
         }
         this.dataSource.forEach(data => this.checkedSelection.select(data));
-    }
-
-    /**
-     * 表头主复选框的选中状态
-     */
-    isMasterChecked() {
-        return this.checkedSelection.hasValue() &&
-            this.isAllChecked() &&
-            this.checkedSelection.selected.length >= this.dataSource.length;
-    }
-
-    /**
-     * 是否所有行复选框被选中
-     */
-    isAllChecked() {
-        return this.dataSource.every(data => this.checkedSelection.isSelected(data));
-    }
-
-    /**
-     * 表头主复选框的确定状态
-     */
-    isMasterIndeterminate() {
-        return this.checkedSelection.hasValue() && (!this.isAllChecked() || !this.dataSource.length);
     }
 
     /**
@@ -550,25 +608,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     private initLineNumbers(data) {
         let result = new PageList<TModel>(data, this.queryParam.page, this.queryParam.pageSize);
         result.initLineNumbers();
-    }
-
-    /**
-     * 移除行
-     * @param ids 行标识列表
-     */
-    removeRows(ids?: string[]) {
-        if (!ids || ids.length === 0)
-            ids = this.getChecked().map(value => value.id);
-        if (!ids || ids.length === 0) {
-            this.util.message.warn(I18nKeys.noDeleteItemSelected);
-            return null;
-        }
-        let result = this.util.helper.remove(this.dataSource, row => ids.findIndex(id => row.id === id) > -1);
-        this.dataSource = [...this.dataSource];
-        this.total = this.total - result.length;
-        this.initLineNumbers(this.dataSource);
-        this.checkedSelection.deselect(...result);
-        return result;
     }
 
     /**
@@ -667,18 +706,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
                 return;
             }
         }
-    }
-
-    /**
-     * 清理
-     */
-    clear() {
-        this.dataSource = [];
-        this.queryParam.page = 1;
-        this.total = 0;
-        this.checkedSelection.clear();
-        this.selectedSelection.clear();
-        this.checkedKeys = null;
     }
 }
 

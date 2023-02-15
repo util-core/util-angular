@@ -11,6 +11,7 @@ import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
 import { AppConfig } from '../config/app-config';
 import { I18nKeys } from '../config/i18n-keys';
+import { forEach } from 'lodash';
 
 /**
  * NgZorro树形表格扩展指令
@@ -78,6 +79,248 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     }
 
     /**
+     * 获取上级节点
+     * @param node 节点
+     */
+    getParent(node) {
+        if (!node)
+            return null;
+        return this.dataSource.find(t => t.id === node.parentId);
+    }
+
+    /**
+     * 获取所有上级节点列表
+     * @param node 节点
+     */
+    getParents(node) {
+        /**
+         * 添加所有上级节点
+         */
+        let addParents = (list, node) => {
+            if (!node)
+                return;
+            let parent = this.getParent(node);
+            if (!parent)
+                return;
+            list.push(parent);
+            addParents(list, parent);
+        };
+
+        let result = [];
+        addParents(result, node);
+        return result;
+    }
+
+    /**
+     * 获取直接下级节点列表
+     * @param node 节点
+     */
+    getChildren(node) {
+        if (!node)
+            return [];
+        return this.dataSource.filter(t => t.parentId === node.id);
+    }
+
+    /**
+     * 获取所有下级节点列表
+     * @param node 节点
+     * @param isContainsNode 是否包含父节点
+     */
+    getAllChildren(node, isContainsNode: boolean = false) {
+        /**
+         * 添加所有下级节点
+         */
+        let addChildren = (list, node) => {
+            if (!node)
+                return;
+            list.push(node);
+            let children = this.getChildren(node);
+            if (!children || children.length === 0)
+                return;
+            children.forEach(item => addChildren(list, item));
+        };
+
+        if (!node)
+            return [];
+        let result = [];
+        addChildren(result, node);
+        if (!isContainsNode)
+            this.util.helper.remove(result, item => item === node);
+        return result;
+    }
+
+    /**
+     * 获取下级最后一个节点
+     * @param node 节点
+     * @param excludeNode 需要排除的节点
+     */
+    getLastChild(node, excludeNode = null) {
+        if (!node)
+            return null;
+        let children = this.getAllChildren(node);
+        if (excludeNode) {
+            if (!excludeNode.id)
+                excludeNode = this.getById(excludeNode);
+            let excludeNodes = this.getAllChildren(excludeNode, true);
+            children = children.filter(value => !excludeNodes.some(t => t.id === value.id));
+        }
+        if (children && children.length > 0)
+            return children[children.length - 1];
+        return null;
+    }
+
+    /**
+     * 是否存在子节点
+     * @param node 节点
+     * @param excludeNode 需要排除的节点
+     */
+    hasChildren(node, excludeNode = null) {
+        let excludeId = excludeNode && excludeNode.id;
+        if (excludeId)
+            return this.dataSource.some(t => t.parentId === node.id && t.id != excludeId);
+        return this.dataSource.some(t => t.parentId === node.id);
+    }
+
+    /**
+    * 移除节点
+    */
+    removeNode(node) {
+        let index = this.dataSource.indexOf(node);
+        if (index < 0)
+            return;
+        this.dataSource.splice(index, 1);
+    }
+
+    /**
+    * 移除直接下级节点
+    * @param node 节点
+    * @param isRemoveSelf 是否移除节点自身
+    */
+    removeChildren(node, isRemoveSelf?: boolean) {
+        if (!node)
+            return;
+        if (isRemoveSelf)
+            this.removeNode(node);
+        let nodes = this.getChildren(node);
+        nodes.forEach(item => {
+            this.removeNode(item);
+        });
+    }
+
+    /**
+    * 移除所有下级节点
+    * @param node 节点
+    * @param isRemoveSelf 是否移除节点自身
+    */
+    removeAllChildren(node, isRemoveSelf?: boolean) {
+        if (!node)
+            return;
+        if (isRemoveSelf)
+            this.removeNode(node);
+        let nodes = this.getAllChildren(node);
+        nodes.forEach(item => {
+            this.removeNode(item);
+        });
+    }
+
+    /**
+     * 移动节点,将节点及节点下所有子节点移动到目标父节点下
+     * @param node 节点
+     * @param parent 移动到目标父节点下方,为空则设置为根节点
+     */
+    moveNode(node, parent = null) {
+        let getLastIndex = (lastNode) => {
+            if (!lastNode)
+                return this.dataSource.length -1;
+            return this.dataSource.findIndex(value => value.id === lastNode.id);
+        };
+
+        let lastNode = this.getLastChild(parent, node);
+        if (!lastNode)
+            lastNode = parent;
+        let nodes = this.getAllChildren(node, true);
+        nodes.forEach(node => {
+            let nodeParent = this.getParent(node);
+            let parentLevel = this.util.helper.toNumber( nodeParent && nodeParent.level ) || 0;            
+            node.level = parentLevel + 1;
+            this.removeNode(node);
+            let lastIndex = getLastIndex(lastNode);
+            this.dataSource.splice(lastIndex + 1, 0, node);
+            lastNode = node;
+        });
+    }
+
+    /**
+     * 是否叶节点
+     * @param node 节点
+     */
+    isLeaf(node) {
+        if (!node)
+            return false;
+        return node.leaf;
+    }
+
+    /**
+     * 是否根节点
+     * @param node 节点
+     */
+    isRoot(node) {
+        if (!node)
+            return false;
+        let parent = this.getParent(node);
+        return !parent;
+    }
+
+    /**
+     * 是否已展开
+     * @param node 节点
+     */
+    isExpand(node) {
+        if (!node)
+            return false;
+        return node.expanded;
+    }
+
+    /**
+     * 是否显示
+     * @param node 节点
+     */
+    isShow(node) {
+        if (!node)
+            return false;
+        if (node.level === 1)
+            return true;
+        let parent = this.getParent(node);
+        if (!parent)
+            return false;
+        if (!parent.expanded)
+            return false;
+        return this.isShow(parent);
+    }
+
+    /**
+     * 是否显示单选框
+     * @param node 节点
+     */
+    isShowRadio(node) {
+        if (!this.isCheckLeafOnly)
+            return true;
+        if (this.isLeaf(node))
+            return true;
+        return false;
+    }
+
+    /**
+     * 展开节点
+     * @param node 节点
+     */
+    expand(node) {
+        if (!node)
+            return;
+        node.expanded = true;
+    }
+
+    /**
      * 加载,对于异步请求,仅加载第一级节点
      */
     load() {
@@ -130,7 +373,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
             before: options.before,
             ok: options.ok,
             fail: options.fail,
-            complete: options.complete            
+            complete: options.complete
         });
     }
 
@@ -188,7 +431,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         if (!param.page)
             param.page = 1;
         this.util.webapi.get<any>(url)
-            .paramIf("is_search", "false", this.isSearch ===false)
+            .paramIf("is_search", "false", this.isSearch === false)
             .paramIf("is_expand_all", "true", this.isExpandAll)
             .paramIf("loadMode", this.loadMode, !this.util.helper.isUndefined(this.loadMode))
             .param(param).button(options.button).handle({
@@ -229,78 +472,9 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         this.dataSource = result.data || [];
         this.total = result.total;
         if (this.queryParam.pageSize != result.pageSize)
-            this.queryParam.pageSize = result.pageSize;        
+            this.queryParam.pageSize = result.pageSize;
         this.checkedSelection.clear();
         this.checkIds(this.checkedKeys);
-    }
-
-    /**
-     * 获取直接下级节点列表
-     * @param node 节点
-     */
-    getChildren(node) {
-        if (!node)
-            return [];
-        return this.dataSource.filter(t => t.parentId === node.id);
-    }
-
-    /**
-     * 获取所有下级节点列表
-     * @param node 节点
-     */
-    getAllChildren(node) {
-        if (!node)
-            return [];
-        let result = [];
-        this.addAllChildren(result, node);
-        this.util.helper.remove(result, item => item === node);
-        return result;
-    }
-
-    /**
-     * 添加所有下级节点
-     */
-    private addAllChildren(list, node) {
-        if (!node)
-            return;
-        list.push(node);
-        let children = this.getChildren(node);
-        if (!children || children.length === 0)
-            return;
-        children.forEach(item => this.addAllChildren(list, item));
-    }
-
-    /**
-     * 获取上级节点
-     * @param node 节点
-     */
-    getParent(node) {
-        if (!node)
-            return null;
-        return this.dataSource.find(t => t.id === node.parentId);
-    }
-
-    /**
-     * 获取所有上级节点列表
-     * @param node 节点
-     */
-    getParents(node) {
-        let result = [];
-        this.addParents(result, node);
-        return result;
-    }
-
-    /**
-     * 添加所有上级节点
-     */
-    private addParents(list, node) {
-        if (!node)
-            return;
-        let parent = this.getParent(node);
-        if (!parent)
-            return;
-        list.push(parent);
-        this.addParents(list, parent);
     }
 
     /**
@@ -310,7 +484,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      */
     collapse(node: TreeNode, expand) {
         if (!node)
-            return;        
+            return;
         node.expanded = !!expand;
         if (expand) {
             this.loadChildren(node);
@@ -324,22 +498,18 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      * 加载下级节点
      * @param node 节点
      * @param handler 成功加载回调函数
+     * @param hasChildren 是否存在子节点
      */
-    loadChildren(node: TreeNode, handler?: (node: TreeNode, result) => void) {
+    loadChildren(node: TreeNode, handler?: (node: TreeNode, result) => void, hasChildren: boolean | null = null) {
         if (!node)
             return;
         if (this.isLeaf(node))
             return;
-        if (this.hasChildren(node))
+        if (hasChildren === true)
+            return;
+        if (hasChildren === null && this.hasChildren(node))
             return;
         this.requestLoadChildren(node, handler);
-    }
-
-    /**
-     * 是否存在子节点
-     */
-    private hasChildren(node: TreeNode) {
-        return this.dataSource.some(t => t.parentId === node.id);
     }
 
     /**
@@ -360,7 +530,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                 },
                 ok: result => {
                     this.handleLoadChildren(node, result);
-                    handler && handler(node,result);
+                    handler && handler(node, result);
                     this.onLoadChildren.emit({ node: node, result: result });
                 },
                 complete: () => {
@@ -380,77 +550,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         }
         let index = this.dataSource.indexOf(node);
         this.dataSource.splice(index + 1, 0, ...result.data);
-        this.dataSource = this.dataSource;
-    }
-
-    /**
-     * 是否叶节点
-     * @param node 节点
-     */
-    isLeaf(node: TreeNode) {
-        if (!node)
-            return false;
-        return node.leaf;
-    }
-
-    /**
-     * 是否根节点
-     * @param node 节点
-     */
-    isRoot(node: TreeNode) {
-        if (!node)
-            return false;
-        let parent = this.getParent(node);
-        return !parent;
-    }
-
-    /**
-     * 是否已展开
-     * @param node 节点
-     */
-    isExpand(node: TreeNode) {
-        if (!node)
-            return false;
-        return node.expanded;
-    }
-
-    /**
-     * 是否显示行
-     * @param node 节点
-     */
-    isShow(node) {
-        if (!node)
-            return false;
-        if (node.level === 1)
-            return true;
-        let parent = this.getParent(node);
-        if (!parent)
-            return false;
-        if (!parent.expanded)
-            return false;
-        return this.isShow(parent);
-    }
-
-    /**
-     * 是否显示单选框
-     * @param node 节点
-     */
-    isShowRadio(node) {
-        if (!this.isCheckLeafOnly)
-            return true;
-        if (this.isLeaf(node))
-            return true;
-        return false;
-    }
-
-    /**
-     * 展开节点
-     * @param node 节点
-     */
-    expand(node) {
-        if (!node)
-            return;
-        node.expanded = true;
+        this.dataSource = [...this.dataSource];
     }
 
     /**
@@ -458,47 +558,47 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      * @param node 节点
      */
     toggle(node) {
+        /**
+         * 切换所有下级节点的选中状态
+         */
+        let toggleAllChildren = (node) => {
+            let isChecked = this.isChecked(node);
+            let nodes = this.getAllChildren(node);
+            if (isChecked) {
+                nodes.forEach(item => this.checkedSelection.select(item));
+                return;
+            }
+            nodes.forEach(item => this.checkedSelection.deselect(item));
+        };
+
+        /**
+         * 是否直接下级所有节点被选中
+         */
+        let isChildrenAllChecked = (node) => {
+            let children = this.getChildren(node);
+            if (!children || children.length === 0)
+                return false;
+            return children.every(item => this.checkedSelection.isSelected(item));
+        };
+
+        /**
+         * 切换所有父节点选中状态
+         */
+        let toggleParents = (node) => {
+            let parent = this.getParent(node);
+            if (!parent)
+                return;
+            let isAllChecked = isChildrenAllChecked(parent);
+            if (isAllChecked)
+                this.checkedSelection.select(parent);
+            else
+                this.checkedSelection.deselect(parent);
+            toggleParents(parent);
+        };
+
         this.checkedSelection.toggle(node);
-        this.toggleAllChildren(node);
-        this.toggleParents(node);
-    }
-
-    /**
-     * 切换所有下级节点的选中状态
-     */
-    private toggleAllChildren(node) {
-        let isChecked = this.isChecked(node);
-        let nodes = this.getAllChildren(node);
-        if (isChecked) {
-            nodes.forEach(item => this.checkedSelection.select(item));
-            return;
-        }
-        nodes.forEach(item => this.checkedSelection.deselect(item));
-    }
-
-    /**
-     * 切换所有父节点选中状态
-     */
-    private toggleParents(node) {
-        let parent = this.getParent(node);
-        if (!parent)
-            return;
-        let isAllChecked = this.isChildrenAllChecked(parent);
-        if (isAllChecked)
-            this.checkedSelection.select(parent);
-        else
-            this.checkedSelection.deselect(parent);
-        this.toggleParents(parent);
-    }
-
-    /**
-     * 是否直接下级所有节点被选中
-     */
-    private isChildrenAllChecked(node) {
-        let children = this.getChildren(node);
-        if (!children || children.length === 0)
-            return false;
-        return children.every(item => this.checkedSelection.isSelected(item));
+        toggleAllChildren(node);
+        toggleParents(node);
     }
 
     /**
@@ -620,75 +720,96 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      * @param data 单个对象数据
      */
     protected refreshNode(data) {
+        /**
+         * 是否新增
+         */
+        let isNew = (node) => {
+            return !this.dataSource.some(t => t.id === node.id);
+        }
+
+        /**
+         * 刷新父节点
+         */
+        let refreshParent = (node, handler?: () => void, loadChildrenBefore?: () => void) => {
+            let parent = this.getParent(node);
+            this.expand(parent);
+            if (this.hasChildren(parent, node) || this.isLeaf(parent)) {
+                parent.leaf = false;
+                this.moveNode(node, parent);
+                return;
+            }
+            loadChildrenBefore && loadChildrenBefore();
+            this.loadChildren(parent, () => {
+                handler && handler();
+            },false);
+        };
+
+        /**
+        * 刷新新增节点
+        */
+        let refreshNewNode = (data) => {
+            /**
+             * 初始化新增节点
+             */
+            let initNewNode = (node) => {
+                this.expand(node);
+                node.leaf = true;
+            }
+
+            if (this.isRoot(data)) {
+                this.load();
+                return;
+            }
+            initNewNode(data);
+            refreshParent(data, () => {
+                let item = this.getById(data.id);
+                initNewNode(item);
+            });
+        }
+
+        /**
+         * 刷新更新节点
+         */
+        let refreshUpdateNode = (data) => {
+            /**
+             * 初始化更新节点
+             */
+            let initUpdateNode = (newNode, originalNode) => {
+                newNode.leaf = originalNode.leaf;
+                newNode.expanded = originalNode.expanded;
+                let index = this.dataSource.indexOf(originalNode);
+                this.dataSource[index] = newNode;
+            }
+
+            /**
+             * 将节点及所有子节点移动到目标父节点下
+             */
+            let moveToParent = (node) => {                
+                refreshParent(node, null, () => {
+                    this.removeAllChildren(node, true);
+                });
+            }
+
+            for (var i = 0; i < this.dataSource.length; i++) {
+                let item = this.dataSource[i];
+                if (item.id === data.id) {
+                    initUpdateNode(data, item);
+                    if (item.parentId !== data.parentId)
+                        moveToParent(data);
+                    return;
+                }
+            }
+        }
+
         if (!data)
             return;
         if (!data.id)
             return;
-        if (this.isNew(data)) {
-            this.refreshNewNode(data);
-            return;
-        }
-        this.refreshUpdateNode(data);
-    }
-
-    /**
-     * 是否新增
-     */
-    private isNew(data) {
-        return !this.dataSource.some(t => t.id === data.id);
-    }
-
-    /**
-     * 刷新新增节点
-     */
-    private refreshNewNode(data) {
-        if (this.isRoot(data)) {
-            this.load();
-            return;
-        }
-        let lastIndex = 0;
-        for (var i = 0; i < this.dataSource.length; i++) {
-            let item = this.dataSource[i];
-            if (item.parentId === data.parentId || item.id === data.parentId) {
-                lastIndex = i;
-            }
-        }
-        let parent = this.getParent(data);
-        this.expand(parent);
-        this.initNewNode(data);
-        if (this.hasChildren(parent) || this.isLeaf(parent)) {
-            this.dataSource.splice(lastIndex + 1, 0, data);
-            this.dataSource = this.dataSource;
-            return;
-        }
-        this.loadChildren(parent, (node, result) => {
-            let item = this.dataSource.find(t => t.id === data.id);
-            this.initNewNode(item);
-        });        
-    }
-
-    /**
-     * 初始化新增节点
-     */
-    private initNewNode(data) {
-        this.expand(data);
-        data.leaf = true;
-    }
-
-    /**
-     * 刷新更新节点
-     */
-    private refreshUpdateNode(data) {
-        for (var i = 0; i < this.dataSource.length; i++) {
-            let item = this.dataSource[i];
-            if (item.id === data.id) {
-                let index = this.dataSource.indexOf(item);
-                data.leaf = item.leaf;
-                data.expanded = item.expanded;
-                this.dataSource[index] = data;
-                return;
-            }
-        }
+        if (isNew(data))
+            refreshNewNode(data);        
+        else
+            refreshUpdateNode(data);
+        this.dataSource = [...this.dataSource];
     }
 }
 

@@ -247,4 +247,13 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     protected getCreateDialogData(data?): any {
         return { parent: data };
     }
+
+    /**
+     * 获取勾选的实体列表长度
+     */
+    getCheckedLength(): number {
+        if (!this.table)
+            return 0;
+        return this.table.getCheckedLength();
+    }
 }

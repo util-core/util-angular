@@ -132,7 +132,9 @@ export class Dialog {
         let dialogRef: NzModalRef = dialog.openModals[dialog.openModals.length - 1];
         if (!dialogRef)
             return;
-        dialogRef.destroy(result);
-        dialog.openModals.pop();
+        let content = dialogRef.getContentComponent();
+        if (!content && dialog.openModals.length > 1)
+            dialogRef = dialog.openModals[dialog.openModals.length - 2];
+        dialogRef.close(result);
     }
 }

@@ -121,25 +121,28 @@ export class ValidationExtendDirective {
      * 获取必填项验证消息
      */
     private getRequiredMessage() {
-        let result = this.getDefaultMessage(I18nKeys.requiredMessage);
-        if (this.requiredMessage)
-            result = this.requiredMessage;
-        return this.replace(result);
+        return this.getI18nMessage(I18nKeys.requiredMessage, this.requiredMessage);
     }
 
     /**
-     * 获取默认验证消息
+     * 获取多语言验证消息
      */
-    private getDefaultMessage(key) {
-        return this.util.i18n.get(key);
+    private getI18nMessage(defaultMessage, message,value?) {
+        let result = defaultMessage;
+        if (message)
+            result = message;        
+        result = this.util.i18n.get(result);
+        return this.replace(result, value);
     }
 
     /**
      * 替换{0}为显示名称,{1}为值
      */
     private replace(message, value?) {
-        message = message.replace(/\{0\}/, this.getDisplayName());
-        return message.replace(/\{1\}/, String(value));
+        let result = message.replace(/\{0\}/, this.getDisplayName());
+        if (this.util.helper.isEmpty(value))
+            return result;
+        return result.replace(/\{1\}/, String(value));
     }
 
     /**
@@ -153,69 +156,49 @@ export class ValidationExtendDirective {
      * 获取最小长度验证消息
      */
     private getMinLengthMessage() {
-        let result = this.getDefaultMessage(I18nKeys.minLengthMessage);
-        if (this.minLengthMessage)
-            result = this.minLengthMessage;
-        return this.replace(result, this.minlength);
+        return this.getI18nMessage(I18nKeys.minLengthMessage, this.minLengthMessage, this.minlength);
     }
 
     /**
      * 获取最小值验证消息
      */
     private getMinMessage() {
-        let result = this.getDefaultMessage(I18nKeys.minMessage);
-        if (this.minMessage)
-            result = this.minMessage;
-        return this.replace(result, this.min);
+        return this.getI18nMessage(I18nKeys.minMessage, this.minMessage, this.min);
     }
 
     /**
      * 获取最大值验证消息
      */
     private getMaxMessage() {
-        let result = this.getDefaultMessage(I18nKeys.maxMessage);
-        if (this.maxMessage)
-            result = this.maxMessage;
-        return this.replace(result, this.max);
+        return this.getI18nMessage(I18nKeys.maxMessage, this.maxMessage, this.max);
     }
 
     /**
      * 获取电子邮件验证消息
      */
     private getEmailMessage() {
-        let result = this.getDefaultMessage(I18nKeys.emailMessage);
-        if (this.emailMessage)
-            result = this.emailMessage;
-        return this.replace(result);
+        return this.getI18nMessage(I18nKeys.emailMessage, this.emailMessage);
     }
 
     /**
      * 获取手机号验证消息
      */
     private getPhoneMessage() {
-        let result = this.getDefaultMessage(I18nKeys.phoneMessage);
-        if (this.patternMessage)
-            result = this.patternMessage;
-        return this.replace(result);
+        return this.getI18nMessage(I18nKeys.phoneMessage, this.patternMessage);
     }
 
     /**
      * 获取身份证验证消息
      */
     private getIdCardMessage() {
-        let result = this.getDefaultMessage(I18nKeys.idCardMessage);
-        if (this.patternMessage)
-            result = this.patternMessage;
-        return this.replace(result);
+        return this.getI18nMessage(I18nKeys.idCardMessage, this.patternMessage);
     }
 
     /**
      * 获取正则表达式验证消息
      */
     private getPatternMessage() {
-        if (this.patternMessage)
-            return this.replace(this.patternMessage);
-        return null;
+        return this.getI18nMessage(this.patternMessage, this.patternMessage);
     }
 }
 
