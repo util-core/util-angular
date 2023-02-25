@@ -9,11 +9,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.2" />
-		<PackageReference Include="Util.Data.Core" Version="7.0.12" />
-		<PackageReference Include="Util.Domain.Biz" Version="7.0.12" />
-		<PackageReference Include="Util.Logging.Serilog.Exceptionless" Version="7.0.12" />
-		<PackageReference Include="Util.Ui.NgAlain" Version="7.0.12" />
-		<PackageReference Include="Util.Ui.NgZorro" Version="7.0.12" />
+		<PackageReference Include="Util.Data.Core" Version="7.0.26" />
+		<PackageReference Include="Util.Domain.Biz" Version="7.0.26" />
+		<PackageReference Include="Util.Logging.Serilog.Exceptionless" Version="7.0.26" />
+		<PackageReference Include="Util.Ui.NgAlain" Version="7.0.26" />
+		<PackageReference Include="Util.Ui.NgZorro" Version="7.0.26" />
 	</ItemGroup>
 
 	<ItemGroup>

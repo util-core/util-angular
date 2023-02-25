@@ -70,7 +70,8 @@ describe('util.helper', () => {
     });
     it("formatDate", () => {
         expect(helper.formatDate(new Date(2022, 8, 2, 13, 58, 36))).toEqual("2022-09-02 13:58:36");
-        expect(helper.formatDate(new Date("2022-9-2 13:58:36"))).toEqual("2022-09-02 13:58:36");
+        expect(helper.formatDate(new Date("2022-9-2 13:58:36"), "YYYY-MM-DD HH:mm:ss")).toEqual("2022-09-02 13:58:36");
+        expect(helper.formatDate(new Date("2022-9-2 13:58:36"), "YY-MM-DD HH:mm:ss")).toEqual("22-09-02 13:58:36");
     });
 });
 

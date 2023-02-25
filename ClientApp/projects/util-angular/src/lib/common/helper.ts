@@ -6,7 +6,7 @@ import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
     hasIn, cloneDeep, assign as assign2
 } from "lodash";
-import * as moment from 'moment';
+import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
 
 /**
@@ -176,20 +176,20 @@ export let assign = (destination,source) => {
 /**
  *  格式化日期
  * @param datetime 日期
- * @param format 格式化字符串，范例：YYYY-MM-DD,可选值：(注意：区分大小写)
- * (1) 年: YYYY
+ * @param format 格式化字符串，范例：yyyy-MM-dd,可选值：(注意：区分大小写)
+ * (1) 年: yyyy
  * (2) 月: MM
- * (3) 日: DD
+ * (3) 日: dd
  * (4) 时: HH
  * (5) 分: mm
  * (6) 秒: ss
  * (7) 毫秒: SSS
  */
-export let formatDate = (datetime, format: string = 'YYYY-MM-DD HH:mm:ss'): string => {
-    let date = moment(datetime);
-    if (!date.isValid())
-        return "";
-    return date.format(format);
+export let formatDate = (datetime, format: string = 'yyyy-MM-dd HH:mm:ss'): string => {
+    if (!format)
+        format = 'yyyy-MM-dd HH:mm:ss';
+    format = format.replace(/Y/g, "y").replace(/D/g, "d");
+    return format2(datetime, format);
 }
 
 /**

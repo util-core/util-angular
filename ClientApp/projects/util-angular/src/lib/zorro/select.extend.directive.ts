@@ -3,6 +3,8 @@
 //Licensed under the MIT license
 //=========================================================
 import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime, filter } from 'rxjs/operators';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
 import { SelectOption } from '../core/select-option';
@@ -24,9 +26,13 @@ export class SelectExtendDirective implements OnInit {
      */
     protected util: Util;
     /**
+     * 搜索变更对象
+     */
+    private searchChange$ = new BehaviorSubject(null);
+    /**
      * 加载状态
      */
-    @Input() loading: boolean;
+    loading: boolean;
     /**
      * 按组显示
      */
@@ -70,6 +76,10 @@ export class SelectExtendDirective implements OnInit {
      */
     @Input() autoLoad: boolean;
     /**
+     * 搜索延迟时间,单位:毫秒
+     */
+    @Input() searchDelay: number;
+    /**
      * 是否下拉加载
      */
     @Input() isScrollLoad: boolean;
@@ -81,6 +91,14 @@ export class SelectExtendDirective implements OnInit {
      * 加载完成事件
      */
     @Output() onLoad = new EventEmitter<any>();
+    /**
+     * 搜索事件
+     */
+    @Output() onSearch = new EventEmitter<string>();
+    /**
+     * 滚动到底部事件
+     */
+    @Output() onScrollToBottom = new EventEmitter<void>();
 
     /**
      * 初始化选择框扩展指令
@@ -92,6 +110,7 @@ export class SelectExtendDirective implements OnInit {
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
+        this.searchDelay = 500;
     }
 
     /**
@@ -109,6 +128,7 @@ export class SelectExtendDirective implements OnInit {
     ngOnInit() {
         this.initPageSize();
         this.initOrder();
+        this.initSearch();
         this.loadData();
         if (this.data)
             return;
@@ -132,6 +152,18 @@ export class SelectExtendDirective implements OnInit {
         if (!this.order)
             return;
         this.queryParam.order = this.order;
+    }
+
+    /**
+     * 初始化搜索
+     */
+    private initSearch() {
+        this.searchChange$.pipe(
+            filter(value => value !== null),
+            debounceTime(this.searchDelay)
+        ).subscribe(value => {
+            this.serverSearch(value);
+        });
     }
 
     /**
@@ -191,23 +223,18 @@ export class SelectExtendDirective implements OnInit {
                 return true;
             },
             ok: result => {
-                this.loadData(result);
-                options.ok && options.ok(result);
-                this.loadAfter(result);
                 this.onLoad.emit(result);
+                if (options.ok) {
+                    options.ok(result); 
+                    return;
+                } 
+                this.loadData(result);                
             },
             complete: () => {
                 this.loading = false;
                 options.complete && options.complete();
             }
         });
-    }
-
-    /**
-     * 加载完成操作
-     * @param result
-     */
-    loadAfter(result) {
     }
 
     /**
@@ -222,5 +249,48 @@ export class SelectExtendDirective implements OnInit {
         this.queryParam.order = null;
         this.loadUrl();
     }
-}
 
+    /**
+     * 搜索
+     * @param value 值
+     */
+    search(value: string) {
+        this.searchChange$.next(value);
+    }
+
+    /**
+     * 服务端搜索
+     */
+    private serverSearch(value: string) {
+        this.onSearch.emit(value);
+        this.queryParam.page = 1;
+        this.queryParam.keyword = value;
+        this.loadUrl();
+    }
+
+    /**
+     * 滚动到底部
+     */
+    scrollToBottom() {
+        this.onScrollToBottom.emit();
+        if (this.isScrollLoad)
+            this.scrollLoad();
+    }
+
+    /**
+     * 下拉加载
+     */
+    private scrollLoad() {
+        this.queryParam.page = this.util.helper.toNumber(this.queryParam.page) + 1;
+        this.loadUrl({
+            ok: result => {
+                if (!result || result.length === 0) {
+                    this.isScrollLoad = false;
+                    return;
+                }
+                let data = [...this.data, ...result];
+                this.loadData(data);
+            }
+        });
+    }
+}
