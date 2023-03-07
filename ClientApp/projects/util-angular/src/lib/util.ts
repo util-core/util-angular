@@ -2,12 +2,13 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector, InjectFlags } from '@angular/core';
+import { Injector } from '@angular/core';
 import * as Helper from './common/helper';
 import { Ioc } from './common/ioc';
 import { Message } from './message/message';
 import { Router } from "./common/router";
 import { Dialog } from "./dialog/dialog";
+import { Drawer } from "./drawer/drawer";
 import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
@@ -16,6 +17,7 @@ import { I18n } from "./common/i18n";
 import { Sanitizer } from "./common/sanitizer";
 import { Loading } from "./common/loading";
 import { Url } from "./common/url";
+import { Component } from "./common/component";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 
@@ -39,6 +41,10 @@ export class Util {
      * 弹出层操作
      */
     private _dialog: Dialog;
+    /**
+     * 抽屉操作
+     */
+    private _drawer: Drawer;
     /**
      * Http操作
      */
@@ -71,6 +77,10 @@ export class Util {
      * Url操作
      */
     private _url: Url;
+    /**
+     * 组件操作
+     */
+    private _component: Component;
 
     /**
      * 初始化操作入口
@@ -127,8 +137,17 @@ export class Util {
     */
     get dialog() {
         if (!this._dialog)
-            this._dialog = new Dialog(this.ioc);
+            this._dialog = new Dialog(this);
         return this._dialog;
+    };
+
+    /**
+    * 抽屉操作
+    */
+    get drawer() {
+        if (!this._drawer)
+            this._drawer = new Drawer(this);
+        return this._drawer;
     };
 
     /**
@@ -204,6 +223,15 @@ export class Util {
     };
 
     /**
+    * 组件操作
+    */
+    get component() {
+        if (!this._component)
+            this._component = new Component(this);
+        return this._component;
+    };
+
+    /**
      * 初始化
      * @param injector 全局注入器
      */
@@ -216,7 +244,7 @@ export class Util {
      * 初始化分页大小
      */
     private static initPageSize() {
-        let config = this.injector.get<AppConfig>(AppConfig, <AppConfig>null, InjectFlags.Optional);
+        let config = this.injector.get<AppConfig>(AppConfig, null, { optional: true });
         if (!config)
             return;
         if (config.pageSize > 0)

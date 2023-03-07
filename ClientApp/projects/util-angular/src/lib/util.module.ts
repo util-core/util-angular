@@ -3,6 +3,8 @@
 //Licensed under the MIT license
 //================================================
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { TableExtendDirective } from "./zorro/table.extend.directive";
 import { EditTableDirective } from "./zorro/edit-table.directive";
 import { EditRowDirective } from "./zorro/edit-row.directive";
@@ -13,6 +15,7 @@ import { SelectExtendDirective } from "./zorro/select.extend.directive";
 import { TreeTableExtendDirective } from "./zorro/tree.table.extend.directive";
 import { TreeExtendDirective } from "./zorro/tree.extend.directive";
 import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
+import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
 
 /**
  * utilÄ£¿é
@@ -24,9 +27,10 @@ import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
         ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
-        TinymceExtendDirective
+        TinymceExtendDirective, DrawerFooterComponent
     ],
     imports: [
+        CommonModule,NzButtonModule
     ],
     exports: [
         TableExtendDirective,

@@ -6,7 +6,7 @@ import { Directive, Input, Optional } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { Util } from "../util";
-import { AppConfig, initAppConfig } from '../config/app-config';
+import { isEmpty } from '../common/helper';
 
 /**
  * NgZorro按钮扩展指令
@@ -31,18 +31,7 @@ export class ButtonExtendDirective  {
      * @param button 按钮
      * @param config 配置
      */
-    constructor(@Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent, @Optional() protected config: AppConfig) {
-        this.initAppConfig();
-        this.util = new Util(null,this.config);
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
+    constructor(@Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent) {
     }
 
     /**
@@ -51,7 +40,7 @@ export class ButtonExtendDirective  {
     ngDoCheck() {
         if (!this.form)
             return;
-        if (this.util.helper.isEmpty(this.disabled) === false)
+        if (isEmpty(this.disabled) === false)
             return;
         this.button.disabled = !this.form.valid;
     }

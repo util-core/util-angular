@@ -1,19 +1,18 @@
-﻿//============== 树形弹出层编辑组件基类===============
+﻿//============== 树形编辑组件基类=====================
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //====================================================
 import { Injector, Input, OnInit, Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
 import { TreeViewModel } from "../core/tree-view-model";
 import { EditComponentBase } from "./edit-component-base";
 
 /**
- * 树形弹出层编辑组件基类
+ * 树形编辑组件基类
  */
 @Component({
     template: ''
 })
-export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewModel> extends EditComponentBase<TViewModel> implements OnInit {
+export abstract class TreeEditComponentBase<TViewModel extends TreeViewModel> extends EditComponentBase<TViewModel> implements OnInit {
     /**
      * 父节点
      */
@@ -81,20 +80,5 @@ export abstract class TreeDialogEditComponentBase<TViewModel extends TreeViewMod
      */
     protected onLoad(result) {
         this.setParent(this.getParent());
-    }
-
-    /**
-     * 提交表单
-     * @param button 按钮
-     * @param form 表单
-     */
-    submit(button?, form?: NgForm) {
-        this.util.form.submit({
-            url: this.getSubmitUrl(),
-            data: this.model,
-            form: form || this.form,
-            button: button,
-            closeDialog: true
-        });
     }
 }

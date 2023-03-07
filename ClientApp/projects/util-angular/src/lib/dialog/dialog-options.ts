@@ -63,7 +63,7 @@ export interface IDialogOptions {
      */
     okText?: string,
     /**
-     * 确定按钮的类型, 可选值: default,primary,dashed,danger
+     * 确定按钮的类型, 可选值: 'primary' | 'default' | 'dashed' | 'link' | 'text' | null
      */
     okType?: NzButtonType,
     /**

@@ -67,6 +67,10 @@ export interface IFormSubmitOptions {
      */
     closeDialog?: boolean;
     /**
+     * 提交成功后关闭抽屉，当在抽屉中编辑时使用，默认为false
+     */
+    closeDrawer?: boolean;
+    /**
      * 提交前处理函数，返回false则取消提交
      * @param data 数据
      */

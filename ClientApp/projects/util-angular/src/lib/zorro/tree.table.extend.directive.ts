@@ -11,7 +11,6 @@ import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
 import { AppConfig } from '../config/app-config';
 import { I18nKeys } from '../config/i18n-keys';
-import { forEach } from 'lodash';
 
 /**
  * NgZorro树形表格扩展指令

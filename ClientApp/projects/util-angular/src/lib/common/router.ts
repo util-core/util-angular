@@ -20,9 +20,10 @@ export class Router {
     /**
      * 返回上一次视图
      */
-    back(): void {
+    back() {
         let location: Location = this.ioc.get(Location);
-        location.back();
+        if (location )
+            location.back();
     }
 
     /**

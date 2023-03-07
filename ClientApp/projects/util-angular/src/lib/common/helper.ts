@@ -4,7 +4,7 @@
 //================================================
 import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
-    hasIn, cloneDeep, assign as assign2
+    hasIn, cloneDeep, assign as assign2, toString as toString2
 } from "lodash";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
@@ -15,6 +15,14 @@ import { UUID } from './internal/uuid';
  */
 export let isUndefined = (value): boolean => {
     return typeof value === 'undefined';
+}
+
+/**
+ * 是否字符串
+ * @param value 值
+ */
+export let isString = (value): boolean => {
+    return typeof value === 'string';
 }
 
 /**
@@ -95,40 +103,11 @@ export let trimEnd = (value: string, end: string) => {
 }
 
 /**
- * 获取地址
- * @param url 请求地址
- * @param host 主机
- * @param path 路径
+ * 是否Promise类型
+ * @param obj 对象
  */
-export function getUrl(url: string, host: string = null, path: string = null) {
-    url = getHostUrl(url, host);
-    if (!url)
-        return null;
-    if (path) {
-        url = trimEnd(url, "/");
-        path = trimStart(path, "/");
-        return `${url}/${path}`;
-    }
-    return url;
-}
-
-/**
- * 获取地址
- */
-function getHostUrl(url: string, host: string) {
-    if (!url)
-        return null;
-    if (url.startsWith("http"))
-        return url;
-    host = trimEnd(host, "/");
-    if (url.startsWith("/")) {
-        if (host)
-            return `${host}${url}`;
-        return url;
-    }
-    if (host)
-        return `${host}/api/${url}`;
-    return `/api/${url}`;
+export function isPromise<T>(obj): obj is Promise<T> {
+    return !!obj && typeof obj.then === 'function' && typeof obj.catch === 'function';
 }
 
 /**
@@ -169,8 +148,8 @@ export let clone = <T>(obj: T): T => {
  * @param destination 目标对象
  * @param source 源对象
  */
-export let assign = (destination,source) => {
-    return assign2(destination, source );
+export let assign = (destination, source) => {
+    return assign2(destination, source);
 }
 
 /**
@@ -190,6 +169,14 @@ export let formatDate = (datetime, format: string = 'yyyy-MM-dd HH:mm:ss'): stri
         format = 'yyyy-MM-dd HH:mm:ss';
     format = format.replace(/Y/g, "y").replace(/D/g, "d");
     return format2(datetime, format);
+}
+
+/**
+ * 转换为字符串
+ * @param value 输入值
+ */
+export let toString = (value): string => {
+    return toString2(value).trim();
 }
 
 /**
@@ -218,4 +205,41 @@ export function getIds(data) {
     if (!data.map)
         return data.id;
     return data.map(t => t.id);
+}
+
+/**
+ * 获取地址
+ * @param url 请求地址
+ * @param host 主机
+ * @param path 路径
+ */
+export function getUrl(url: string, host: string = null, path: string = null) {
+    url = getHostUrl(url, host);
+    if (!url)
+        return null;
+    if (path) {
+        url = trimEnd(url, "/");
+        path = trimStart(path, "/");
+        return `${url}/${path}`;
+    }
+    return url;
+}
+
+/**
+ * 获取地址
+ */
+function getHostUrl(url: string, host: string) {
+    if (!url)
+        return null;
+    if (url.startsWith("http"))
+        return url;
+    host = trimEnd(host, "/");
+    if (url.startsWith("/")) {
+        if (host)
+            return `${host}${url}`;
+        return url;
+    }
+    if (host)
+        return `${host}/api/${url}`;
+    return `/api/${url}`;
 }

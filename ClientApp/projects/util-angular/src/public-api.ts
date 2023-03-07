@@ -21,6 +21,9 @@ export * from "./lib/config/app-config";
 //导出dialog
 export * from "./lib/dialog/dialog-options";
 
+//导出drawer
+export * from "./lib/drawer/drawer-options";
+
 //导出message
 export * from "./lib/message/confirm-options";
 
@@ -38,11 +41,10 @@ export * from "./lib/form/form-submit-option";
 export * from "./lib/base/component-base";
 export * from "./lib/base/query-component-base";
 export * from "./lib/base/table-query-component-base";
-export * from "./lib/base/edit-component-base";
-export * from "./lib/base/dialog-edit-component-base";
-export * from "./lib/base/table-edit-component-base";
 export * from "./lib/base/tree-table-query-component-base";
-export * from "./lib/base/tree-dialog-edit-component-base";
+export * from "./lib/base/edit-component-base";
+export * from "./lib/base/tree-edit-component-base";
+export * from "./lib/base/table-edit-component-base";
 
 //导出ng-zorro
 export * from "./lib/zorro/table.extend.directive";

@@ -138,11 +138,12 @@ export class Form {
         options.ok && options.ok( result );
         if (options.showMessage !== false)
             this.util.message.success(options.message || I18nKeys.succeeded);
-        if ( options.back )
-            this.util.router.back();
-        if ( options.closeDialog ) {
-            result = result || "ok";
+        result = result || "ok";        
+        if ( options.closeDialog )
             this.util.dialog.close(result);
-        }
+        if (options.closeDrawer)
+            this.util.drawer.close(result);
+        if (options.back)
+            this.util.router.back();
     }
 }

@@ -62,15 +62,15 @@ export abstract class QueryComponentBase extends ComponentBase {
     }
 
     /**
-     * 打开创建页面弹出框
+     * 打开创建弹出框
      */
     openCreateDialog(data?) {
         this.util.dialog.open({
-            component: this.getCreateDialogComponent(),
+            component: this.getCreateComponent(),
             centered: true,
-            title: this.getCreateDialogTitle(),
-            data: this.getCreateDialogData(data),
-            width: this.getCreateDialogWidth(),
+            title: this.getCreateTitle(),
+            data: this.getCreateData(data),
+            width: this.getCreateWidth(),
             disableClose: true,
             showFooter: false,
             onOpenBefore: () => {
@@ -86,57 +86,57 @@ export abstract class QueryComponentBase extends ComponentBase {
     }
 
     /**
-     * 获取创建弹出框组件
+     * 获取创建组件
      */
-    protected getCreateDialogComponent() {
+    protected getCreateComponent() {
         return {};
     }
 
     /**
-     * 获取创建弹出框标题
+     * 获取创建标题
      */
-    protected getCreateDialogTitle() {
+    protected getCreateTitle() {
         return null;
     }
 
     /**
-     * 获取创建弹出框数据
+     * 获取创建数据
      */
-    protected getCreateDialogData(data?) {
+    protected getCreateData(data?) {
         return {};
     }
 
     /**
-     * 获取创建弹出框宽度
+     * 获取创建框宽度
      */
-    protected getCreateDialogWidth() {
-        return this.getDialogWidth();
+    protected getCreateWidth() {
+        return this.getWidth();
     }
 
     /**
      * 获取弹出框宽度，默认值：60%
      */
-    protected getDialogWidth() {
+    protected getWidth() {
         return "60%";
     }
 
     /**
-     * 创建弹出框打开前回调函数，返回 false 阻止打开
+     * 创建框打开前回调函数，返回 false 阻止打开
      */
     protected onCreateOpenBefore() {
         return true;
     }
 
     /**
-     * 创建弹出框关闭前回调函数，返回 false 阻止关闭
+     * 创建框关闭前回调函数，返回 false 阻止关闭
      * @param result 返回结果
      */
-    protected onCreateCloseBefore(result) {
+    protected onCreateCloseBefore(result?) {
         return true;
     }
 
     /**
-     * 创建弹出框关闭回调函数
+     * 创建框关闭回调函数
      * @param result 返回结果
      */
     protected onCreateClose(result) {
@@ -145,15 +145,15 @@ export abstract class QueryComponentBase extends ComponentBase {
     }
 
     /**
-     * 打开修改页面弹出框
+     * 打开修改弹出框
      */
     openEditDialog(data) {
         this.util.dialog.open({
-            component: this.getEditDialogComponent(),
+            component: this.getEditComponent(),
             centered: true,
-            title: this.getEditDialogTitle(),
-            data: this.getEditDialogData(data),
-            width: this.getEditDialogWidth(),
+            title: this.getEditTitle(),
+            data: this.getEditData(data),
+            width: this.getEditWidth(),
             disableClose: true,
             showFooter: false,
             onOpenBefore: () => {
@@ -169,52 +169,52 @@ export abstract class QueryComponentBase extends ComponentBase {
     }
 
     /**
-     * 获取更新弹出框组件
+     * 获取更新组件
      */
-    protected getEditDialogComponent() {
-        return this.getCreateDialogComponent();
+    protected getEditComponent() {
+        return this.getCreateComponent();
     }
 
     /**
-     * 获取更新弹出框标题
+     * 获取更新标题
      */
-    protected getEditDialogTitle() {
+    protected getEditTitle() {
         return null;
     }
 
     /**
-     * 获取更新弹出框数据
+     * 获取更新数据
      */
-    protected getEditDialogData(data) {
+    protected getEditData(data) {
         if (!data)
             return null;
         return { id: data.id, data: data };
     }
 
     /**
-     * 获取编辑弹出框宽度
+     * 获取编辑框宽度
      */
-    protected getEditDialogWidth() {
-        return this.getDialogWidth();
+    protected getEditWidth() {
+        return this.getWidth();
     }
 
     /**
-     * 更新弹出框打开前回调函数，返回 false 阻止打开
+     * 更新框打开前回调函数，返回 false 阻止打开
      */
     protected onEditOpenBefore() {
         return true;
     }
 
     /**
-     * 更新弹出框关闭前回调函数，返回 false 阻止关闭
+     * 更新框关闭前回调函数，返回 false 阻止关闭
      * @param result 返回结果
      */
-    protected onEditCloseBefore(result) {
+    protected onEditCloseBefore(result?) {
         return true;
     }
 
     /**
-     * 更新弹出框关闭回调函数
+     * 更新框关闭回调函数
      * @param result 返回结果
      */
     protected onEditClose(result) {
@@ -223,44 +223,117 @@ export abstract class QueryComponentBase extends ComponentBase {
     }
 
     /**
-     * 打开详情页面弹出框
+     * 打开详情弹出框
      */
     openDetailDialog(data) {
         this.util.dialog.open({
-            component: this.getDetailDialogComponent(),
+            component: this.getDetailComponent(),
             centered: true,
-            title: this.getDetailDialogTitle(),
-            data: this.getDetailDialogData(data),
-            width: this.getDetailDialogWidth(),
+            title: this.getDetailTitle(),
+            data: this.getDetailData(data),
+            width: this.getDetailWidth(),
             showOk: false
         });
     }
 
     /**
-     * 获取详情弹出框组件
+     * 获取详情组件
      */
-    protected getDetailDialogComponent() {
+    protected getDetailComponent() {
         return {};
     }
 
     /**
-     * 获取更新弹出框标题
+     * 获取详情标题
      */
-    protected getDetailDialogTitle() {
+    protected getDetailTitle() {
         return null;
     }
 
     /**
-     * 获取详情弹出框数据
+     * 获取详情数据
      */
-    protected getDetailDialogData(data) {
-        return this.getEditDialogData(data);
+    protected getDetailData(data) {
+        return this.getEditData(data);
     }
 
     /**
-     * 获取详情弹出框宽度
+     * 获取详情宽度
      */
-    protected getDetailDialogWidth() {
-        return this.getDialogWidth();
+    protected getDetailWidth() {
+        return this.getWidth();
+    }
+
+    /**
+     * 打开创建抽屉
+     */
+    openCreateDrawer(data?) {
+        this.util.drawer.open({
+            component: this.getCreateComponent(),
+            title: this.getCreateTitle(),
+            data: this.getCreateData(data),
+            width: this.getCreateWidth(),
+            disableClose: true,
+            showFooter: this.isShowDrawerFooter(),
+            onOpenBefore: () => {
+                return this.onCreateOpenBefore();
+            },
+            onCloseBefore: () => {
+                return this.onCreateCloseBefore();
+            },
+            onClose: result => {
+                this.onCreateClose(result);
+            },
+            onOk: (instance,btn) => {
+                instance.submit(btn);
+            }
+        });
+    }
+
+    /**
+     * 是否显示抽屉页脚,默认值: true
+     */
+    protected isShowDrawerFooter() {
+        return true;
+    }
+
+    /**
+     * 打开修改抽屉
+     */
+    openEditDrawer(data) {
+        this.util.drawer.open({
+            component: this.getEditComponent(),
+            title: this.getEditTitle(),
+            data: this.getEditData(data),
+            width: this.getEditWidth(),
+            disableClose: true,
+            showFooter: this.isShowDrawerFooter(),
+            onOpenBefore: () => {
+                return this.onEditOpenBefore();
+            },
+            onCloseBefore: () => {
+                return this.onEditCloseBefore();
+            },
+            onClose: result => {
+                this.onEditClose(result);
+            },
+            onOk: (instance, btn) => {
+                instance.submit(btn);
+            }
+        });
+    }
+
+    /**
+     * 打开详情抽屉
+     */
+    openDetailDrawer(data) {
+        this.util.drawer.open({
+            component: this.getDetailComponent(),
+            title: this.getDetailTitle(),
+            data: this.getDetailData(data),
+            width: this.getDetailWidth(),
+            showFooter: this.isShowDrawerFooter(),
+            showOk: false
+        });
     }
 }

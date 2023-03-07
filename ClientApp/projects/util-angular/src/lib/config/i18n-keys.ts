@@ -20,6 +20,14 @@ export class I18nKeys {
      */
     static tips = "util.tips";
     /**
+     * 取消
+     */
+    static cancel = "util.cancel";
+    /**
+     * 确定
+     */
+    static ok = "util.ok";
+    /**
      * 操作成功
      */
     static succeeded = "util.succeeded";

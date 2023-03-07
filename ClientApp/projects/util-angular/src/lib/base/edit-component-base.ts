@@ -65,11 +65,11 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * @param id 标识
      */
     protected loadById(id?) {
-        if (this.onLoadBefore(id) === false)
-            return;       
         id = id || this.id || this.util.router.getParam("id");
         if (!id)
             return;
+        if (this.onLoadBefore(id) === false)
+            return;        
         this.util.webapi.get<TViewModel>(this.getLoadUrl(id)).handle({
             ok: result => {
                 let model = this.toModel(result);
@@ -83,16 +83,16 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * 加载前操作,返回false阻止加载
      * @param id 标识
      */
-    protected onLoadBefore(id?) {
+    protected onLoadBefore(id) {
         return true;
     }
 
     /**
-     * 转换为模型
-     * @param data 数据
+     * 将结果转换为模型
+     * @param result 结果
      */
-    protected toModel(data) {
-        return data;
+    protected toModel(result) {
+        return result;
     }
 
     /**
@@ -138,15 +138,18 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
     /**
      * 提交表单
      * @param button 按钮
-     * @param form 表单
      */
-    submit(button?, form?: NgForm) {
+    submit(button?) {
         this.util.form.submit({
             url: this.getSubmitUrl(),
             data: this.model,
-            form: form || this.form,
+            form: this.form,
             button: button,
-            back: true
+            back: this.isBack(),
+            closeDialog: this.isCloseDialog(),
+            closeDrawer: this.isCloseDrawer(),            
+            before: data => this.onSubmitBefore(data),
+            ok: result => this.onSubmit(result)
         });
     }
 
@@ -176,6 +179,51 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
     }
 
     /**
+     * 提交完成是否返回路由,默认值: false,注意,不使用弹出框编辑时设置为true
+     */
+    protected isBack() {
+        return false;
+    }
+
+    /**
+     * 提交完成是否关闭弹出层,默认值: true
+     * @returns
+     */
+    protected isCloseDialog() {
+        return true;
+    }    
+
+    /**
+     * 提交完成是否关闭抽屉,默认值: true
+     * @returns
+     */
+    protected isCloseDrawer() {
+        return true;
+    }
+
+    /**
+     * 提交前操作
+     * @param data 参数
+     */
+    protected onSubmitBefore(data) {
+        return true;
+    }
+
+    /**
+     * 提交后操作
+     * @param result 结果
+     */
+    protected onSubmit(result) {
+    }
+
+    /**
+     * 是否有效
+     */
+    isValid(): boolean {
+        return this.form && this.form.valid;
+    }
+
+    /**
      * 返回
      */
     back() {
@@ -183,9 +231,10 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
     }
 
     /**
-     * 关闭弹出框
+     * 关闭
      */
     close() {
         this.util.dialog.close();
+        this.util.drawer.close();
     }
 }

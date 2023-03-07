@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { NzModalService, ModalOptions, NzModalRef } from "ng-zorro-antd/modal";
-import { Ioc } from '../common/ioc';
+import { Util } from '../util';
 import { isUndefined } from '../common/helper';
 import { IDialogOptions } from "./dialog-options";
 
@@ -13,9 +13,9 @@ import { IDialogOptions } from "./dialog-options";
 export class Dialog {
     /**
      * 初始化弹出层操作
-     * @param ioc Ioc操作
+     * @param util 操作入口
      */
-    constructor( private ioc:Ioc ) {
+    constructor(private util: Util) {
     }
 
     /**
@@ -38,7 +38,7 @@ export class Dialog {
      * 获取模态窗服务
      */
     private getModalService() {
-        return this.ioc.get(NzModalService);
+        return this.util.ioc.get(NzModalService);
     }
 
     /**
@@ -54,7 +54,7 @@ export class Dialog {
      */
     private toOptions(options: IDialogOptions): ModalOptions {
         return {
-            nzTitle: options.title,
+            nzTitle: this.getTitle(options),
             nzContent: options.component || options.content,
             nzComponentParams: options.data,
             nzCentered: options.centered,
@@ -84,6 +84,15 @@ export class Dialog {
                 options.onCloseBefore && options.onCloseBefore(null);
             }
         };
+    }
+
+    /**
+     * 获取标题
+     */
+    private getTitle(options: IDialogOptions) {
+        if (this.util.helper.isString(options.title))
+            return this.util.i18n.get(<string>options.title);
+        return options.title;
     }
 
     /**
@@ -127,6 +136,8 @@ export class Dialog {
      */
     close(result?) {
         let dialog: NzModalService = this.getModalService();
+        if (!dialog)
+            return;
         if (!dialog.openModals || dialog.openModals.length === 0)
             return;
         let dialogRef: NzModalRef = dialog.openModals[dialog.openModals.length - 1];

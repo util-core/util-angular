@@ -27,7 +27,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 是否显示进度条
      */
-    loading: boolean;
+    loading: boolean = false;
     /**
      * 总行数
      */
@@ -44,10 +44,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 查询延迟
      */
     @Input() timeout;
-    /**
-     * 查询延迟间隔，单位：毫秒，默认500
-     */
-    @Input() delay: number;
     /**
      * 数据源
      */
@@ -106,7 +102,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         this.selectedSelection = new SelectionModel<TModel>(false, []);
         this.pageSizeOptions = [];
         this.autoLoad = true;
-        this.delay = 500;
     }
 
     /**
@@ -122,7 +117,8 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 初始化
      */
     ngOnInit() {
-        setTimeout(() => {
+        setTimeout(() => {            
+            this.queryParam = this.queryParam || new QueryParameter();
             this.initPageSize();
             this.initOrder();
             if (this.autoLoad)
@@ -151,6 +147,8 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 获取勾选的实体列表
      */
     getChecked(): TModel[] {
+        if (!this.dataSource)
+            return [];
         return this.dataSource.filter(data => this.checkedSelection.isSelected(data));
     }
 

@@ -84,6 +84,10 @@ export class SelectExtendDirective implements OnInit {
      */
     @Input() isScrollLoad: boolean;
     /**
+     * 是否下拉加载已完成
+     */
+    private isScrollLoadCompleted: boolean;
+    /**
      * 查询参数变更事件
      */
     @Output() queryParamChange = new EventEmitter<any>();
@@ -262,6 +266,7 @@ export class SelectExtendDirective implements OnInit {
      * 服务端搜索
      */
     private serverSearch(value: string) {
+        this.isScrollLoadCompleted = false;
         this.onSearch.emit(value);
         this.queryParam.page = 1;
         this.queryParam.keyword = value;
@@ -273,8 +278,11 @@ export class SelectExtendDirective implements OnInit {
      */
     scrollToBottom() {
         this.onScrollToBottom.emit();
-        if (this.isScrollLoad)
-            this.scrollLoad();
+        if (!this.isScrollLoad)
+            return;
+        if (this.isScrollLoadCompleted)
+            return;
+        this.scrollLoad();
     }
 
     /**
@@ -285,7 +293,7 @@ export class SelectExtendDirective implements OnInit {
         this.loadUrl({
             ok: result => {
                 if (!result || result.length === 0) {
-                    this.isScrollLoad = false;
+                    this.isScrollLoadCompleted = true;
                     return;
                 }
                 let data = [...this.data, ...result];
