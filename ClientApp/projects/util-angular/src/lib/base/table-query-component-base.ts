@@ -14,11 +14,7 @@ import { TableExtendDirective } from "../zorro/table.extend.directive";
 @Component({
     template: ''
 })
-export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQuery extends QueryParameter> extends QueryComponentBase implements AfterViewInit {
-    /**
-     * 查询参数
-     */
-    queryParam: TQuery;
+export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQuery extends QueryParameter> extends QueryComponentBase<TQuery> implements AfterViewInit {
     /**
      * 表格扩展指令
      */
@@ -30,21 +26,6 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
      */
     constructor(injector: Injector) {
         super(injector);
-        this.queryParam = <TQuery>new QueryParameter();
-    }
-
-    /**
-     * 初始化
-     */
-    ngOnInit() {
-        this.queryParam = this.createQuery();
-    }
-
-    /**
-     * 创建查询参数
-     */
-    protected createQuery(): TQuery {
-        return <TQuery>new QueryParameter();
     }
 
     /**
@@ -120,17 +101,13 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     }
 
     /**
-     * 通过标识刷新单个节点
-     * @param id 标识
-     * @param handler 刷新后回调函数
+     * 刷新单个实体
+     * @param model 实体对象
      */
-    refreshById(id, handler?: (data) => void) {
+    refreshByModel(model) {
         if (!this.table)
             return;
-        this.table.refreshById({
-            id: id,
-            ok: handler
-        });
+        this.table.refreshByModel(model);
     }
 
     /**

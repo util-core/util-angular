@@ -3,6 +3,7 @@
 //Licensed under the MIT license
 //=======================================================
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Result } from '../core/result';
 import { FailResult } from "../core/fail-result";
 import { StateCode } from "../core/state-code";
@@ -85,7 +86,7 @@ export class WebApiRequest<T> {
      * 设置响应类型
      * @param responseType 响应类型
      */
-    responseType( responseType ): WebApiRequest<T>  {
+    responseType(responseType): WebApiRequest<T> {
         this.request.responseType(responseType);
         return this;
     }
@@ -145,6 +146,15 @@ export class WebApiRequest<T> {
      */
     loading(isShowLoading: boolean = true): WebApiRequest<T> {
         this.isShowLoading = isShowLoading;
+        return this;
+    }
+
+    /**
+     * 配置请求客户端
+     * @param handler 请求客户端配置操作
+     */
+    configClient(handler: (client: Observable<T>) => Observable<T>): WebApiRequest<T> {
+        this.request.configClient(handler);
         return this;
     }
 
@@ -211,7 +221,7 @@ export class WebApiRequest<T> {
     /**
      * 处理Http异常
      */
-    private handleHttpException( failResult: FailResult) {
+    private handleHttpException(failResult: FailResult) {
         if (failResult.errorResponse)
             console.log(this.getHttpExceptionMessage(failResult));
     }
@@ -254,10 +264,10 @@ export class WebApiRequest<T> {
      * 显示加载状态
      */
     private showLoading() {
-        if ( this.btn )
+        if (this.btn)
             this.btn.nzLoading = true;
         if (this.isShowLoading)
-            this.util.loading.open();        
+            this.util.loading.open();
     }
 
     /**

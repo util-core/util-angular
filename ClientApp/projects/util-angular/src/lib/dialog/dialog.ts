@@ -75,6 +75,7 @@ export class Dialog {
             nzMaskStyle: options.maskStyle,
             nzClassName: options.className,
             nzWrapClassName: options.wrapClassName,
+            nzAutofocus: this.getAutofocus(options),
             nzOnOk: options.onOk,
             nzOnCancel: data => {
                 if (data.tag === true) {
@@ -120,6 +121,15 @@ export class Dialog {
         if (options.showFooter === false)
             return null;
         return options.footer;
+    }
+
+    /**
+     * 获取焦点设置
+     */
+    private getAutofocus(options: IDialogOptions) {
+        if (options.autofocus)
+            return options.autofocus;
+        return 'auto';
     }
 
     /**

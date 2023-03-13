@@ -2,9 +2,9 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { debounceTime, filter } from 'rxjs/operators';
+import { Directive, Input, Output, OnInit, OnDestroy, EventEmitter, Optional } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
 import { SelectOption } from '../core/select-option';
@@ -20,11 +20,15 @@ import { AppConfig, initAppConfig } from '../config/app-config';
     selector: '[x-select-extend]',
     exportAs: 'xSelectExtend'
 })
-export class SelectExtendDirective implements OnInit {
+export class SelectExtendDirective implements OnInit, OnDestroy {
     /**
      * 操作入口
      */
     protected util: Util;
+    /**
+     * 清理对象
+     */
+    private destroy$ = new Subject<void>();
     /**
      * 搜索变更对象
      */
@@ -127,6 +131,14 @@ export class SelectExtendDirective implements OnInit {
     }
 
     /**
+     * 组件清理
+     */
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    /**
      * 组件初始化
      */
     ngOnInit() {
@@ -163,8 +175,10 @@ export class SelectExtendDirective implements OnInit {
      */
     private initSearch() {
         this.searchChange$.pipe(
+            takeUntil(this.destroy$),
             filter(value => value !== null),
-            debounceTime(this.searchDelay)
+            debounceTime(this.searchDelay),
+            distinctUntilChanged()
         ).subscribe(value => {
             this.serverSearch(value);
         });

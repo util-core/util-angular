@@ -18,6 +18,8 @@ import { Sanitizer } from "./common/sanitizer";
 import { Loading } from "./common/loading";
 import { Url } from "./common/url";
 import { Component } from "./common/component";
+import { ChangeDetector } from "./common/change-detector";
+import { Event } from "./common/event";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 
@@ -81,6 +83,14 @@ export class Util {
      * 组件操作
      */
     private _component: Component;
+    /**
+     * 变更检测操作
+     */
+    private _changeDetector: ChangeDetector;
+    /**
+     * 事件操作
+     */
+    private _event: Event;
 
     /**
      * 初始化操作入口
@@ -115,8 +125,8 @@ export class Util {
     };
 
     /**
-    * 消息操作
-    */
+     * 消息操作
+     */
     get message() {
         if (!this._message)
             this._message = new Message(this);
@@ -124,8 +134,8 @@ export class Util {
     };
 
     /**
-    * 路由操作
-    */
+     * 路由操作
+     */
     get router() {
         if (!this._router)
             this._router = new Router(this.ioc);
@@ -133,8 +143,8 @@ export class Util {
     };
 
     /**
-    * 弹出层操作
-    */
+     * 弹出层操作
+     */
     get dialog() {
         if (!this._dialog)
             this._dialog = new Dialog(this);
@@ -142,8 +152,8 @@ export class Util {
     };
 
     /**
-    * 抽屉操作
-    */
+     * 抽屉操作
+     */
     get drawer() {
         if (!this._drawer)
             this._drawer = new Drawer(this);
@@ -151,8 +161,8 @@ export class Util {
     };
 
     /**
-    * Http操作
-    */
+     * Http操作
+     */
     get http() {
         if (!this._http)
             this._http = new Http(this.ioc);
@@ -160,8 +170,8 @@ export class Util {
     };
 
     /**
-    * WebApi操作
-    */
+     * WebApi操作
+     */
     get webapi() {
         if (!this._webapi)
             this._webapi = new WebApi(this);
@@ -169,8 +179,8 @@ export class Util {
     };
 
     /**
-    * Form操作
-    */
+     * Form操作
+     */
     get form() {
         if (!this._form)
             this._form = new Form(this);
@@ -178,8 +188,8 @@ export class Util {
     };
 
     /**
-    * Cookie操作
-    */
+     * Cookie操作
+     */
     get cookie() {
         if (!this._cookie)
             this._cookie = new Cookie(this);
@@ -187,8 +197,8 @@ export class Util {
     };
 
     /**
-    * 清理操作
-    */
+     * 清理操作
+     */
     get sanitizer() {
         if (!this._sanitizer)
             this._sanitizer = new Sanitizer(this);
@@ -196,8 +206,8 @@ export class Util {
     };
 
     /**
-    * 国际化操作
-    */
+     * 国际化操作
+     */
     get i18n() {
         if (!this._i18n)
             this._i18n = new I18n(this);
@@ -205,8 +215,8 @@ export class Util {
     };
 
     /**
-    * 加载操作
-    */
+     * 加载操作
+     */
     get loading() {
         if (!this._loading)
             this._loading = new Loading(this);
@@ -214,8 +224,8 @@ export class Util {
     };
 
     /**
-    * Url操作
-    */
+     * Url操作
+     */
     get url() {
         if (!this._url)
             this._url = new Url(this);
@@ -223,12 +233,30 @@ export class Util {
     };
 
     /**
-    * 组件操作
-    */
+     * 组件操作
+     */
     get component() {
         if (!this._component)
             this._component = new Component(this);
         return this._component;
+    };
+
+    /**
+     * 变更检测操作
+     */
+    get changeDetector() {
+        if (!this._changeDetector)
+            this._changeDetector = new ChangeDetector(this);
+        return this._changeDetector;
+    };
+
+    /**
+     * 事件操作
+     */
+    get event() {
+        if (!this._event)
+            this._event = new Event(this);
+        return this._event;
     };
 
     /**

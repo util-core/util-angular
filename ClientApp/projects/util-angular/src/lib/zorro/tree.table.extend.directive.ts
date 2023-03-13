@@ -715,8 +715,16 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     }
 
     /**
+     * 刷新单个实体
+     * @param model 实体对象
+     */
+    refreshByModel(model) {
+        this.refreshNode(model);
+    }
+
+    /**
      * 刷新单个节点
-     * @param data 单个对象数据
+     * @param data 实体对象
      */
     protected refreshNode(data) {
         /**

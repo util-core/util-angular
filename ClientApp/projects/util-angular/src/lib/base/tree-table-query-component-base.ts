@@ -15,11 +15,7 @@ import { QueryComponentBase } from "./query-component-base";
 @Component({
     template: ''
 })
-export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewModel, TQuery extends TreeQueryParameter> extends QueryComponentBase implements OnInit {
-    /**
-     * 查询参数
-     */
-    queryParam: TQuery;
+export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewModel, TQuery extends TreeQueryParameter> extends QueryComponentBase<TQuery> implements OnInit {
     /**
      * 树形表格扩展指令
      */
@@ -31,31 +27,14 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
      */
     constructor(injector: Injector) {
         super(injector);
-        this.queryParam = <TQuery>new TreeQueryParameter();
     }
 
     /**
      * 初始化
      */
     ngOnInit() {
-        this.queryParam = this.createQuery();
+        super.ngOnInit();
         this.loadCheckedIds();
-    }
-
-    /**
-     * 创建查询参数
-     */
-    protected createQuery(): TQuery {
-        return <TQuery>new TreeQueryParameter();
-    }
-
-    /**
-     * 创建弹出框关闭回调函数
-     * @param result 返回结果
-     */
-    protected onCreateClose(result) {
-        if (result)
-            this.refreshById(result);
     }
 
     /**
@@ -189,17 +168,13 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     }
 
     /**
-     * 通过标识刷新单个节点
-     * @param id 标识
-     * @param handler 刷新后回调函数
+     * 刷新单个实体
+     * @param model 实体对象
      */
-    refreshById(id, handler?: (data) => void) {
+    refreshByModel(model) {
         if (!this.table)
             return;
-        this.table.refreshById({
-            id: id,
-            ok: handler
-        });
+        this.table.refreshByModel(model);
     }
 
     /**
@@ -242,18 +217,18 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     }
 
     /**
-     * 获取创建弹出框数据
-     */
-    protected getCreateDialogData(data?): any {
-        return { parent: data };
-    }
-
-    /**
      * 获取勾选的实体列表长度
      */
     getCheckedLength(): number {
         if (!this.table)
             return 0;
         return this.table.getCheckedLength();
+    }
+
+    /**
+     * 获取创建框数据
+     */
+    protected getCreateData(data?) {
+        return { parent: data };
     }
 }

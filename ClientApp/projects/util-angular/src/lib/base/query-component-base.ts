@@ -2,8 +2,9 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Input, Injector, Component } from '@angular/core';
+import { Input,Injector, Component } from '@angular/core';
 import { ComponentBase } from './component-base';
+import { QueryParameter } from "../core/query-parameter";
 
 /**
  * 查询组件基类
@@ -11,7 +12,11 @@ import { ComponentBase } from './component-base';
 @Component({
     template: ''
 })
-export abstract class QueryComponentBase extends ComponentBase {
+export abstract class QueryComponentBase<TQuery extends QueryParameter> extends ComponentBase {
+    /**
+     * 查询参数
+     */
+    queryParam: TQuery;
     /**
      * 是否展开
      */
@@ -31,6 +36,21 @@ export abstract class QueryComponentBase extends ComponentBase {
      */
     constructor(injector: Injector) {
         super(injector);
+        this.queryParam = <TQuery>new QueryParameter();
+    }
+
+    /**
+     * 初始化
+     */
+    ngOnInit() {
+        this.queryParam = this.createQuery();
+    }
+
+    /**
+     * 创建查询参数
+     */
+    protected createQuery(): TQuery {
+        return <TQuery>new QueryParameter();
     }
 
     /**
@@ -47,11 +67,10 @@ export abstract class QueryComponentBase extends ComponentBase {
     abstract refresh(button?, handler?: (data) => void);
 
     /**
-     * 通过标识刷新单个节点
-     * @param id 标识
-     * @param handler 刷新后回调函数
+     * 刷新单个实体
+     * @param model 实体对象
      */
-    abstract refreshById(id, handler?: (data) => void);
+    abstract refreshByModel(model);
 
     /**
      * 路由复用标签刷新
@@ -70,7 +89,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             centered: true,
             title: this.getCreateTitle(),
             data: this.getCreateData(data),
-            width: this.getCreateWidth(),
+            width: this.getCreateWidth(true),
             disableClose: true,
             showFooter: false,
             onOpenBefore: () => {
@@ -108,16 +127,20 @@ export abstract class QueryComponentBase extends ComponentBase {
 
     /**
      * 获取创建框宽度
+     * @param isDialog true表示Dialog,false表示Drawer
      */
-    protected getCreateWidth() {
-        return this.getWidth();
+    protected getCreateWidth(isDialog?: boolean) {
+        return this.getWidth(isDialog);
     }
 
     /**
-     * 获取弹出框宽度，默认值：60%
+     * 获取弹出框宽度，默认值：Dialog为 60% , Drawer为 38%
+     * @param isDialog true表示Dialog,false表示Drawer
      */
-    protected getWidth() {
-        return "60%";
+    protected getWidth(isDialog?: boolean): string {
+        if (isDialog )
+            return "60%";
+        return "38%";
     }
 
     /**
@@ -141,7 +164,7 @@ export abstract class QueryComponentBase extends ComponentBase {
      */
     protected onCreateClose(result) {
         if (result)
-            this.query();
+            this.refreshByModel(result);
     }
 
     /**
@@ -153,7 +176,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             centered: true,
             title: this.getEditTitle(),
             data: this.getEditData(data),
-            width: this.getEditWidth(),
+            width: this.getEditWidth(true),
             disableClose: true,
             showFooter: false,
             onOpenBefore: () => {
@@ -194,8 +217,8 @@ export abstract class QueryComponentBase extends ComponentBase {
     /**
      * 获取编辑框宽度
      */
-    protected getEditWidth() {
-        return this.getWidth();
+    protected getEditWidth(isDialog?: boolean) {
+        return this.getWidth(isDialog);
     }
 
     /**
@@ -219,7 +242,7 @@ export abstract class QueryComponentBase extends ComponentBase {
      */
     protected onEditClose(result) {
         if (result)
-            this.refreshById(result);
+            this.refreshByModel(result);
     }
 
     /**
@@ -231,7 +254,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             centered: true,
             title: this.getDetailTitle(),
             data: this.getDetailData(data),
-            width: this.getDetailWidth(),
+            width: this.getDetailWidth(true),
             showOk: false
         });
     }
@@ -260,8 +283,8 @@ export abstract class QueryComponentBase extends ComponentBase {
     /**
      * 获取详情宽度
      */
-    protected getDetailWidth() {
-        return this.getWidth();
+    protected getDetailWidth(isDialog?: boolean) {
+        return this.getWidth(isDialog);
     }
 
     /**
@@ -272,7 +295,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             component: this.getCreateComponent(),
             title: this.getCreateTitle(),
             data: this.getCreateData(data),
-            width: this.getCreateWidth(),
+            width: this.getCreateWidth(false),
             disableClose: true,
             showFooter: this.isShowDrawerFooter(),
             onOpenBefore: () => {
@@ -305,7 +328,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             component: this.getEditComponent(),
             title: this.getEditTitle(),
             data: this.getEditData(data),
-            width: this.getEditWidth(),
+            width: this.getEditWidth(false),
             disableClose: true,
             showFooter: this.isShowDrawerFooter(),
             onOpenBefore: () => {
@@ -331,7 +354,7 @@ export abstract class QueryComponentBase extends ComponentBase {
             component: this.getDetailComponent(),
             title: this.getDetailTitle(),
             data: this.getDetailData(data),
-            width: this.getDetailWidth(),
+            width: this.getDetailWidth(false),
             showFooter: this.isShowDrawerFooter(),
             showOk: false
         });

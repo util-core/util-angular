@@ -7,40 +7,44 @@ import { QueryParameter } from "../core/query-parameter";
 
 describe('util.helper', () => {
     it("isEmpty", () => {
-        expect(helper.isEmpty(undefined)).toBeTruthy("undefined");
-        expect(helper.isEmpty(null)).toBeTruthy("null");
-        expect(helper.isEmpty({})).toBeTruthy("{}");
-        expect(helper.isEmpty("")).toBeTruthy("''");
-        expect(helper.isEmpty("  ")).toBeTruthy("'  '");
-        expect(helper.isEmpty(0)).toBeFalsy("0");
-        expect(helper.isEmpty("0")).toBeFalsy("'0'");
-        expect(helper.isEmpty("00000000-0000-0000-0000-000000000000")).toBeTruthy("00000000-0000-0000-0000-000000000000");
-        expect(helper.isEmpty("4ABCA27E-EAFC-4DEE-B809-8DD2ABDFDA1C")).toBeFalsy("4ABCA27E-EAFC-4DEE-B809-8DD2ABDFDA1C");
-        expect(helper.isEmpty("6")).toBeFalsy("'6'");
-        expect(helper.isEmpty(6)).toBeFalsy("6");
-        expect(helper.isEmpty("a6")).toBeFalsy("a6");
-        expect(helper.isEmpty("false")).toBeFalsy("false");
-        expect(helper.isEmpty(false)).toBeFalsy("false");
-        expect(helper.isEmpty(true)).toBeFalsy("true");
+        expect(helper.isEmpty(undefined)).withContext("undefined").toBeTruthy();
+        expect(helper.isEmpty(null)).withContext("null").toBeTruthy();
+        expect(helper.isEmpty({})).withContext("{}").toBeTruthy();
+        expect(helper.isEmpty("")).withContext("''").toBeTruthy();
+        expect(helper.isEmpty("  ")).withContext("'  '").toBeTruthy();
+        expect(helper.isEmpty(0)).withContext("0").toBeFalsy();
+        expect(helper.isEmpty("0")).withContext("'0'").toBeFalsy();
+        expect(helper.isEmpty("00000000-0000-0000-0000-000000000000")).withContext("00000000-0000-0000-0000-000000000000").toBeTruthy();
+        expect(helper.isEmpty("4ABCA27E-EAFC-4DEE-B809-8DD2ABDFDA1C")).withContext("4ABCA27E-EAFC-4DEE-B809-8DD2ABDFDA1C").toBeFalsy();
+        expect(helper.isEmpty("6")).withContext("'6'").toBeFalsy();
+        expect(helper.isEmpty(6)).withContext("6").toBeFalsy();
+        expect(helper.isEmpty("a6")).withContext("a6").toBeFalsy();
+        expect(helper.isEmpty("false")).withContext("false").toBeFalsy();
+        expect(helper.isEmpty(false)).withContext("false").toBeFalsy();
+        expect(helper.isEmpty(true)).withContext("true").toBeFalsy();
     });
     it("isNumber", () => {
-        expect(helper.isNumber(1)).toBeTruthy("1");
-        expect(helper.isNumber("1")).toBeTruthy("'1'");
-        expect(helper.isNumber("")).toBeFalsy("''");
-        expect(helper.isNumber("a")).toBeFalsy("'a'");
+        expect(helper.isNumber(1)).withContext("1").toBeTruthy();
+        expect(helper.isNumber("1")).withContext("'1'").toBeTruthy();
+        expect(helper.isNumber("")).withContext("''").toBeFalsy();
+        expect(helper.isNumber("a")).withContext("'a'").toBeFalsy();
     });
     it("toNumber", () => {
-        expect(helper.toNumber("a")).toEqual(0, "a");
-        expect(helper.toNumber("0")).toEqual(0, "0");
-        expect(helper.toNumber("1")).toEqual(1, "1");
-        expect(helper.toNumber("1.5")).toEqual(1.5, "1.5");
-        expect(helper.toNumber("1.5", 0)).toEqual(2, "1.5,0");
-        expect(helper.toNumber("1.5", 0, true)).toEqual(1, "1.5,0,true");
+        expect(helper.toNumber("a")).withContext("a").toEqual(0);
+        expect(helper.toNumber("0")).withContext("0").toEqual(0);
+        expect(helper.toNumber("1")).withContext("1").toEqual(1);
+        expect(helper.toNumber("1.5")).withContext("1.5").toEqual(1.5);
+        expect(helper.toNumber("1.5", 0)).withContext("1.5,0").toEqual(2);
+        expect(helper.toNumber("1.5", 0, true)).withContext("1.5,0,true").toEqual(1);
         expect(helper.toNumber("8.99999999999999999", 0)).toEqual(9);
         expect(helper.isNumber(helper.toNumber("8.99999999999999999", 0))).toBeTruthy();
         expect(helper.toNumber("8.99999999999999999", 2, true)).toEqual(8.99);
         expect(helper.toNumber(1.567, 1, true)).toEqual(1.5);
         expect(helper.isNumber(helper.toNumber("8.99999999999999999", 2, true))).toBeTruthy();
+    });
+    it("toArray", () => {
+        expect(helper.toArray("a")).toEqual(['a']);
+        expect(helper.toArray("a,b")).toEqual(['a','b']);
     });
     it("getUrl", () => {
         expect(helper.getUrl(null)).toBeNull();

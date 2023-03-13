@@ -4,7 +4,7 @@
 //================================================
 import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
-    hasIn, cloneDeep, assign as assign2, toString as toString2
+    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2
 } from "lodash";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
@@ -52,20 +52,19 @@ export let isNumber = (value): boolean => {
 }
 
 /**
- * 转换为数值
- * @param value 输入值
- * @param precision 数值精度，即小数位数，可选值为0-20
- * @param isTruncate 是否截断，传入true，则按精度截断，否则四舍五入
+ * 是否数组
+ * @param value 值
  */
-export let toNumber = (value, precision?, isTruncate?: boolean) => {
-    if (!isNumber(value))
-        return 0;
-    value = value.toString();
-    if (isEmpty(precision))
-        return parseFloat(value);
-    if (isTruncate)
-        return parseFloat(value.substring(0, value.indexOf(".") + parseInt(precision) + 1));
-    return parseFloat(parseFloat(value).toFixed(precision));
+export let isArray = (value): boolean => {
+    return Array.isArray(value);
+}
+
+/**
+ * 是否空数组,undefined和null返回false,[]返回true
+ * @param value 值
+ */
+export let isEmptyArray = (value): boolean => {
+    return isArray(value) && value.length === 0;
 }
 
 /**
@@ -82,6 +81,23 @@ export let uuid = (): string => {
  */
 export let remove = <T>(source: Array<T>, predicate: (value: T) => boolean): Array<T> => {
     return remove2(source, t => predicate(t));
+}
+
+/**
+ * 插入到数组
+ * @param source 数组
+ * @param item 项
+ * @param index 索引
+ */
+export let insert = (source: any[], item, index?: number) => {
+    if (isUndefined(source) || source == null)
+        return [];
+    if (isUndefined(index)) {
+        source.push(item);
+        return source;
+    }
+    source.splice(index, 0, item);
+    return source;
 }
 
 /**
@@ -169,6 +185,31 @@ export let formatDate = (datetime, format: string = 'yyyy-MM-dd HH:mm:ss'): stri
         format = 'yyyy-MM-dd HH:mm:ss';
     format = format.replace(/Y/g, "y").replace(/D/g, "d");
     return format2(datetime, format);
+}
+
+/**
+ * 转换为数值
+ * @param value 输入值
+ * @param precision 数值精度，即小数位数，可选值为0-20
+ * @param isTruncate 是否截断，传入true，则按精度截断，否则四舍五入
+ */
+export let toNumber = (value, precision?, isTruncate?: boolean) => {
+    if (!isNumber(value))
+        return 0;
+    value = value.toString();
+    if (isEmpty(precision))
+        return parseFloat(value);
+    if (isTruncate)
+        return parseFloat(value.substring(0, value.indexOf(".") + parseInt(precision) + 1));
+    return parseFloat(parseFloat(value).toFixed(precision));
+}
+
+/**
+ * 将逗号分隔的字符串转换为数组
+ * @param value 输入值,范例: "a,b,c"
+ */
+export let toArray = <T>(value: string): T[] => {
+    return split2(value,',');
 }
 
 /**

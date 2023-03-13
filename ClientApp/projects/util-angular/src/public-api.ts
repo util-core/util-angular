@@ -17,6 +17,11 @@ export * from "./lib/core/load-mode";
 
 //导出config
 export * from "./lib/config/app-config";
+export * from "./lib/config/i18n-keys";
+
+//导出data
+export * from "./lib/data/data-container";
+export * from "./lib/data/data-loader";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
