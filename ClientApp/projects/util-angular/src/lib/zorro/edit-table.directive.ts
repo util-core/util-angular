@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, HostListener, Input } from '@angular/core';
+import { Directive, HostListener, Input, Self, ElementRef } from '@angular/core';
 import { TableExtendDirective } from "./table.extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
@@ -57,8 +57,9 @@ export class EditTableDirective {
     /**
      * 初始化编辑表格扩展指令
      * @param table 表格扩展指令
+     * @param element 表格元素
      */
-    constructor(private table: TableExtendDirective<any>) {
+    constructor(private table: TableExtendDirective<any>, @Self() private element: ElementRef) {
         this.util = table.util;
         this.dblClickStartEdit = true;
         this.rows = new Map<string, EditRowDirective>();
@@ -110,11 +111,15 @@ export class EditTableDirective {
     /**
      * 处理全局点击事件
      */
-    @HostListener('document:click')
-    handleClick() {
+    @HostListener('document:click', ['$event.target'])
+    handleClick(element) {
         if (!this.validate())
             return;
-        this.clearEditRow();
+        setTimeout(() => {
+            if (!element.contains(this.element.nativeElement))
+                return;            
+            this.clearEditRow();
+        }, 100);
     }
 
     /**
@@ -305,7 +310,7 @@ export class EditTableDirective {
         /**
          * 确认消息,
          */
-        confirm?:string,
+        confirm?: string,
         /**
          * 创建保存参数
          */
@@ -323,12 +328,12 @@ export class EditTableDirective {
          * 保存成功回调函数
          */
         ok?: (result) => void;
-    } ) {
+    }) {
         if (!options)
             return;
         if (!this.validate())
             return;
-        let url = options.url || this.saveUrl || this.getUrl(this.table.url, "save" );
+        let url = options.url || this.saveUrl || this.getUrl(this.table.url, "save");
         if (!url) {
             console.log("表格编辑saveUrl未设置");
             return;
@@ -351,16 +356,16 @@ export class EditTableDirective {
             confirm: options.confirm,
             ok: result => {
                 this.clear();
-                options.ok && options.ok( result );
-                this.table.query( {
+                options.ok && options.ok(result);
+                this.table.query({
                     ok: result => {
-                        if ( result.page > result.pageCount ) {
-                            this.table.query( {
+                        if (result.page > result.pageCount) {
+                            this.table.query({
                                 page: result.page - 1
-                            } );
+                            });
                         }
                     }
-                } );
+                });
             }
         });
     }

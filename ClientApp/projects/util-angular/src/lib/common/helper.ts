@@ -4,8 +4,8 @@
 //================================================
 import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
-    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2
-} from "lodash";
+    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2, toPairs
+} from "lodash-es";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
 
@@ -234,6 +234,18 @@ export let toJson = (value): string => {
  */
 export let toObjectFromJson = <T>(json: string): T => {
     return JSON.parse(json);
+}
+
+/**
+ * 将对象转换为url查询字符串,即?后面的参数
+ * @param obj 对象
+ */
+export let toQueryString = (obj): string => {
+    if (!obj)
+        return null;
+    return toPairs(obj)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
 }
 
 /**

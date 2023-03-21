@@ -12,6 +12,10 @@ export class Url {
      * Api端点地址
      */
     private apiEndpoint: string;
+    /**
+     * 查询对象
+     */
+    private _query;
 
     /**
      * 初始化Url操作
@@ -22,13 +26,26 @@ export class Url {
     }
 
     /**
+     * 设置查询参数
+     * @param obj 查询参数
+     */
+    query(obj): Url{
+        this._query = obj;
+        return this;
+    }
+
+    /**
      * 获取Url
      * @param url Url地址
      * @param paths 路径
      */
     get(url: string, ...paths: string[]): string {
         let path = this.getPath(paths);
-        return this.util.helper.getUrl(url, this.apiEndpoint, path)
+        let result = this.util.helper.getUrl(url, this.apiEndpoint, path)
+        let queryString = this.util.helper.toQueryString(this._query);
+        if (queryString)
+            result += `?${queryString}`;
+        return result;
     }
 
     /**

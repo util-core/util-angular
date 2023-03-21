@@ -20,6 +20,8 @@ import { Url } from "./common/url";
 import { Component } from "./common/component";
 import { ChangeDetector } from "./common/change-detector";
 import { Event } from "./common/event";
+import { EventBus } from "./common/eventbus";
+import { SessionService } from "./common/session.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 
@@ -91,6 +93,14 @@ export class Util {
      * 事件操作
      */
     private _event: Event;
+    /**
+     * 事件总线操作
+     */
+    private _eventbus: EventBus;
+    /**
+     * 用户会话操作
+     */
+    private _session: SessionService;
 
     /**
      * 初始化操作入口
@@ -257,6 +267,24 @@ export class Util {
         if (!this._event)
             this._event = new Event(this);
         return this._event;
+    };
+
+    /**
+     * 事件总线操作
+     */
+    get eventbus() {
+        if (!this._eventbus)
+            this._eventbus = new EventBus(this);
+        return this._eventbus;
+    };
+
+    /**
+     * 用户会话操作
+     */
+    get session() {
+        if (!this._session)
+            this._session = new SessionService(this);
+        return this._session;
     };
 
     /**

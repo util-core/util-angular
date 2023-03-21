@@ -46,6 +46,10 @@ describe('util.helper', () => {
         expect(helper.toArray("a")).toEqual(['a']);
         expect(helper.toArray("a,b")).toEqual(['a','b']);
     });
+    it("toQueryString", () => {
+        expect(helper.toQueryString({a:1})).toEqual("a=1");
+        expect(helper.toQueryString({ a: 1,b:"c" })).toEqual("a=1&b=c");
+    });
     it("getUrl", () => {
         expect(helper.getUrl(null)).toBeNull();
         expect(helper.getUrl(undefined)).toBeNull();

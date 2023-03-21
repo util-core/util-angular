@@ -1,6 +1,6 @@
 {
   "name": "util-angular",
-  "version": "1.3.9",
+  "version": "1.4.9",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
@@ -21,9 +21,10 @@
     "@delon/abc": "^15.1.0",
     "@delon/theme": "^15.1.0",
     "@delon/util": "^15.1.0",
-    "lodash": "~4.17.21",
+    "lodash-es": "~4.17.21",
     "date-fns": "~2.29.3",
-    "ngx-tinymce": "^15.0.0"
+    "ngx-tinymce": "^15.0.0",
+    "ng-event-bus": "~5.1.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

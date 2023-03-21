@@ -33,8 +33,9 @@
     "@delon/theme": "^15.1.0",
     "@delon/util": "^15.1.0",
     "ngx-tinymce": "^15.0.0",
-    "lodash": "~4.17.21",
-    "date-fns": "~2.29.3"
+    "lodash-es": "~4.17.21",
+    "date-fns": "~2.29.3",
+    "ng-event-bus": "~5.1.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.1.3",

@@ -271,4 +271,20 @@ export class HttpRequest<T> {
                 retry(this.retryTimes)
             );
     }
+
+    /**
+     * 下载文件
+     * @param fileName 文件名,包含扩展名,范例: a.png
+     */
+    download(fileName) {
+        this.responseType("blob");
+        this.handle(result => {
+            const url = window.URL.createObjectURL(<Blob>result);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            link.click();
+            window.URL.revokeObjectURL(url);
+        });
+    }
 }

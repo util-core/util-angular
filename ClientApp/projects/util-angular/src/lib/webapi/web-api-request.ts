@@ -159,6 +159,13 @@ export class WebApiRequest<T> {
     }
 
     /**
+     * 获取请求客户端
+     */
+    getClient(): Observable<Result<T>> {
+        return this.request.request();
+    }
+
+    /**
      * 处理响应
      * @param options 响应处理器配置
      */
@@ -288,5 +295,13 @@ export class WebApiRequest<T> {
         }
         if (this.isShowLoading)
             this.util.loading.close();
+    }
+
+    /**
+     * 下载文件
+     * @param fileName 文件名,包含扩展名,范例: a.png
+     */
+    download(fileName) {
+        this.request.download(fileName);
     }
 }

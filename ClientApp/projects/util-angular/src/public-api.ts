@@ -19,6 +19,9 @@ export * from "./lib/core/load-mode";
 export * from "./lib/config/app-config";
 export * from "./lib/config/i18n-keys";
 
+//导出session
+export * from "./lib/common/session";
+
 //导出data
 export * from "./lib/data/data-container";
 export * from "./lib/data/data-loader";
