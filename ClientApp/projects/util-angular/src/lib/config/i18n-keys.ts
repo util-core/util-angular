@@ -86,5 +86,9 @@ export class I18nKeys {
     /**
      * 身份证验证消息
      */
-    static idCardMessage = "util.idCardMessage";    
+    static idCardMessage = "util.idCardMessage";
+    /**
+     * 未授权异常消息
+     */
+    static unauthorizedMessage = "util.unauthorizedMessage";
 }

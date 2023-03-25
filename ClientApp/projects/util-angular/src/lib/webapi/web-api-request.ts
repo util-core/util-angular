@@ -4,6 +4,7 @@
 //=======================================================
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { I18nKeys } from "../config/i18n-keys";
 import { Result } from '../core/result';
 import { FailResult } from "../core/fail-result";
 import { StateCode } from "../core/state-code";
@@ -205,7 +206,22 @@ export class WebApiRequest<T> {
             options.ok && options.ok(result.data);
             return;
         }
+        if (result.code === StateCode.Unauthorized) {
+            this.handleUnauthorize(options);
+            return;
+        }
         this.handleFail(options, result);
+    }
+
+    /**
+     * 处理未授权响应
+     */
+    private handleUnauthorize(options: WebApiHandleOptions<T>) {
+        if (options.unauthorize) {
+            options.unauthorize();
+            return;
+        }
+        this.util.message.error(I18nKeys.unauthorizedMessage);
     }
 
     /**

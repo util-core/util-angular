@@ -14,5 +14,9 @@ export enum StateCode {
     /**
      * 成功
      */
-    Ok = "1"
+    Ok = "1",
+    /**
+     * 未授权
+     */
+    Unauthorized = "2"
 }

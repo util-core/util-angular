@@ -218,8 +218,6 @@ export class HttpRequest<T> {
         switch (contentType) {
             case HttpContentType.FormUrlEncoded:
                 return "application/x-www-form-urlencoded";
-            case HttpContentType.Json:
-                return "application/json";
             default:
                 return "application/json";
         }

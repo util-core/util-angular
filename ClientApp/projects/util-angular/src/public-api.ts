@@ -64,6 +64,7 @@ export * from "./lib/zorro/validation.extend.directive";
 export * from "./lib/zorro/select.extend.directive";
 export * from "./lib/zorro/tree.table.extend.directive";
 export * from "./lib/zorro/tree.extend.directive";
+export * from "./lib/zorro/required.extend.directive";
 
 //导出tinymce
 export * from "./lib/tinymce/tinymce.extend.directive";

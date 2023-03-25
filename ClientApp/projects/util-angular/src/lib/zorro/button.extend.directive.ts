@@ -29,7 +29,6 @@ export class ButtonExtendDirective  {
      * 初始化按钮扩展指令
      * @param form 表单
      * @param button 按钮
-     * @param config 配置
      */
     constructor(@Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent) {
     }

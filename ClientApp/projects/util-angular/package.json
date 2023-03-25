@@ -1,6 +1,6 @@
 {
   "name": "util-angular",
-  "version": "1.4.9",
+  "version": "15.0.4",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
@@ -15,8 +15,9 @@
     "angular"
   ],
   "peerDependencies": {
-    "@angular/common": "^15.1.0",
     "@angular/core": "^15.1.0",
+    "@angular/common": "^15.1.0",
+    "@angular/forms": "^15.1.0",
     "ng-zorro-antd": "^15.0.3",
     "@delon/abc": "^15.1.0",
     "@delon/theme": "^15.1.0",

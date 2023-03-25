@@ -54,6 +54,17 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     }
 
     /**
+     * 重置
+     */
+    reset() {
+        let order = this.queryParam.order;
+        let pageSize = this.queryParam.pageSize;
+        this.queryParam = this.createQuery();
+        this.queryParam.order = order;
+        this.queryParam.pageSize = pageSize;
+    }
+
+    /**
      * 查询
      * @param button 按钮
      */
