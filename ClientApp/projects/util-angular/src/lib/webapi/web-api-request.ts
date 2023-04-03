@@ -31,7 +31,7 @@ export class WebApiRequest<T> {
      * @param request Http请求操作
      * @param message 消息操作
      */
-    constructor(private request: HttpRequest<Result<T>>, private util: Util) {
+    constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {
     }
 
     /**
@@ -164,6 +164,25 @@ export class WebApiRequest<T> {
      */
     getClient(): Observable<Result<T>> {
         return this.request.request();
+    }
+
+    /**
+     * 发送客户端请求
+     * @param client Http客户端
+     * @param options 响应处理器配置
+     */
+    sendClient(client: Observable<any>, options: WebApiHandleOptions<T>) {
+        if (!client)
+            return;
+        if (!options)
+            return;
+        if (options.before && options.before() === false)
+            return;
+        client.subscribe({
+            next: (result: Result<T>) => this.handleOk(options, result),
+            error: (error: HttpErrorResponse) => this.handleFail(options, undefined, error),
+            complete: ()=> this.handleComplete(options)
+        });
     }
 
     /**

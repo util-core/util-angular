@@ -287,6 +287,8 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     isShow(node) {
         if (!node)
             return false;
+        if (node.hide === true)
+            return false;
         if (node.level === 1)
             return true;
         let parent = this.getParent(node);

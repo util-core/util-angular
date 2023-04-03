@@ -4,7 +4,7 @@
 //=========================================================
 import { Directive, Input, Output, OnInit, OnDestroy, EventEmitter, Optional } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, takeUntil, switchMap } from 'rxjs/operators';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
 import { SelectOption } from '../core/select-option';
@@ -131,7 +131,7 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
     }
 
     /**
-     * 组件清理
+     * 指令清理
      */
     ngOnDestroy() {
         this.destroy$.next();
@@ -139,17 +139,19 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
     }
 
     /**
-     * 组件初始化
+     * 指令初始化
      */
     ngOnInit() {
-        this.initPageSize();
-        this.initOrder();
-        this.initSearch();
-        this.loadData();
-        if (this.data)
-            return;
-        if (this.autoLoad)
-            this.loadUrl();
+        setTimeout(() => {
+            this.initPageSize();
+            this.initOrder();
+            this.initSearch();
+            this.loadData();
+            if (this.data)
+                return;
+            if (this.autoLoad)
+                this.loadUrl();
+        }, 0);
     }
 
     /**
@@ -174,14 +176,46 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      * 初始化搜索
      */
     private initSearch() {
-        this.searchChange$.pipe(
+        let client$ = this.searchChange$.pipe(
             takeUntil(this.destroy$),
             filter(value => value !== null),
             debounceTime(this.searchDelay),
-            distinctUntilChanged()
-        ).subscribe(value => {
-            this.serverSearch(value);
-        });
+            distinctUntilChanged(),
+            switchMap(value => this.serverSearch(value))
+        );
+        this.util.webapi.handle<SelectItem[]>(client$, {
+            before: () => {
+                this.loading = true;
+                return true;
+            },
+            ok: result => {
+                this.onLoad.emit(result);
+                this.loadData(result);
+            },
+            complete: () => {
+                this.loading = false;
+            }
+        })
+    }
+
+    /**
+     * 服务端搜索
+     */
+    private serverSearch(value: string) {
+        this.isScrollLoadCompleted = false;
+        this.onSearch.emit(value);
+        this.queryParam.page = 1;
+        this.queryParam.keyword = value;
+        return this.request();
+    }
+
+    /**
+     * 发送请求
+     */
+    private request() {
+        if (!this.url)
+            return null;
+        return this.util.webapi.get<SelectItem[]>(this.url).param(this.queryParam).getClient();
     }
 
     /**
@@ -243,10 +277,10 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
             ok: result => {
                 this.onLoad.emit(result);
                 if (options.ok) {
-                    options.ok(result); 
+                    options.ok(result);
                     return;
-                } 
-                this.loadData(result);                
+                }
+                this.loadData(result);
             },
             complete: () => {
                 this.loading = false;
@@ -264,7 +298,7 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
             this.queryParam = queryParam;
             this.queryParamChange.emit(queryParam);
         }
-        this.queryParam.order = null;
+        this.queryParam.order = this.order;
         this.loadUrl();
     }
 
@@ -274,17 +308,6 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      */
     search(value: string) {
         this.searchChange$.next(value);
-    }
-
-    /**
-     * 服务端搜索
-     */
-    private serverSearch(value: string) {
-        this.isScrollLoadCompleted = false;
-        this.onSearch.emit(value);
-        this.queryParam.page = 1;
-        this.queryParam.keyword = value;
-        this.loadUrl();
     }
 
     /**

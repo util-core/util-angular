@@ -60,7 +60,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     load(button?, handler?: (data: PageList<TViewModel>) => void) {
         if (!this.table)
             return;
-        handler = handler || this.onQuery;
+        handler = handler || (items => this.onQuery(items));
         this.table.query({
             isSearch: false,
             url: this.table.loadUrl,
@@ -77,7 +77,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     query(button?, handler?: (data: PageList<TViewModel>) => void) {
         if (!this.table)
             return;
-        handler = handler || this.onQuery;
+        handler = handler || (items => this.onQuery(items));
         this.table.search({
             button: button,
             ok: handler
@@ -87,7 +87,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     /**
      * 查询完成操作
      */
-    protected onQuery = (data: PageList<TViewModel>) => {
+    protected onQuery(data: PageList<TViewModel>) {
     }
 
     /**
@@ -108,7 +108,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     /**
      * 删除后操作
      */
-    protected onDelete = () => {
+    protected onDelete() {
     }
 
     /**
@@ -155,7 +155,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     refresh(button?, handler?: (data) => void) {
         if (!this.table)
             return;
-        handler = handler || this.onRefresh;
+        handler = handler || (items => this.onRefresh(items));
         this.queryParam = this.createQuery();
         this.table.refresh(this.queryParam, button, handler);
     }
@@ -163,7 +163,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     /**
      * 刷新完成操作
      */
-    protected onRefresh = data => {
+    protected onRefresh(data) {
         this.checkIds();
     }
 

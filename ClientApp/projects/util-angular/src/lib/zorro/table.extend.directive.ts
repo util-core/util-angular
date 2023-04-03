@@ -166,7 +166,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 获取勾选的实体标识列表
      */
     getCheckedIds(): string {
-        return this.getChecked().map(value => value.id).join(",");
+        return this.checkedSelection.selected.map(value => value.id).join(",");
     }
 
     /**

@@ -36,4 +36,16 @@ export class TreeViewModel extends ViewModel {
      * 是否展开
      */
     expanded?: boolean;
+    /**
+     * 是否叶节点
+     */
+    leaf?: boolean;
+    /**
+     * 复选框是否被勾选
+     */
+    checked?: boolean;
+    /**
+     * 是否隐藏
+     */
+    hide?: boolean;
 }

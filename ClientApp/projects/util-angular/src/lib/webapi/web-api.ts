@@ -2,11 +2,13 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
+import { Observable } from 'rxjs';
 import { HttpMethod } from "../http/http-method";
 import { Util } from "../util";
 import { WebApiRequest } from "./web-api-request";
 import { Result } from "../core/result";
 import { AppConfig } from '../config/app-config';
+import { WebApiHandleOptions } from "./web-api-handle-options";
 
 /**
  * WebApi操作
@@ -91,5 +93,14 @@ export class WebApi {
     delete<T>(url: string): WebApiRequest<T> {
         url = this.getUrl(url);
         return new WebApiRequest<T>(this.util.http.delete<Result<T>>(url), this.util);
+    }
+
+    /**
+     * 处理客户端响应
+     * @param client Http客户端
+     * @param options 响应处理器配置
+     */
+    handle<T>(client: Observable<any>, options: WebApiHandleOptions<T>) {
+        return new WebApiRequest<T>(null, this.util).sendClient(client, options);
     }
 }

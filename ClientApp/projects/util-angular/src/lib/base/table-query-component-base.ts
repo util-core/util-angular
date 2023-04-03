@@ -77,7 +77,7 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     /**
      * 删除后操作
      */
-    protected onDelete = () => {
+    protected onDelete() {
     }
 
     /**
@@ -88,7 +88,7 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
     refresh(button?, handler?: (data) => void) {
         if (!this.table)
             return;
-        handler = handler || this.onRefresh;
+        handler = handler || (items => this.onRefresh(items));
         this.queryParam = this.createQuery();
         this.table.refresh(this.queryParam, button, handler);
     }
@@ -97,7 +97,7 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
      * 刷新完成操作
      * @param data 数据
      */
-    protected onRefresh = data => {
+    protected onRefresh(data) {
     }
 
     /**

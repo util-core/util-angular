@@ -152,7 +152,7 @@ export class DataContainer<TModel extends IKey> {
      * 获取勾选的标识列表
      */
     getCheckedIds(): string {
-        return this.getChecked().map(item => item.id).join(",");
+        return this.checkedSelection.selected.map(value => value.id).join(",");
     }
 
     /**

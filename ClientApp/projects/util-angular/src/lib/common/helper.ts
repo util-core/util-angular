@@ -4,7 +4,7 @@
 //================================================
 import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
-    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2, toPairs
+    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2, toPairs, uniqBy
 } from "lodash-es";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
@@ -140,6 +140,15 @@ export let groupBy = <T>(source: T[], property?: (t: T) => any): Map<string, T[]
         result.set(key, groups[key].map(t => <T>t));
     }
     return result;
+}
+
+/**
+ * 去重复
+ * @param source 源集合
+ * @param property 属性
+ */
+export let distinct = <T>(source: T[], property?: (t: T) => any): T[] => {
+    return uniqBy(source, property);
 }
 
 /**
