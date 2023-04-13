@@ -476,6 +476,10 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
             this.queryParam.pageSize = result.pageSize;
         this.checkedSelection.clear();
         this.checkIds(this.checkedKeys);
+        this.dataSource.forEach(item => {
+            if (item.checked)
+                this.checkRow(item);
+        });
     }
 
     /**

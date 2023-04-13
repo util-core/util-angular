@@ -273,16 +273,35 @@ export class HttpRequest<T> {
     /**
      * 下载文件
      * @param fileName 文件名,包含扩展名,范例: a.png
+     * @param getUrl 文件名,包含扩展名,范例: a.png
      */
-    download(fileName) {
-        this.responseType("blob");
-        this.handle(result => {
-            const url = window.URL.createObjectURL(<Blob>result);
+    download(fileName?, getUrl?: (result) => Promise<string>) {
+        this.responseType("blob").handle( async result => {
+            if (!result)
+                return;
+            let url = await this.getDownloadUrl(result, getUrl);
+            if (!url)
+                return;
             const link = document.createElement('a');
             link.href = url;
-            link.download = fileName;
+            if (fileName)
+                link.download = fileName;
             link.click();
             window.URL.revokeObjectURL(url);
         });
+    }
+
+    /**
+     * 获取下载文件地址
+     */
+    private async getDownloadUrl(result, getUrl?: (result) => Promise<string>) {
+        if (getUrl)
+            return await getUrl(result);
+        try {
+            return window.URL.createObjectURL(<Blob>result)
+        }
+        catch {
+            return result;
+        }
     }
 }

@@ -41,6 +41,8 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
      * 加载勾选的复选框标识
      */
     protected loadCheckedIds() {
+        if (this.checkedIds && !this.util.helper.isEmptyArray(this.checkedIds))
+            return;
         let selection = this.getSelection();
         this.checkedIds = this.util.helper.getIds(selection);
     }

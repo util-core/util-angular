@@ -81,6 +81,26 @@ describe('util.helper', () => {
         expect(helper.formatDate(new Date("2022-9-2 13:58:36"), "YYYY-MM-DD HH:mm:ss")).toEqual("2022-09-02 13:58:36");
         expect(helper.formatDate(new Date("2022-9-2 13:58:36"), "YY-MM-DD HH:mm:ss")).toEqual("22-09-02 13:58:36");
     });
+    it("toList", () => {
+        expect(helper.toList<number>("")).toEqual([]);
+        expect(helper.toList<number>("1")[0]==1).toBeTrue();
+        expect(helper.toList<number>("1,2")[1] == 2).toBeTrue();
+        expect(helper.toList<string>("1")[0] == "1").toBeTrue();
+    });
+    it("to", () => {
+        expect(helper.to<number>(undefined)).toEqual(undefined);
+        expect(helper.to<number>("1") == 1).toBeTrue();
+    });
+    it("blobToStringAsync", async () => {
+        let json = '{"test":"a","order":"b"}';
+        let blobParts = [json];
+        let blob = new Blob(blobParts, { type: "application/json" })
+        let jsonResult = await helper.blobToStringAsync(blob);
+        expect(jsonResult).toEqual(json);
+        let query = helper.toObjectFromJson<TestQuery>(jsonResult);
+        expect(query.test).toEqual("a");
+        expect(query.order).toEqual("b");
+    });
 });
 
 /**

@@ -117,7 +117,7 @@ export class EditTableDirective {
             return;
         setTimeout(() => {
             if (!element.contains(this.element.nativeElement))
-                return;            
+                return;
             this.clearEditRow();
         }, 100);
     }
@@ -342,7 +342,8 @@ export class EditTableDirective {
         if (!data)
             return;
         if (!this.isDirty(data, options.isDirty)) {
-            this.util.message.warn(I18nKeys.noNeedSave);
+            if (this.table.config.table.isShowNoNeedSaveMessage)
+                this.util.message.warn(I18nKeys.noNeedSave);
             return;
         }
         if (options.before && !options.before(data))

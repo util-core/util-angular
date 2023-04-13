@@ -8,6 +8,7 @@ import {
 } from "lodash-es";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
+import { buffer } from "rxjs";
 
 /**
  * 是否未定义
@@ -246,6 +247,16 @@ export let toObjectFromJson = <T>(json: string): T => {
 }
 
 /**
+ * Blob转换为字符串
+ * @param value 二进制大对象值
+ */
+export let blobToStringAsync = async (value: Blob): Promise<string> => {
+    var decoder = new TextDecoder('utf-8');
+    let buffer = await value.arrayBuffer();
+    return decoder.decode(new Uint8Array(buffer));
+}
+
+/**
  * 将对象转换为url查询字符串,即?后面的参数
  * @param obj 对象
  */
@@ -267,6 +278,31 @@ export function getIds(data) {
     if (!data.map)
         return data.id;
     return data.map(t => t.id);
+}
+
+/**
+ * 泛型集合转换
+ * @param input 以逗号分隔的元素集合字符串，范例: 1,2
+ */
+export let toList = <T>(input: string): T[] => {
+    var result = new Array<T>();
+    if (isEmpty(input))
+        return result;
+    var array = input.split(',');
+    array.forEach(value => {
+        if (!value)
+            return;
+        result.push(to(value));
+    });
+    return result;
+}
+
+/**
+ * 通用泛型转换
+ * @param value 值
+ */
+export let to = <T>(value): T => {
+    return <T>value;
 }
 
 /**

@@ -181,7 +181,7 @@ export class WebApiRequest<T> {
         client.subscribe({
             next: (result: Result<T>) => this.handleOk(options, result),
             error: (error: HttpErrorResponse) => this.handleFail(options, undefined, error),
-            complete: ()=> this.handleComplete(options)
+            complete: () => this.handleComplete(options)
         });
     }
 
@@ -235,8 +235,8 @@ export class WebApiRequest<T> {
     /**
      * 处理未授权响应
      */
-    private handleUnauthorize(options: WebApiHandleOptions<T>) {
-        if (options.unauthorize) {
+    private handleUnauthorize(options?: WebApiHandleOptions<T>) {
+        if (options && options.unauthorize) {
             options.unauthorize();
             return;
         }
@@ -287,7 +287,6 @@ export class WebApiRequest<T> {
     private handleBusinessException(result: Result<T>) {
         if (result.code === StateCode.Fail) {
             this.util.message.error(result.message);
-            console.log(`error message:\n${result.message}`);
         }
     }
 
@@ -336,7 +335,32 @@ export class WebApiRequest<T> {
      * 下载文件
      * @param fileName 文件名,包含扩展名,范例: a.png
      */
-    download(fileName) {
-        this.request.download(fileName);
+    download(fileName?) {
+        this.request.download(fileName, async (blob: Blob) => {
+            try {
+                if (blob.type === "application/octet-stream")
+                    return window.URL.createObjectURL(blob);
+                let value = await this.util.helper.blobToStringAsync(blob);
+                if (blob.type === "text/plain")
+                    return value;
+                if (blob.type === "application/json") {
+                    let result = this.util.helper.toObjectFromJson<Result<any>>(value);
+                    if (result.code === StateCode.Ok)
+                        return result.data;
+                    if (result.code === StateCode.Unauthorized) {
+                        this.handleUnauthorize();
+                        return null;
+                    }
+                    if (result.code === StateCode.Fail) {
+                        this.handleBusinessException(result);
+                        return null;
+                    }
+                }
+                return window.URL.createObjectURL(blob);
+            }
+            catch {
+                return blob;
+            }
+        });
     }
 }

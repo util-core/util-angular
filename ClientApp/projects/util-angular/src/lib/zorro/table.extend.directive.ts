@@ -211,6 +211,8 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 勾选一行
      */
     checkRow(row) {
+        if (this.isChecked(row))
+            return;
         this.checkedSelection.select(row);
     }
 
@@ -227,17 +229,20 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     checkIds(ids) {
         if (!ids)
             return;
-        if (!ids.some) {
-            let item = this.dataSource.find(data => data.id === ids);
-            this.checkedSelection.select(item);
-            return;
-        }
-        let list = this.dataSource.filter(data => ids.indexOf(data.id) > -1);
-        list.forEach(item => {
-            if (this.checkedSelection.isSelected(item))
+        if (this.util.helper.isString(ids)) {
+            if (ids.indexOf(",") < 0) {
+                let item = this.dataSource.find(data => data.id === ids);
+                this.checkRow(item);
                 return;
-            this.checkedSelection.select(item);
-        });
+            }
+            ids = this.util.helper.toList<string>(ids);
+        }
+        if (this.util.helper.isArray(ids)) {
+            let list = this.dataSource.filter(data => ids.indexOf(data.id) >= 0);
+            list.forEach(item => {
+                this.checkRow(item);
+            });
+        }
     }
 
     /**

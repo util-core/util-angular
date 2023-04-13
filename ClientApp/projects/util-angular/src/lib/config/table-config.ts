@@ -22,5 +22,9 @@ export class TableConfig {
     /**
      * 树形表格单元格缩进单位宽度,默认值: "20"
      */
-    indentUnitWidth?:string;
+    indentUnitWidth?: string;
+    /**
+     * 是否显示不需要保存的提示消息,默认值: true
+     */
+    isShowNoNeedSaveMessage?: boolean;
 }

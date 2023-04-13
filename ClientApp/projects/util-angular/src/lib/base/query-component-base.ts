@@ -24,7 +24,7 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     /**
      * 复选框或单选框选中的标识列表
      */
-    checkedIds;
+    @Input() checkedIds:[];
     /**
      * 传入数据
      */

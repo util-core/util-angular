@@ -210,17 +210,20 @@ export class DataContainer<TModel extends IKey> {
     checkIds(ids) {
         if (!ids)
             return;
-        if (!ids.some) {
-            let item = this.data.find(data => data.id === ids);
-            this.check(item);
-            return;
-        }
-        let list = this.data.filter(data => ids.indexOf(data.id) > -1);
-        list.forEach(item => {
-            if (this.isChecked(item))
+        if (this.util.helper.isString(ids)) {
+            if (ids.indexOf(",") < 0) {
+                let item = this.data.find(data => data.id === ids);
+                this.check(item);
                 return;
-            this.check(item);
-        });
+            }
+            ids = this.util.helper.toList<string>(ids);
+        }
+        if (this.util.helper.isArray(ids)) {
+            let list = this.data.filter(data => ids.indexOf(data.id) >= 0);
+            list.forEach(item => {
+                this.check(item);
+            });
+        }
     }
 
     /**
@@ -235,6 +238,8 @@ export class DataContainer<TModel extends IKey> {
      * 勾选项
      */
     check(item) {
+        if (this.isChecked(item))
+            return;
         this.checkedSelection.select(item);
     }
 
