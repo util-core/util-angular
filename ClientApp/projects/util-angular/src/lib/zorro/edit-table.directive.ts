@@ -375,7 +375,7 @@ export class EditTableDirective {
      * 获取地址
      */
     private getUrl(url: string, path: string = null) {
-        return this.util.helper.getUrl(url, null, path);
+        return this.util.helper.joinUrl(url, path);
     }
 
     /**

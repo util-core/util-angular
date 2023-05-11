@@ -14,9 +14,11 @@ export * from "./lib/core/result";
 export * from "./lib/core/fail-result";
 export * from "./lib/core/state-code";
 export * from "./lib/core/load-mode";
+export * from "./lib/core/file-info";
 
 //导出config
 export * from "./lib/config/app-config";
+export * from "./lib/config/module-config";
 export * from "./lib/config/i18n-keys";
 
 //导出session
@@ -45,6 +47,13 @@ export * from "./lib/webapi/web-api-handle-options";
 //导出form
 export * from "./lib/form/form-submit-option";
 
+//导出auth
+export * from "./lib/auth/auth-guard";
+export * from "./lib/auth/auth.service";
+
+//导出upload
+export * from "./lib/upload/upload.service";
+
 //导出base
 export * from "./lib/base/component-base";
 export * from "./lib/base/query-component-base";
@@ -65,6 +74,7 @@ export * from "./lib/zorro/select.extend.directive";
 export * from "./lib/zorro/tree.table.extend.directive";
 export * from "./lib/zorro/tree.extend.directive";
 export * from "./lib/zorro/required.extend.directive";
+export * from "./lib/zorro/upload.extend.directive";
 
 //导出tinymce
 export * from "./lib/tinymce/tinymce.extend.directive";

@@ -2,10 +2,12 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
-import { NzModalService, ModalOptions, NzModalRef } from "ng-zorro-antd/modal";
+import { EventEmitter } from "@angular/core";
+import { NzModalService, ModalOptions, NzModalRef, OnClickCallback } from "ng-zorro-antd/modal";
 import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
+import { IConfirmOptions } from "../message/confirm-options";
 import { IDialogOptions } from "./dialog-options";
 
 /**
@@ -17,6 +19,97 @@ export class Dialog {
      * @param util 操作入口
      */
     constructor(private util: Util) {
+    }
+
+    /**
+     * 获取模态窗服务
+     */
+    private getModalService() {
+        return this.util.ioc.get<NzModalService>(NzModalService);
+    }
+
+    /**
+     * 成功消息
+     * @param message 消息
+     * @param title 标题
+     * @param onOk 点击确定事件处理函数
+     */
+    success(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+        if (!message)
+            return;
+        message = this.util.i18n.get(message);
+        title = this.util.i18n.get(title);
+        let service = this.getModalService();
+        service.success({
+            nzContent: message,
+            nzTitle: title,
+            nzOnOk: onOk
+        });
+    }
+
+    /**
+     * 信息消息
+     * @param message 消息
+     * @param title 标题
+     * @param onOk 点击确定事件处理函数
+     */
+    info(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+        if (!message)
+            return;
+        message = this.util.i18n.get(message);
+        title = this.util.i18n.get(title);
+        let service = this.getModalService();
+        service.info({
+            nzContent: message,
+            nzTitle: title,
+            nzOnOk: onOk
+        });
+    }
+
+    /**
+     * 警告消息
+     * @param message 消息
+     * @param title 标题
+     * @param onOk 点击确定事件处理函数
+     */
+    warn(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+        if (!message)
+            return;
+        message = this.util.i18n.get(message);
+        title = this.util.i18n.get(title);
+        let service = this.getModalService();
+        service.warning({
+            nzContent: message,
+            nzTitle: title,
+            nzOnOk: onOk
+        });
+    }
+
+    /**
+     * 错误消息
+     * @param message 消息
+     * @param title 标题
+     * @param onOk 点击确定事件处理函数
+     */
+    error(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+        if (!message)
+            return;
+        message = this.util.i18n.get(message);
+        title = this.util.i18n.get(title);
+        let service = this.getModalService();
+        service.error({
+            nzContent: message,
+            nzTitle: title,
+            nzOnOk: onOk
+        });
+    }
+
+    /**
+     * 确认
+     * @param options 配置
+     */
+    confirm(options: IConfirmOptions) {
+        this.util.message.confirm(options);
     }
 
     /**
@@ -33,13 +126,6 @@ export class Dialog {
         dialogRef.afterOpen.subscribe(() => options.onOpen && options.onOpen());
         dialogRef.afterClose.subscribe((result) => options.onClose && options.onClose(result));
         return dialogRef;
-    }
-
-    /**
-     * 获取模态窗服务
-     */
-    private getModalService() {
-        return this.util.ioc.get(NzModalService);
     }
 
     /**

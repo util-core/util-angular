@@ -11,6 +11,7 @@ import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
 import { AppConfig, initAppConfig } from '../config/app-config';
+import { ModuleConfig } from '../config/module-config';
 
 /**
  * NgZorro树形扩展指令
@@ -115,10 +116,15 @@ export class TreeExtendDirective implements OnInit {
 
     /**
      * 初始化树形扩展指令
+     * @param treeComponent 树形组件
+     * @param treeSelectComponent 下拉树形组件
+     * @param config 应用配置
+     * @param moduleConfig 模块配置
      */
-    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent, @Optional() public config: AppConfig) {
+    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent,
+        @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
         this.initAppConfig();
-        this.util = new Util(null, this.config);
+        this.util = new Util(null, config, moduleConfig);
         this.tree = treeComponent || treeSelectComponent;
         this.dataSource = new Array<any>();
         this.autoLoad = true;

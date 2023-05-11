@@ -132,7 +132,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
     protected getUrl(url: string, path: string) {
         if (!url)
             return null;
-        return this.util.helper.getUrl(url, null, path);
+        return this.util.helper.joinUrl(url, path);
     }
 
     /**

@@ -42,7 +42,7 @@ export class EventBus {
         if (!this._eventbus)
             return null;
         return this._eventbus.on(key).subscribe(value => {
-            handler(value.data);
+            handler(<T>value.data);
         });
     }
 }

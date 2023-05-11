@@ -71,6 +71,14 @@ describe('util.helper', () => {
         expect(helper.getUrl("/test/", "http://a.com/", "b")).toEqual("http://a.com/test/b");
         expect(helper.getUrl("/test/b/", "http://a.com/", "/c")).toEqual("http://a.com/test/b/c");
     });
+    it("joinUrl", () => {
+        expect(helper.joinUrl(null,null)).toBeNull();
+        expect(helper.joinUrl(undefined, undefined)).toBeUndefined();
+        expect(helper.joinUrl("", "")).toEqual('');
+        expect(helper.joinUrl("a", "b",)).toEqual("a/b");
+        expect(helper.joinUrl("/a/", "/b/",)).toEqual("/a/b/");
+
+    });
     it("hasProperty", () => {
         let query = new TestQuery();
         expect(helper.hasProperty(query, "pageSize")).toBeTrue();

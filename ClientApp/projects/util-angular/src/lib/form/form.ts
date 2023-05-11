@@ -4,7 +4,6 @@
 //================================================
 import { HttpMethod } from "../http/http-method";
 import { Util } from "../util";
-import { AppConfig,initAppConfig } from "../config/app-config";
 import { IFormSubmitOptions } from "./form-submit-option";
 import { I18nKeys } from '../config/i18n-keys';
 
@@ -13,17 +12,10 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 export class Form {
     /**
-     * 应用配置
-     */
-    private config: AppConfig;
-
-    /**
      * 
      * @param util 公共操作
      */
     constructor(private util: Util) {
-        this.config = util.getAppConfig();
-        initAppConfig(this.config);
     }
 
     /**

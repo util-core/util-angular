@@ -10,6 +10,7 @@ import { QueryParameter } from "../core/query-parameter";
 import { PageList } from "../core/page-list";
 import { FailResult } from "../core/fail-result";
 import { AppConfig, initAppConfig } from '../config/app-config';
+import { ModuleConfig } from '../config/module-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -88,14 +89,15 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 初始化表格扩展指令
      * @param config 应用配置
+     * @param moduleConfig 模块配置
      */
-    constructor(@Optional() public config: AppConfig) {
+    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
         this.initAppConfig();
-        this.util = new Util(null, this.config);
+        this.util = new Util(null, config, moduleConfig);
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
-        this.selectedSelection = new SelectionModel<TModel>(false, []);
+        this.selectedSelection = new SelectionModel<TModel>(true, []);
         this.pageSizeOptions = [];
         this.autoLoad = true;
     }
@@ -246,6 +248,13 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     }
 
     /**
+     * 切换选中状态
+     */
+    toggleSelect(row) {
+        this.selectedSelection.toggle(row);
+    }
+
+    /**
      * 仅选中一行
      */
     selectRowOnly(row) {
@@ -254,7 +263,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     }
 
     /**
-     * 单击选中一行
+     * 选中一行
      */
     selectRow(row) {
         this.selectedSelection.select(row);
@@ -439,7 +448,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     protected getUrl(url: string, path: string) {
         if (!url)
             return null;
-        return this.util.helper.getUrl(url, null, path);
+        return this.util.helper.joinUrl(url, path);
     }
 
     /**

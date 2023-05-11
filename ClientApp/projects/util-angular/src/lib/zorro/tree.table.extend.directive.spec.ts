@@ -15,7 +15,7 @@ describe('TreeExtendDirective', () => {
      * ²âÊÔ³õÊ¼»¯
      */
     beforeEach(async () => {
-        directive = new TreeTableExtendDirective(null);
+        directive = new TreeTableExtendDirective(null,null);
         directive.dataSource = [
             getNodeA(), getNodeA1(), getNodeA11(), getNodeA12(), getNodeA2(), getNodeA21(), getNodeA22(),
             getNodeB(), getNodeB1(), getNodeB11(), getNodeB12(), getNodeB2(), getNodeB21(), getNodeB22(),

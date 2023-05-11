@@ -64,6 +64,13 @@ export class DrawerFooterComponent {
     @ViewChild("footer", { static: true }) footer: TemplateRef<any>;
 
     /**
+     * 初始化
+     */
+    constructor() {
+        this.isValid = true;
+    }
+
+    /**
      * 关闭抽屉
      */
     close() {
@@ -77,7 +84,8 @@ export class DrawerFooterComponent {
         let component = this.drawer.getContentComponent();
         if (!component)
             return;
-        this.isValid = component.isValid();
+        if (component.isValid)
+            this.isValid = component.isValid();
     }
 
     /**

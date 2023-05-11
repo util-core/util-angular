@@ -80,7 +80,7 @@ export class ValidationExtendDirective {
      */
     constructor(@Optional() protected controlModel: NgModel, @Optional() public config: AppConfig) {
         this.initAppConfig();
-        this.util = new Util(null, this.config);
+        this.util = new Util(null, config);
     }
 
     /**

@@ -17,33 +17,44 @@ export class Message {
     /**
      * 应用配置
      */
-    private config: AppConfig;
+    private _config: AppConfig;
     /**
      * 
      * @param ioc Ioc操作
      */
     constructor(private util: Util) {
-        this.config = this.util.ioc.get(AppConfig);
-        initAppConfig(this.config);
+        this._config = this.util.ioc.get(AppConfig);
+        initAppConfig(this._config);
     }
 
+    /**
+     * 获取消息服务
+     */
+    private getService() {
+        return this.util.ioc.get<NzMessageService>(NzMessageService);
+    }
+     
     /**
      * 成功消息
      * @param message 消息
      */
-    success(message: string): void {
-        let service = this.util.ioc.get(NzMessageService);
+    success(message: string) {
+        if (!message)
+            return;
         message = this.util.i18n.get(message);
+        let service = this.getService();
         service.success(message);
-    }
+    }    
 
     /**
      * 信息消息
      * @param message 消息
      */
-    info(message: string): void {
-        let service = this.util.ioc.get(NzMessageService);
+    info(message: string) {
+        if (!message)
+            return;
         message = this.util.i18n.get(message);
+        let service = this.getService();
         service.info(message);
     }
 
@@ -51,9 +62,11 @@ export class Message {
      * 警告消息
      * @param message 消息
      */
-    warn(message: string): void {
-        let service = this.util.ioc.get(NzMessageService);
+    warn(message: string) {
+        if (!message)
+            return;
         message = this.util.i18n.get(message);
+        let service = this.getService();
         service.warning(message);
     }
 
@@ -61,9 +74,11 @@ export class Message {
      * 错误消息
      * @param message 消息
      */
-    error(message: string): void {
-        let service = this.util.ioc.get(NzMessageService);
+    error(message: string) {
+        if (!message)
+            return;
         message = this.util.i18n.get(message);
+        let service = this.getService();
         service.error(message);
     }
 
@@ -71,7 +86,7 @@ export class Message {
      * 确认
      * @param options 配置
      */
-    confirm(options: IConfirmOptions): void {
+    confirm(options: IConfirmOptions) {
         options = options || {};
         if (!options.onCancel)
             options.onCancel = () => true;

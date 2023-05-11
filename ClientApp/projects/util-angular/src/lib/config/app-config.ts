@@ -22,7 +22,7 @@ export class AppConfig {
     /**
      * 分页大小
      */
-    pageSize?:number;
+    pageSize?: number;
     /**
      * 表格配置
      */

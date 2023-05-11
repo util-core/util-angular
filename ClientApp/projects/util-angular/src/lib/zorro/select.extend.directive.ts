@@ -12,6 +12,7 @@ import { SelectOptionGroup } from "../core/select-option-group";
 import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
 import { AppConfig, initAppConfig } from '../config/app-config';
+import { ModuleConfig } from '../config/module-config';
 
 /**
  * NgZorro选择框扩展指令
@@ -25,6 +26,10 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      * 操作入口
      */
     protected util: Util;
+    /**
+     * 文本框是否被修改过
+     */
+    private _isDirty: boolean;
     /**
      * 清理对象
      */
@@ -111,10 +116,11 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
     /**
      * 初始化选择框扩展指令
      * @param config 应用配置
+     * @param moduleConfig 模块配置
      */
-    constructor(@Optional() public config: AppConfig) {
+    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
         this.initAppConfig();
-        this.util = new Util(null, this.config);
+        this.util = new Util(null, config, moduleConfig);
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
@@ -215,7 +221,9 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
     private request() {
         if (!this.url)
             return null;
-        return this.util.webapi.get<SelectItem[]>(this.url).param(this.queryParam).getClient();
+        return this.util.webapi.get<SelectItem[]>(this.url)
+            .param(this.queryParam)
+            .getClient();
     }
 
     /**
@@ -226,6 +234,7 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
         this._data = data || this._data;
         if (!this._data)
             return;
+        this._data = this.util.helper.distinct(this._data, t => t.value);
         let select = new SelectList(this._data);
         if (select.isGroup()) {
             this.isGroup = true;
@@ -249,6 +258,10 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
          */
         param?,
         /**
+         * 选中的标识列表,支持数组或逗号分隔的字符串
+         */
+        selectedKeys?,
+        /**
          * 请求前处理函数，返回false则取消提交
          */
         before?: () => boolean;
@@ -267,26 +280,68 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
         if (!url)
             return;
         let param = options.param || this.queryParam;
-        this.util.webapi.get<SelectItem[]>(url).param(param).handle({
-            before: () => {
-                this.loading = true;
-                if (options.before)
-                    return options.before();
-                return true;
-            },
-            ok: result => {
-                this.onLoad.emit(result);
-                if (options.ok) {
-                    options.ok(result);
-                    return;
+        let selectedKeys = this.getSelectedKeys(options.selectedKeys);
+        this.util.webapi.get<SelectItem[]>(url)
+            .paramIf("load_keys", selectedKeys, !!selectedKeys)
+            .param(param)
+            .handle({
+                before: () => {
+                    this.loading = true;
+                    if (options.before)
+                        return options.before();
+                    return true;
+                },
+                ok: result => {
+                    this.onLoad.emit(result);
+                    if (options.ok) {
+                        options.ok(result);
+                        return;
+                    }
+                    this.loadData(result);
+                },
+                complete: () => {
+                    this.loading = false;
+                    options.complete && options.complete();
                 }
-                this.loadData(result);
-            },
-            complete: () => {
-                this.loading = false;
-                options.complete && options.complete();
-            }
-        });
+            });
+    }
+
+    /**
+     * 获取选中的标识列表
+     */
+    private getSelectedKeys(selectedKeys) {
+        if (!selectedKeys)
+            return null;
+        let result = this.getNotLoadedKeys(selectedKeys);
+        return result.join(",");
+    }
+
+    /**
+     * 获取未加载的标识集合
+     */
+    private getNotLoadedKeys(keys) {
+        if (this.util.helper.isArray(keys))
+            return keys.filter(key => !this.exists(key));
+        if (keys.indexOf(",") >= 0) {
+            let list = this.util.helper.toList<string>(keys);
+            return list.filter(key => !this.exists(key));
+        }
+        if (this.exists(keys))
+            return [];
+        return [keys];        
+    }
+
+    /**
+     * 通过标识判断是否存在
+     * @param id 标识或对象
+     */
+    private exists(id): boolean {
+        if (!id)
+            return false;
+        if (!this.data)
+            return false;
+        id = id.id || id;
+        return this.data.some(item => item.value === id);
     }
 
     /**
@@ -307,6 +362,9 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      * @param value 值
      */
     search(value: string) {
+        if (!this._isDirty && value === '')            
+            return;        
+        this._isDirty = true;
         this.searchChange$.next(value);
     }
 

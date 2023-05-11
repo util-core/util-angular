@@ -238,7 +238,7 @@ export class DataLoader<T extends IKey> {
     private getUrl(url: string, path: string) {
         if (!url)
             return null;
-        return this.util.helper.getUrl(url, null, path);
+        return this.util.helper.joinUrl(url, path);
     }
 
     /**

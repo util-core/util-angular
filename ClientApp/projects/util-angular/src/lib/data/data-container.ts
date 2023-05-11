@@ -37,7 +37,7 @@ export class DataContainer<TModel extends IKey> {
      */
     constructor(private util: Util) {
         this.checkedSelection = new SelectionModel<TModel>(true, []);
-        this.selectedSelection = new SelectionModel<TModel>(false, []);
+        this.selectedSelection = new SelectionModel<TModel>(true, []);
         this.total = 0;
         this.data = new Array<TModel>();
     }
@@ -259,6 +259,13 @@ export class DataContainer<TModel extends IKey> {
             return;
         }
         this.data.forEach(item => this.check(item));
+    }
+
+    /**
+     * 切换选中状态
+     */
+    toggleSelect(row) {
+        this.selectedSelection.toggle(row);
     }
 
     /**

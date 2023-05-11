@@ -18,6 +18,7 @@ import { TreeExtendDirective } from "./zorro/tree.extend.directive";
 import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
 import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
 import { RequiredExtendDirective } from "./zorro/required.extend.directive";
+import { UploadExtendDirective } from "./zorro/upload.extend.directive";
 
 /**
  * utilÄ£¿é
@@ -29,7 +30,8 @@ import { RequiredExtendDirective } from "./zorro/required.extend.directive";
         RequiredExtendDirective,ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
-        TinymceExtendDirective, DrawerFooterComponent        
+        TinymceExtendDirective, DrawerFooterComponent,
+        UploadExtendDirective
     ],
     imports: [
         CommonModule,FormsModule,NzButtonModule
@@ -40,7 +42,7 @@ import { RequiredExtendDirective } from "./zorro/required.extend.directive";
         RequiredExtendDirective,ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
-        TinymceExtendDirective
+        TinymceExtendDirective, UploadExtendDirective
     ]
 })
 export class UtilModule {

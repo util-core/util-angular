@@ -7,7 +7,6 @@ import { HttpMethod } from "../http/http-method";
 import { Util } from "../util";
 import { WebApiRequest } from "./web-api-request";
 import { Result } from "../core/result";
-import { AppConfig } from '../config/app-config';
 import { WebApiHandleOptions } from "./web-api-handle-options";
 
 /**
@@ -15,25 +14,17 @@ import { WebApiHandleOptions } from "./web-api-handle-options";
  */
 export class WebApi {
     /**
-     * 应用配置
-     */
-    private config: AppConfig;
-
-    /**
      * 初始化WebApi操作
-     * @param request Http请求操作
-     * @param message 消息操作
+     * @param util 操作入口
      */
     constructor(private util: Util) {
-        this.config = util.getAppConfig();
     }
 
     /**
-     * 获取完整url地址,如果配置了Api端点地址则自动包含
-     * @param url 地址,范例: /api/test
+     * 获取完整url地址,如果配置了Api端点和Api前缀则自动包含
      */
     private getUrl(url: string): string {
-        return this.util.helper.getUrl(url, this.config && this.config.apiEndpoint);
+        return this.util.url.get(url);
     }
 
     /**

@@ -10,6 +10,7 @@ import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table.extend.directive";
 import { AppConfig } from '../config/app-config';
+import { ModuleConfig } from '../config/module-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -72,9 +73,10 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
     /**
      * 初始化树形表格扩展指令
      * @param config 应用配置
+     * @param moduleConfig 模块配置
      */
-    constructor(@Optional() config: AppConfig) {
-        super(config);
+    constructor(@Optional() config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
+        super(config, moduleConfig);
     }
 
     /**

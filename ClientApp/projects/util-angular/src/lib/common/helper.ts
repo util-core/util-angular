@@ -8,7 +8,6 @@ import {
 } from "lodash-es";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
-import { buffer } from "rxjs";
 
 /**
  * 是否未定义
@@ -306,6 +305,19 @@ export let to = <T>(value): T => {
 }
 
 /**
+ * 连接url
+ * @param url 地址
+ * @param path 路径
+ */
+export let joinUrl = (url: string, path: string) => {
+    if (!url || !path)
+        return url;
+    url = trimEnd(url, "/");
+    path = trimStart(path, "/");
+    return `${url}/${path}`;
+}
+
+/**
  * 获取地址
  * @param url 请求地址
  * @param host 主机
@@ -313,14 +325,7 @@ export let to = <T>(value): T => {
  */
 export function getUrl(url: string, host: string = null, path: string = null) {
     url = getHostUrl(url, host);
-    if (!url)
-        return null;
-    if (path) {
-        url = trimEnd(url, "/");
-        path = trimStart(path, "/");
-        return `${url}/${path}`;
-    }
-    return url;
+    return joinUrl(url, path);
 }
 
 /**

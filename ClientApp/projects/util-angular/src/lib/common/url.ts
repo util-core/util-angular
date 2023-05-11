@@ -3,15 +3,12 @@
 //Licensed under the MIT license
 //====================================================
 import { Util } from "../util";
+import { ModuleConfig } from "../config/module-config";
 
 /**
  * Url操作
  */
 export class Url {
-    /**
-     * Api端点地址
-     */
-    private apiEndpoint: string;
     /**
      * 查询对象
      */
@@ -20,9 +17,9 @@ export class Url {
     /**
      * 初始化Url操作
      * @param util 公共操作
+     * @param moduleConfig 模块配置
      */
-    constructor(private util: Util) {
-        this.apiEndpoint = util.getAppConfig().apiEndpoint;
+    constructor(private util: Util, private moduleConfig: ModuleConfig = null) {
     }
 
     /**
@@ -40,12 +37,37 @@ export class Url {
      * @param paths 路径
      */
     get(url: string, ...paths: string[]): string {
+        let apiEndpoint = this.util.getAppConfig().apiEndpoint;
         let path = this.getPath(paths);
-        let result = this.util.helper.getUrl(url, this.apiEndpoint, path)
+        let result = this.util.helper.getUrl(this.getUrl(url), apiEndpoint, path)
         let queryString = this.util.helper.toQueryString(this._query);
         if (queryString)
             result += `?${queryString}`;
         return result;
+    }
+
+    /**
+     * 获取Api前缀
+     */
+    private getUrl(url: string) {
+        if (!url)
+            return url;
+        if (url.startsWith("/"))
+            return url;
+        let apiPrefix = this.getApiPrefix();
+        if (!apiPrefix)
+            return url;
+        apiPrefix = this.util.helper.trimStart(apiPrefix, "/");
+        apiPrefix = this.util.helper.trimEnd(apiPrefix, "/");
+        return `/${apiPrefix}/api/${url}`;
+    }
+
+    /**
+     * 获取Api前缀
+     */
+    private getApiPrefix() {
+        let moduleConfig = this.moduleConfig || this.util.ioc.get(ModuleConfig);
+        return moduleConfig && moduleConfig.apiPrefix;
     }
 
     /**

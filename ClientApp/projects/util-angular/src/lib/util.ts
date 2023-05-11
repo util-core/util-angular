@@ -24,6 +24,7 @@ import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
+import { ModuleConfig } from './config/module-config';
 
 /**
  * 操作入口
@@ -106,8 +107,9 @@ export class Util {
      * 初始化操作入口
      * @param componentInjector 组件注入器
      * @param appConfig 应用配置
+     * @param moduleConfig 模块配置
      */
-    constructor(private componentInjector: Injector = null, private appConfig: AppConfig = null) {
+    constructor(private componentInjector: Injector = null, private appConfig: AppConfig = null, private moduleConfig: ModuleConfig = null) {
     }
 
     /**
@@ -238,7 +240,7 @@ export class Util {
      */
     get url() {
         if (!this._url)
-            this._url = new Url(this);
+            this._url = new Url(this,this.moduleConfig);
         return this._url;
     };
 
