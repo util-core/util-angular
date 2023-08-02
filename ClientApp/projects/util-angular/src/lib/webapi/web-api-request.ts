@@ -32,6 +32,15 @@ export class WebApiRequest<T> {
      * @param message 消息操作
      */
     constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {
+        this.initContentLanguage();
+    }
+
+    /**
+     * 初始化Content-Language请求头
+     */
+    private initContentLanguage() {
+        let culture = this.util.i18n.getCurrentLang();
+        this.contentLanguage(culture);
     }
 
     /**
@@ -69,6 +78,14 @@ export class WebApiRequest<T> {
         else if (typeof name === "string")
             this.request.header(name, value);
         return this;
+    }
+
+    /**
+     * 设置Content-Language请求头
+     * @param culture 语言文化代码
+     */
+    contentLanguage(culture) {
+        this.header("Content-Language", culture);
     }
 
     /**
@@ -140,7 +157,7 @@ export class WebApiRequest<T> {
     button(btn): WebApiRequest<T> {
         this.btn = btn;
         return this;
-    }
+    }    
 
     /**
      * 请求时显示进度条

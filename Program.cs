@@ -6,10 +6,13 @@ using Util.Ui.NgZorro;
 var builder = WebApplication.CreateBuilder( args );
 
 //配置Util服务
-builder.Host.AddUtil( options => options
-    .UseNgZorro(t=> t.RootPath="ClientApp/dist/util")
-    .UseSerilog()
-);
+builder.AsBuild()
+    .AddNgZorro( t => {
+        t.RootPath = "ClientApp/dist/util";
+        t.EnableDefaultOptionText = true;
+    } )
+    .AddSerilog()
+    .AddUtil();
 
 //构建Web应用程序
 var app = builder.Build();

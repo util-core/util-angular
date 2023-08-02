@@ -27,6 +27,10 @@ export interface IFormSubmitOptions {
      */
     httpMethod?: HttpMethod;
     /**
+     * 跨域是否允许携带cookie
+     */
+    withCredentials?: boolean;
+    /**
      * 确认消息,设置该项则提交前需要确认
      */
     confirm?: string;
