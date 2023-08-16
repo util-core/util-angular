@@ -98,7 +98,6 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
         this.selectedSelection = new SelectionModel<TModel>(true, []);
-        this.pageSizeOptions = [];
         this.autoLoad = true;
     }
 
@@ -115,8 +114,9 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 初始化
      */
     ngOnInit() {
-        setTimeout(() => {            
+        setTimeout(() => {
             this.queryParam = this.queryParam || new QueryParameter();
+            this.initPageSizeOptions();
             this.initPageSize();
             this.initOrder();
             if (this.autoLoad)
@@ -125,11 +125,26 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     }
 
     /**
+     * 初始化分页大小选项
+     */
+    protected initPageSizeOptions() {
+        if (this.pageSizeOptions && this.pageSizeOptions.length > 0)
+            return;
+        let pageSizeOptions = this.config.table.pageSizeOptions;
+        if (pageSizeOptions && pageSizeOptions.length > 0) {
+            this.pageSizeOptions = pageSizeOptions;
+            return;
+        }
+        this.pageSizeOptions = [10, 20, 30, 40, 50];
+    }
+
+    /**
      * 初始化分页大小
      */
     protected initPageSize() {
-        if (this.pageSizeOptions && this.pageSizeOptions.length > 0)
-            this.queryParam.pageSize = this.pageSizeOptions[0];
+        if (this.pageSizeOptions.some(value => value === this.config.pageSize))
+            return;
+        this.queryParam.pageSize = this.pageSizeOptions[0];
     }
 
     /**
@@ -516,7 +531,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
                 this.util.message.success(I18nKeys.deleteSuccessed);
                 this.query({
                     before: before,
-                    ok: result => {         
+                    ok: result => {
                         if (result.page > result.pageCount) {
                             this.query({
                                 page: result.page - 1,
@@ -536,7 +551,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      */
     private getDeleteUrl(url) {
         return url || this.deleteUrl || this.getUrl(this.url, "delete");
-    }    
+    }
 
     /**
      * 页索引变化事件处理
@@ -587,7 +602,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     sort(order: string) {
         if (order)
             this.queryParam.order = order;
-        else 
+        else
             this.queryParam.order = this.order;
         this.query();
     }
@@ -654,7 +669,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
             this.refreshUpdateNode(model);
             return;
         }
-        this.query({ page:1 });
+        this.query({ page: 1 });
     }
 
     /**

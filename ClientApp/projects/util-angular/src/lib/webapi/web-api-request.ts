@@ -39,6 +39,8 @@ export class WebApiRequest<T> {
      * 初始化Content-Language请求头
      */
     private initContentLanguage() {
+        if (this.util.helper.isEmpty(this.request))
+            return;
         let culture = this.util.i18n.getCurrentLang();
         this.contentLanguage(culture);
     }
@@ -157,7 +159,7 @@ export class WebApiRequest<T> {
     button(btn): WebApiRequest<T> {
         this.btn = btn;
         return this;
-    }    
+    }
 
     /**
      * 请求时显示进度条

@@ -143,7 +143,7 @@ export class Dialog {
         return {
             nzTitle: this.getTitle(options),
             nzContent: options.component || options.content,
-            nzComponentParams: options.data,
+            nzData: options.data,
             nzCentered: options.centered,
             nzWidth: options.width,
             nzCancelText: this.getCancelText(options),

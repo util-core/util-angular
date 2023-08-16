@@ -27,4 +27,8 @@ export class TableConfig {
      * 是否显示不需要保存的提示消息,默认值: true
      */
     isShowNoNeedSaveMessage?: boolean;
+    /**
+     * 分页长度列表
+     */
+    pageSizeOptions?: number[];
 }
