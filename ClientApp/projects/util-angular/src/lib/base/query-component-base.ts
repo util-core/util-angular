@@ -37,6 +37,11 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     constructor(injector: Injector) {
         super(injector);
         this.queryParam = <TQuery>new QueryParameter();
+        let param = this.util.dialog.getData<any>();
+        if (param) {
+            this.checkedIds = param.checkedIds;
+            this.data = param.data;
+        }
     }
 
     /**

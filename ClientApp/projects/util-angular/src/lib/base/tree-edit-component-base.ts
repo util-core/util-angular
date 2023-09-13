@@ -24,6 +24,10 @@ export abstract class TreeEditComponentBase<TViewModel extends TreeViewModel> ex
      */
     constructor(injector: Injector) {
         super(injector);
+        let param = this.util.dialog.getData<any>();
+        if (param) {
+            this.parent = param.parent;
+        }
     }
 
     /**

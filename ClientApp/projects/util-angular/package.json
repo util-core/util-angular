@@ -1,6 +1,6 @@
 {
   "name": "util-angular",
-  "version": "16.0.1",
+  "version": "16.0.4",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
@@ -19,9 +19,9 @@
     "@angular/common": "^16.2.0",
     "@angular/forms": "^16.2.0",
     "ng-zorro-antd": "^16.1.0",
-    "@delon/abc": "^16.2.1",
-    "@delon/theme": "^16.2.1",
-    "@delon/util": "^16.2.1",
+    "@delon/abc": "^16.3.0",
+    "@delon/theme": "^16.3.0",
+    "@delon/util": "^16.3.0",
     "lodash-es": "~4.17.21",
     "date-fns": "~2.30.0",
     "ngx-tinymce": "^16.0.0",

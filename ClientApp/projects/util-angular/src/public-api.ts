@@ -51,6 +51,10 @@ export * from "./lib/form/form-submit-option";
 export * from "./lib/auth/auth-guard";
 export * from "./lib/auth/auth.service";
 
+//导出tenant
+export * from "./lib/tenant/tenant.service";
+export * from "./lib/tenant/tenant-info";
+
 //导出upload
 export * from "./lib/upload/upload.service";
 

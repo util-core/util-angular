@@ -17,4 +17,8 @@ export class Session {
      * 用户标识
      */
     userId;
+    /**
+     * 租户标识
+     */
+    tenantId;
 }

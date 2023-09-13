@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { EventEmitter } from "@angular/core";
-import { NzModalService, ModalOptions, NzModalRef, OnClickCallback } from "ng-zorro-antd/modal";
+import { NzModalService, ModalOptions, NzModalRef, OnClickCallback, NZ_MODAL_DATA } from "ng-zorro-antd/modal";
 import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
@@ -253,5 +253,12 @@ export class Dialog {
         if (!content && dialog.openModals.length > 1)
             dialogRef = dialog.openModals[dialog.openModals.length - 2];
         dialogRef.close(result);
+    }
+
+    /**
+     * 获取数据
+     */
+    getData<T>() {
+        return this.util.ioc.get<T>(NZ_MODAL_DATA);
     }
 }

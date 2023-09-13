@@ -17,7 +17,7 @@ export class SessionService {
     /**
      * 初始化用户会话服务
      */
-    constructor(util: Util) {
+    constructor(private util: Util) {
         this._session = util.ioc.get(Session);
     }
 
@@ -28,8 +28,9 @@ export class SessionService {
     setSession(session: Session) {
         if (!this._session)
             return;
-        this._session.userId = session.userId;
         this._session.isAuthenticated = session.isAuthenticated;
+        this._session.userId = session.userId;
+        this._session.tenantId = this.util.tenant.getTenantId();
     }
 
     /**
@@ -48,5 +49,14 @@ export class SessionService {
         if (!this._session)
             return null;
         return this._session.userId;
+    }
+
+    /**
+     * 租户标识
+     */
+    get tenantId() {
+        if (!this._session)
+            return null;
+        return this._session.tenantId;
     }
 }

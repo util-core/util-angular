@@ -31,19 +31,8 @@ export class WebApiRequest<T> {
      * @param request Http请求操作
      * @param message 消息操作
      */
-    constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {
-        this.initContentLanguage();
-    }
-
-    /**
-     * 初始化Content-Language请求头
-     */
-    private initContentLanguage() {
-        if (this.util.helper.isEmpty(this.request))
-            return;
-        let culture = this.util.i18n.getCurrentLang();
-        this.contentLanguage(culture);
-    }
+    constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {        
+    }    
 
     /**
      * 设置请求重试次数

@@ -7,6 +7,7 @@ import { assign } from "../common/helper";
 import { TableConfig } from "./table-config";
 import { TinymceConfig } from "./tinymce-config";
 import { LoadingConfig } from "./loading-config";
+import { TenantConfig } from "./tenant-config";
 import { DefaultTableConfig } from "./default-table-config";
 import { DefaultTinymceConfig } from "./default-tinymce-config";
 
@@ -35,6 +36,10 @@ export class AppConfig {
      * 加载状态配置
      */
     loading?: LoadingConfig
+    /**
+     * 租户配置
+     */
+    tenant?: TenantConfig
 }
 
 /**

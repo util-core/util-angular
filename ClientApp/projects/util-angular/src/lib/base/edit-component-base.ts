@@ -43,6 +43,11 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
         super(injector);
         this.isNew = true;
         this.model = <TViewModel>{};
+        let param = this.util.dialog.getData<any>();
+        if (param) {
+            this.id = param.id;
+            this.data = param.data;
+        }
     }
 
     /**

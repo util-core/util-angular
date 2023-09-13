@@ -13,6 +13,7 @@ import { Http } from "./http/http";
 import { WebApi } from "./webapi/web-api";
 import { Form } from "./form/form";
 import { Cookie } from './common/cookie';
+import { Storage } from './common/storage';
 import { I18n } from "./common/i18n";
 import { Sanitizer } from "./common/sanitizer";
 import { Loading } from "./common/loading";
@@ -22,6 +23,7 @@ import { ChangeDetector } from "./common/change-detector";
 import { Event } from "./common/event";
 import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
+import { TenantService } from "./tenant/tenant.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 import { ModuleConfig } from './config/module-config';
@@ -67,6 +69,10 @@ export class Util {
      */
     private _cookie: Cookie;
     /**
+     * 浏览器本地存储操作
+     */
+    private _storage: Storage;
+    /**
      * 国际化操作
      */
     private _i18n: I18n;
@@ -102,6 +108,10 @@ export class Util {
      * 用户会话操作
      */
     private _session: SessionService;
+    /**
+     * 租户操作
+     */
+    private _tenant: TenantService;
 
     /**
      * 初始化操作入口
@@ -209,6 +219,15 @@ export class Util {
     };
 
     /**
+     * 浏览器本地存储操作
+     */
+    get storage() {
+        if (!this._storage)
+            this._storage = new Storage(this);
+        return this._storage;
+    };
+
+    /**
      * 清理操作
      */
     get sanitizer() {
@@ -287,6 +306,15 @@ export class Util {
         if (!this._session)
             this._session = new SessionService(this);
         return this._session;
+    };
+
+    /**
+     * 租户操作
+     */
+    get tenant() {
+        if (!this._tenant)
+            this._tenant = new TenantService(this);
+        return this._tenant;
     };
 
     /**

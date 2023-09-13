@@ -1,10 +1,11 @@
-//================ utilƒ£øÈ ======================
-//Copyright 2023 ∫Œ’Úœ´
+//================ utilÊ®°Âùó ======================
+//Copyright 2023 ‰ΩïÈïáÊ±ê
 //Licensed under the MIT license
 //================================================
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { TableExtendDirective } from "./zorro/table.extend.directive";
 import { EditTableDirective } from "./zorro/edit-table.directive";
@@ -19,9 +20,11 @@ import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
 import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
 import { RequiredExtendDirective } from "./zorro/required.extend.directive";
 import { UploadExtendDirective } from "./zorro/upload.extend.directive";
+import { TenantInterceptor } from "./tenant/tenant.interceptor";
+import { LanguageInterceptor } from "./language/language.interceptor";
 
 /**
- * utilƒ£øÈ
+ * utilÊ®°Âùó
  */
 @NgModule({
     declarations: [
@@ -43,6 +46,10 @@ import { UploadExtendDirective } from "./zorro/upload.extend.directive";
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
         TinymceExtendDirective, UploadExtendDirective
+    ],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true }
     ]
 })
 export class UtilModule {
