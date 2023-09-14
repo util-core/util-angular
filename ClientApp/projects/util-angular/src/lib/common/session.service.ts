@@ -56,7 +56,7 @@ export class SessionService {
      */
     get tenantId() {
         if (!this._session)
-            return null;
+            return this.util.tenant.getTenantId();
         return this._session.tenantId;
     }
 }

@@ -43,7 +43,7 @@ export class TenantService {
      */
     getTenantId() {
         let tenant = this.getTenant();
-        return tenant.tenantId;
+        return tenant && tenant.tenantId;
     }
 
     /**

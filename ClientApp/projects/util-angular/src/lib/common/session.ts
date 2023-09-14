@@ -12,13 +12,13 @@ export class Session {
     /**
      * 是否认证
      */
-    isAuthenticated;
+    isAuthenticated: boolean;
     /**
      * 用户标识
      */
-    userId;
+    userId: string;
     /**
      * 租户标识
      */
-    tenantId;
+    tenantId?: string;
 }

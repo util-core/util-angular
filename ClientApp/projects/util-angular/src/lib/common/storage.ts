@@ -34,9 +34,15 @@ export class Storage {
      * 获取localStorage项
      * @param key 键
      */
-    getLocalItem<T>(key: string) : T {
+    getLocalItem<T>(key: string): T {
+        if (this.util.helper.isEmpty(key))
+            return null;
         let json = localStorage.getItem(key);
+        if (this.util.helper.isEmpty(json))
+            return null;
         let content = this.util.helper.toObjectFromJson<StorageWrapper>(json);
+        if (!content)
+            return null;
         if (Date.now() - content.time > content.expires) {
             this.removeLocalItem(key);
             return null;
@@ -78,9 +84,15 @@ export class Storage {
      * 获取sessionStorage项
      * @param key 键
      */
-    getSessionItem<T>(key: string) : T{
+    getSessionItem<T>(key: string): T{
+        if (this.util.helper.isEmpty(key))
+            return null;
         let json = sessionStorage.getItem(key);
+        if (this.util.helper.isEmpty(json))
+            return null;
         let content = this.util.helper.toObjectFromJson<StorageWrapper>(json);
+        if (!content)
+            return null;
         if (Date.now() - content.time > content.expires) {
             this.removeSessionItem(key);
             return null;
