@@ -144,6 +144,8 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
     protected initPageSize() {
         if (this.pageSizeOptions.some(value => value === this.config.pageSize))
             return;
+        if (this.pageSizeOptions.some(value => value === this.queryParam.pageSize))
+            return;
         this.queryParam.pageSize = this.pageSizeOptions[0];
     }
 
