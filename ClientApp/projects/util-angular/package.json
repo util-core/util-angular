@@ -15,21 +15,21 @@
     "angular"
   ],
   "peerDependencies": {
-    "@angular/core": "^16.2.0",
-    "@angular/common": "^16.2.0",
-    "@angular/forms": "^16.2.0",
-    "ng-zorro-antd": "^16.2.0",
-    "@delon/abc": "^16.4.0",
-    "@delon/theme": "^16.4.0",
-    "@delon/util": "^16.4.0",
-    "lodash-es": "~4.17.21",
-    "date-fns": "~2.30.0",
-    "ngx-tinymce": "^16.0.0",
-    "ng-event-bus": "~5.2.0",
-    "angular-oauth2-oidc": "^15.0.1"
+    "@angular/core": "16.2.0",
+    "@angular/common": "16.2.0",
+    "@angular/forms": "16.2.0",
+    "ng-zorro-antd": "16.2.0",
+    "@delon/abc": "16.4.0",
+    "@delon/theme": "16.4.0",
+    "@delon/util": "16.4.0",
+    "lodash-es": "4.17.21",
+    "date-fns": "2.30.0",
+    "ngx-tinymce": "16.0.0",
+    "ng-event-bus": "5.2.0",
+    "angular-oauth2-oidc": "15.0.1"
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "2.3.0"
   },
   "devDependencies": {
   }
