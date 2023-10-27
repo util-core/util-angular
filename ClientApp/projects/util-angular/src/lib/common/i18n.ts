@@ -1,4 +1,4 @@
-﻿//============== 国际化操作 ==========================
+﻿//============== 本地化操作 ==========================
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //====================================================
@@ -7,7 +7,7 @@ import { ALAIN_I18N_TOKEN, AlainI18NService } from '@delon/theme';
 import { Util } from "../util";
 
 /**
- * 国际化操作
+ * 本地化操作
  */
 export class I18n {
     /**
@@ -20,7 +20,7 @@ export class I18n {
     private alainI18nService: AlainI18NService
 
     /**
-     * 初始化国际化操作
+     * 初始化本地化操作
      * @param util 公共操作
      */
     constructor(private util: Util) {
