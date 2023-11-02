@@ -4,10 +4,12 @@
 //========================================================
 import { Injectable } from '@angular/core';
 import { assign } from "../common/helper";
+import { FormConfig } from "./form-config";
 import { TableConfig } from "./table-config";
 import { TinymceConfig } from "./tinymce-config";
 import { LoadingConfig } from "./loading-config";
 import { TenantConfig } from "./tenant-config";
+import { DefaultFormConfig } from "./default-form-config";
 import { DefaultTableConfig } from "./default-table-config";
 import { DefaultTinymceConfig } from "./default-tinymce-config";
 
@@ -24,6 +26,10 @@ export class AppConfig {
      * 分页大小
      */
     pageSize?: number;
+    /**
+     * 表单配置
+     */
+    form?: FormConfig;
     /**
      * 表格配置
      */
@@ -49,6 +55,7 @@ export class AppConfig {
 export function initAppConfig(config: AppConfig) {
     if (!config)
         return;
+    config.form = assign(DefaultFormConfig, config.form);
     config.table = assign(DefaultTableConfig, config.table);
     config.tinymce = assign(DefaultTinymceConfig, config.tinymce);
 }
