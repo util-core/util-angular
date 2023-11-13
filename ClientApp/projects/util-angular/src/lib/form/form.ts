@@ -37,7 +37,7 @@ export class Form {
             onOk: () => this.submitFormAsync(options),
             onCancel: options.complete
         });
-    }
+    }    
 
     /**
      * 提交表单验证
@@ -47,8 +47,10 @@ export class Form {
             console.log("表单参数 options 未设置");
             return false;
         }
-        if (options.form && !options.form.valid)
+        if (options.form && !options.form.valid) {
+            this.validateForm(options);
             return false;
+        }
         if (!options.url) {
             console.log("表单url未设置");
             return false;
@@ -58,6 +60,22 @@ export class Form {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 触发表单组件验证提示状态
+     */
+    validateForm(options: IFormSubmitOptions) {
+        if (!options.form.controls)
+            return;
+        Object.values(options.form.controls).forEach(control => {
+            if (!control)
+                return;
+            if (control.invalid) {
+                control.markAsDirty();
+                control.updateValueAndValidity({ onlySelf: true });
+            }
+        });
     }
 
     /**

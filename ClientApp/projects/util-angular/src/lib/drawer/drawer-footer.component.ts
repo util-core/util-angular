@@ -2,10 +2,11 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //====================================================
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, ViewChild, Optional } from '@angular/core';
 import { NzDrawerRef } from "ng-zorro-antd/drawer";
 import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
+import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
  * 抽屉页脚组件
@@ -19,7 +20,8 @@ import { Util } from '../util';
             <button #btnOk nz-button [nzType]="btnOkType" [nzDanger]="btnOkDanger" [nzLoading]="loading" [disabled]="!isValid" (click)="ok(btnOk)" *ngIf="btnOkText">{{btnOkText}}</button>
           </div>
        </ng-template>
-    `
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DrawerFooterComponent {
     /**
@@ -64,10 +66,21 @@ export class DrawerFooterComponent {
     @ViewChild("footer", { static: true }) footer: TemplateRef<any>;
 
     /**
-     * 初始化
+     * 初始化抽屉页脚组件
+     * @param config 应用配置
      */
-    constructor() {
+    constructor(@Optional() protected config: AppConfig) {
+        this.initAppConfig();
         this.isValid = true;
+    }
+
+    /**
+     * 初始化应用配置
+     */
+    private initAppConfig() {
+        if (!this.config)
+            this.config = new AppConfig();
+        initAppConfig(this.config);
     }
 
     /**
@@ -81,9 +94,11 @@ export class DrawerFooterComponent {
      * 组件无效时禁用按钮
      */
     ngDoCheck() {
+        if (!this.config.form.isInvalidFormDisableButton)
+            return;
         let component = this.drawer.getContentComponent();
         if (!component)
-            return;
+            return;        
         if (component.isValid)
             this.isValid = component.isValid();
     }
