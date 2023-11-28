@@ -21,6 +21,7 @@ export class ChangeDetector {
      */
     detectChanges() {
         let detector: ChangeDetectorRef = this.util.ioc.get(ChangeDetectorRef);
-        return detector.detectChanges();
+        if (detector)
+            detector.detectChanges();
     }
 }

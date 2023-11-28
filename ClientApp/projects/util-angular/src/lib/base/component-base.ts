@@ -3,6 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { Injector, Component } from '@angular/core';
+import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { Util } from "../util";
 
 /**
@@ -23,5 +24,14 @@ export abstract class ComponentBase {
      */
     constructor(injector: Injector) {
         this.util = new Util(injector);
+    }
+
+    /**
+     * 创建上下文菜单
+     * @param $event 鼠标事件
+     * @param menu 下拉菜单组件
+     */
+    createContextMenu($event: MouseEvent, menu: NzDropdownMenuComponent) {
+        this.util.contextMenu.create($event, menu);
     }
 }

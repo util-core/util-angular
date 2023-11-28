@@ -8,11 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Util.Data.Core" Version="7.1.66" />
-		<PackageReference Include="Util.Domain.Biz" Version="7.1.66" />
-		<PackageReference Include="Util.Logging.Serilog" Version="7.1.66" />
-		<PackageReference Include="Util.Ui.NgAlain" Version="7.1.66" />
-		<PackageReference Include="Util.Ui.NgZorro" Version="7.1.66" />
+		<PackageReference Include="Util.Data.Core" Version="7.1.92" />
+		<PackageReference Include="Util.Domain.Biz" Version="7.1.92" />
+		<PackageReference Include="Util.Logging.Serilog" Version="7.1.92" />
+		<PackageReference Include="Util.Ui.NgAlain" Version="7.1.92" />
+		<PackageReference Include="Util.Ui.NgZorro" Version="7.1.92" />
 	</ItemGroup>
 
 	<ItemGroup>

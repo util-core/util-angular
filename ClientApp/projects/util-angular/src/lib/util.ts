@@ -23,6 +23,7 @@ import { ChangeDetector } from "./common/change-detector";
 import { Event } from "./common/event";
 import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
+import { ContextMenu } from "./common/context-menu";
 import { TenantService } from "./tenant/tenant.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
@@ -104,6 +105,10 @@ export class Util {
      * 事件总线操作
      */
     private _eventbus: EventBus;
+    /**
+     * 上下文菜单操作
+     */
+    private _contextMenu: ContextMenu;
     /**
      * 用户会话操作
      */
@@ -297,6 +302,15 @@ export class Util {
         if (!this._eventbus)
             this._eventbus = new EventBus(this);
         return this._eventbus;
+    };
+
+    /**
+     * 上下文菜单操作
+     */
+    get contextMenu() {
+        if (!this._contextMenu)
+            this._contextMenu = new ContextMenu(this);
+        return this._contextMenu;
     };
 
     /**
