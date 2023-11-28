@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { ComponentRef } from '@angular/core';
-import { NzDrawerService, NzDrawerOptions, NzDrawerRef } from "ng-zorro-antd/drawer";
+import { NzDrawerService, NzDrawerOptions, NzDrawerRef, NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
 import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
@@ -180,5 +180,12 @@ export class Drawer {
     close(result?) {
         let drawerRef: NzDrawerRef = this.util.ioc.get(NzDrawerRef);
         drawerRef && drawerRef.close(result);
+    }
+
+    /**
+     * 获取数据
+     */
+    getData<T>() {
+        return this.util.ioc.get<T>(NZ_DRAWER_DATA);
     }
 }
