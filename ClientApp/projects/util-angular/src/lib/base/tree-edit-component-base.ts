@@ -24,6 +24,15 @@ export abstract class TreeEditComponentBase<TViewModel extends TreeViewModel> ex
      */
     constructor(injector: Injector) {
         super(injector);
+        this.initParentByDialog();
+    }
+
+    /**
+     * 通过弹出窗口初始化父节点
+     */
+    private initParentByDialog() {
+        if (this.parent)
+            return;
         let param = this.util.dialog.getData<any>();
         if (!param)
             param = this.util.drawer.getData<any>();

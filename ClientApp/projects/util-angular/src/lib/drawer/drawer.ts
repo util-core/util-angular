@@ -74,7 +74,7 @@ export class Drawer {
         return {
             nzTitle: this.getTitle(options),
             nzContent: options.component || options.content,
-            nzContentParams: options.data,
+            nzData: options.data,
             nzOnCancel: this.getOnCancel(options),
             nzClosable: isUndefined(options.showClose) ? true : options.showClose,
             nzExtra: options.extra,
@@ -87,7 +87,7 @@ export class Drawer {
             nzBodyStyle: options.bodyStyle,
             nzFooter: this.getFooter(options),
             nzSize: options.size,
-            nzWidth: options.width,
+            nzWidth: this.getWidth(options),
             nzHeight: options.height,
             nzWrapClassName: options.wrapClassName,
             nzZIndex: options.zIndex,
@@ -171,6 +171,15 @@ export class Drawer {
         if (options.okDanger)
             return options.okDanger;
         return false;
+    }
+
+    /**
+     * 获取宽度
+     */
+    private getWidth(options: IDrawerOptions) {
+        if (options.width || options.size)
+            return options.width;
+        return '30%';
     }
 
     /**

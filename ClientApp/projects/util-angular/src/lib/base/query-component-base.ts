@@ -37,6 +37,15 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     constructor(injector: Injector) {
         super(injector);
         this.queryParam = <TQuery>new QueryParameter();
+        this.initDataByDialog();
+    }
+
+    /**
+     * 通过弹出窗口初始化数据
+     */
+    private initDataByDialog() {
+        if (this.data)
+            return;
         let param = this.util.dialog.getData<any>();
         if (!param)
             param = this.util.drawer.getData<any>();
@@ -158,7 +167,7 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     protected getWidth(isDialog?: boolean): string {
         if (isDialog )
             return "60%";
-        return "38%";
+        return "30%";
     }
 
     /**

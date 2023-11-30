@@ -29,8 +29,8 @@ export class ContextMenu {
      */
     create($event: MouseEvent, menu: NzDropdownMenuComponent) {
         if (!this._service)
-            return;
-        this._service.create($event, menu);
+            return null;
+        return this._service.create($event, menu);
     }
 
     /**

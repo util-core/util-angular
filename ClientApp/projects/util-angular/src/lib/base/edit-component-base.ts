@@ -43,6 +43,15 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
         super(injector);
         this.isNew = true;
         this.model = <TViewModel>{};
+        this.initDataByDialog();
+    }
+
+    /**
+     * 通过弹出窗口初始化数据
+     */
+    private initDataByDialog() {
+        if (this.id || this.data)
+            return;
         let param = this.util.dialog.getData<any>();
         if (!param)
             param = this.util.drawer.getData<any>();

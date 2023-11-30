@@ -32,6 +32,7 @@ export abstract class ComponentBase {
      * @param menu 下拉菜单组件
      */
     createContextMenu($event: MouseEvent, menu: NzDropdownMenuComponent) {
-        this.util.contextMenu.create($event, menu);
+        $event.stopPropagation();
+        return this.util.contextMenu.create($event, menu);
     }
 }
