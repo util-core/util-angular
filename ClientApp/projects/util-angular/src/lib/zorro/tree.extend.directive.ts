@@ -104,7 +104,7 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 子节点加载前事件,返回false停止加载
      */
-    @Input() onLoadChildrenBefore: (node) => boolean;
+    @Input() onLoadChildrenBefore: (node,param?) => boolean;
     /**
      * 子节点加载完成事件
      */
@@ -339,13 +339,13 @@ export class TreeExtendDirective implements OnInit {
     private requestLoadChildren(node: NzTreeNode) {
         this.queryParam.parentId = node.key;
         let url = this.loadChildrenUrl || this.url;
+        if (this.onLoadChildrenBefore && this.onLoadChildrenBefore(node, this.queryParam)=== false)
+            return;
         this.util.webapi.get<any>(url).param(this.queryParam)
             .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
             .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
             .handle({
-                before: () => {
-                    if (this.onLoadChildrenBefore)
-                        return this.onLoadChildrenBefore(node);
+                before: () => {                    
                     return true;
                 },
                 ok: result => {

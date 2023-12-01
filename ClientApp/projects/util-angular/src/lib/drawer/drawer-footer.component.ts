@@ -20,8 +20,7 @@ import { AppConfig, initAppConfig } from '../config/app-config';
             <button #btnOk nz-button [nzType]="btnOkType" [nzDanger]="btnOkDanger" [nzLoading]="loading" [disabled]="!isValid" (click)="ok(btnOk)" *ngIf="btnOkText">{{btnOkText}}</button>
           </div>
        </ng-template>
-    `,
-    changeDetection: ChangeDetectionStrategy.OnPush
+    `
 })
 export class DrawerFooterComponent {
     /**

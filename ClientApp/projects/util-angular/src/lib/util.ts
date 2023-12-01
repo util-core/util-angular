@@ -24,6 +24,7 @@ import { Event } from "./common/event";
 import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
 import { ContextMenu } from "./common/context-menu";
+import { TreeHelper } from "./common/tree-helper";
 import { TenantService } from "./tenant/tenant.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
@@ -109,6 +110,10 @@ export class Util {
      * 上下文菜单操作
      */
     private _contextMenu: ContextMenu;
+    /**
+     * 树形操作
+     */
+    private _tree: TreeHelper;
     /**
      * 用户会话操作
      */
@@ -311,6 +316,15 @@ export class Util {
         if (!this._contextMenu)
             this._contextMenu = new ContextMenu(this);
         return this._contextMenu;
+    };
+
+    /**
+     * 树形操作
+     */
+    get tree() {
+        if (!this._tree)
+            this._tree = new TreeHelper(this);
+        return this._tree;
     };
 
     /**

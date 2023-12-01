@@ -161,7 +161,7 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     }
 
     /**
-     * 获取弹出框宽度，默认值：Dialog为 60% , Drawer为 38%
+     * 获取弹出框宽度，默认值：Dialog为 60% , Drawer为 30%
      * @param isDialog true表示Dialog,false表示Drawer
      */
     protected getWidth(isDialog?: boolean): string {
