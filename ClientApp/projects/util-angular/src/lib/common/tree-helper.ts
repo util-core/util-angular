@@ -5,6 +5,7 @@
 import { NzTreeNode } from 'ng-zorro-antd/tree';
 import { Util } from "../util";
 import { LoadMode } from "../core/load-mode";
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * 树形操作
@@ -68,11 +69,11 @@ export class TreeHelper {
          */
         newNodes,
         /**
-         * 加载子节点地址
+         * 加载子节点请求地址
          */
         loadChildrenUrl: string,
         /**
-         * 加载子节点参数
+         * 加载子节点请求参数
          */
         param?,
         /**
@@ -119,5 +120,45 @@ export class TreeHelper {
         if (children && children.length > 0)
             return true;
         return false;
+    }
+
+    /**
+     * 删除节点,发送Http Delete请求
+     * @param options 配置
+     */
+    deleteNode(options: {
+        /**
+         * 节点
+         */
+        node: NzTreeNode,
+        /**
+         * 删除请求地址
+         */
+        url: string
+
+    }) {
+        if (!options)
+            return;
+        if (!options.node) {
+            this.util.message.warn(I18nKeys.noDeleteItemSelected);
+            return;
+        }
+        if (!options.url)
+            return;
+        let url = this.util.helper.trimEnd(options.url, "/");
+        url = this.util.helper.trimEnd(url, options.node.key);
+        url = this.util.helper.trimEnd(url, "/");
+        url = `${url}/${options.node.key}`;
+        this.util.message.confirm({
+            content: I18nKeys.deleteConfirmation,
+            onOk: () => {
+                this.util.webapi.delete<any>(url)
+                .handle({
+                    ok: () => {
+                        options.node.remove();
+                    }
+                });
+            }
+        });
     }
 }
