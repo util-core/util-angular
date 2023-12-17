@@ -20,8 +20,10 @@ import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
 import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
 import { RequiredExtendDirective } from "./zorro/required.extend.directive";
 import { UploadExtendDirective } from "./zorro/upload.extend.directive";
+import { InputExtendDirective } from "./zorro/input.extend.directive";
 import { TenantInterceptor } from "./tenant/tenant.interceptor";
 import { LanguageInterceptor } from "./language/language.interceptor";
+import { UploadServiceBase, UploadService } from "./upload/upload.service";
 
 /**
  * util模块
@@ -34,7 +36,7 @@ import { LanguageInterceptor } from "./language/language.interceptor";
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
         TinymceExtendDirective, DrawerFooterComponent,
-        UploadExtendDirective
+        UploadExtendDirective, InputExtendDirective
     ],
     imports: [
         CommonModule,FormsModule,NzButtonModule
@@ -45,11 +47,13 @@ import { LanguageInterceptor } from "./language/language.interceptor";
         RequiredExtendDirective,ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
-        TinymceExtendDirective, UploadExtendDirective
+        TinymceExtendDirective, UploadExtendDirective,
+        InputExtendDirective
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true }
+        { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
+        { provide: UploadServiceBase, useClass: UploadService }
     ]
 })
 export class UtilModule {

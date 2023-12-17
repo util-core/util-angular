@@ -133,7 +133,6 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
      * @param data 上传变更参数
      */
     handleChange(data: NzUploadChangeParam) {
-
         if (!data || !data.file)
             return;
         switch (data.file.status) {
@@ -144,6 +143,10 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
                 this.loading = false;
                 if (!data.file.response)
                     return;
+                if (data.type === 'success') {
+                    this.modelChange$.next(data.file.response);
+                    this.setInputValue();
+                }
                 break;
             case 'removed':
                 this.loading = false;

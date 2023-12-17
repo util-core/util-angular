@@ -12,6 +12,7 @@ import { TenantConfig } from "./tenant-config";
 import { DefaultFormConfig } from "./default-form-config";
 import { DefaultTableConfig } from "./default-table-config";
 import { DefaultTinymceConfig } from "./default-tinymce-config";
+import { UploadConfig } from "./upload-config";
 
 /**
  * 应用配置
@@ -37,15 +38,19 @@ export class AppConfig {
     /**
      * Tinymce富文本编辑器配置
      */
-    tinymce?: TinymceConfig
+    tinymce?: TinymceConfig;
     /**
      * 加载状态配置
      */
-    loading?: LoadingConfig
+    loading?: LoadingConfig;
     /**
      * 租户配置
      */
-    tenant?: TenantConfig
+    tenant?: TenantConfig;
+    /**
+     * 上传配置
+     */
+    upload?: UploadConfig;
 }
 
 /**
@@ -54,8 +59,11 @@ export class AppConfig {
  */
 export function initAppConfig(config: AppConfig) {
     if (!config)
-        return;
+        config = new AppConfig();
     config.form = assign(DefaultFormConfig, config.form);
     config.table = assign(DefaultTableConfig, config.table);
     config.tinymce = assign(DefaultTinymceConfig, config.tinymce);
+    config.loading = config.loading || new LoadingConfig();
+    config.tenant = config.tenant || new TenantConfig();
+    config.upload = config.upload || new UploadConfig();
 }
