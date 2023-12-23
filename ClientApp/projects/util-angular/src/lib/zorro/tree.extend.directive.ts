@@ -12,6 +12,7 @@ import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
 import { AppConfig, initAppConfig } from '../config/app-config';
 import { ModuleConfig } from '../config/module-config';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro树形扩展指令
@@ -314,13 +315,11 @@ export class TreeExtendDirective implements OnInit {
     }
 
     /**
-     * 是否存在子节点
+     * 是否包含子节点
      */
-    private hasChildren(node: NzTreeNode) {
+    hasChildren(node: NzTreeNode): boolean {
         let children = node.getChildren();
-        if (children && children.length > 0)
-            return true;
-        return false;
+        return children && children.length > 0;
     }
 
     /**
@@ -378,6 +377,43 @@ export class TreeExtendDirective implements OnInit {
     }
 
     /**
+     * 获取所有父节点
+     * @param node 树节点
+     * @param excludeSelf 是否排除当前节点,默认排除自身
+     */
+    getParentNodes(node: NzTreeNode, excludeSelf: boolean = true): NzTreeNode[] {
+        let result = new Array<NzTreeNode>();
+        if (!node)
+            return result;
+        if (!excludeSelf)
+            result.push(node);
+        this.addParentNode(result, node.getParentNode());
+        return result.reverse();
+    }
+
+    /**
+     * 添加父节点
+     */
+    private addParentNode(result: Array<NzTreeNode>, parentNode: NzTreeNode) {
+        if (!parentNode)
+            return result;
+        result.push(parentNode);
+        return this.addParentNode(result, parentNode.getParentNode());
+    }
+
+    /**
+     * 获取根节点
+     * @param node 树节点
+     */
+    getRootNode(node: NzTreeNode): NzTreeNode {
+        if (!node)
+            return null;
+        if (node.level === 0)
+            return node;
+        return this.getRootNode(node.getParentNode());
+    }
+
+    /**
      * 获取节点
      * @param id 标识
      */
@@ -426,4 +462,217 @@ export class TreeExtendDirective implements OnInit {
     getExpandedIds(): string {
         return this.getExpandedNodes().map(value => value.key).join(",");
     }
+
+    /**
+     * 获取第一个节点
+     */
+    getFirstNode() {
+        let nodes = this.getNodes();
+        if (!nodes || nodes.length === 0)
+            return null;
+        return nodes[0];
+    }
+
+    /**
+     * 展开节点
+     * @param node 节点
+     */
+    expandNode(node: NzTreeNode) {
+        if (!node)
+            return;
+        this.loadChildren(node, true);
+        node.isExpanded = true;
+        this.onExpand.emit(node);
+    }
+
+    /**
+     * 刷新新增节点
+     * @param options 配置
+     */
+    refreshNew(options: {        
+        /**
+         * 新增节点,可以传入NzTreeNode,NzTreeNodeOptions,NzTreeNodeOptions[]类型
+         */
+        node,
+        /**
+         * 父节点
+         */
+        parentNode?: NzTreeNode,
+        /**
+         * 加载子节点地址
+         */
+        url?,
+        /**
+         * 加载子节点参数
+         */
+        param?,
+        /**
+         * 刷新成功处理函数
+         */
+        ok?: () => void;
+    }) {
+        if (!options)
+            return;
+        if (!options.node)
+            return;
+        let origin: NzTreeNodeOptions = this.getOrigin(options.node);
+        let parentId = this.getParentId(origin);
+        let parentNode = options.parentNode || this.tree.getTreeNodeByKey(parentId);
+        parentNode.isLeaf = false;
+        if (this.hasChildren(parentNode)) {
+            parentNode.addChildren([origin]);
+            parentNode.isExpanded = true;
+            options.ok && options.ok();
+            return;
+        }
+        let url = options.url || this.loadChildrenUrl || this.url;
+        let param = options.param || this.queryParam;
+        this.util.webapi.get<any>(url).param(param)
+            .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
+            .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
+            .handle({
+                ok: result => {
+                    if (result && result.nodes && result.nodes.length > 0)
+                        parentNode.addChildren(result.nodes);
+                    parentNode.isExpanded = true;
+                    options.ok && options.ok();
+                }
+            });
+    }
+
+    /**
+     * 获取树节点数据
+     */
+    private getOrigin(node): NzTreeNodeOptions{
+        let nodes = node.nodes;
+        let origin: NzTreeNodeOptions = nodes && nodes.length > 0 && nodes[0];
+        return origin || node.origin || node;
+    }
+
+    /**
+     * 获取父标识
+     */
+    private getParentId(origin: NzTreeNodeOptions) {
+        if (!origin)
+            return null;
+        let model = origin["originalNode"];
+        return model && model.parentId;
+    }
+
+    /**
+     * 刷新更新节点
+     * @param options 配置
+     */
+    refreshUpdate(options: {
+        /**
+         * 更新后节点,可以传入NzTreeNode,NzTreeNodeOptions,NzTreeNodeOptions[]类型
+         */
+        node,        
+        /**
+         * 加载子节点地址
+         */
+        url?,
+        /**
+         * 加载子节点参数
+         */
+        param?,
+        /**
+         * 刷新成功处理函数
+         */
+        ok?: (node: NzTreeNode) => void;
+    }) {
+        if (!options)
+            return;
+        if (!options.node)
+            return;
+        let origin: NzTreeNodeOptions = this.getOrigin(options.node);
+        let originalNode = this.tree.getTreeNodeByKey(origin.key);
+        let originalParentNode = originalNode.getParentNode();
+        let originalParentId = originalParentNode && originalParentNode.key;        
+        originalNode.title = origin.title;
+        originalNode.origin = origin;
+        let newParentId = this.getParentId(origin);
+        if (!this.isParentChange(originalParentId, newParentId)) {
+            options.ok && options.ok(originalNode);
+            return;
+        }
+        this.util.helper.remove(originalParentNode.children, t => t.key === origin.key);
+        let newParentNode = this.tree.getTreeNodeByKey(newParentId);
+        newParentNode.isLeaf = false;
+        if (this.hasChildren(newParentNode)) {
+            newParentNode.addChildren([origin]);
+            newParentNode.isExpanded = true;
+            options.ok && options.ok(newParentNode);
+            return;
+        }
+        let url = options.url || this.loadChildrenUrl || this.url;
+        let param = options.param || this.queryParam;
+        this.util.webapi.get<any>(url).param(param)
+            .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
+            .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
+            .handle({
+                ok: result => {
+                    if (result && result.nodes && result.nodes.length > 0)
+                        newParentNode.addChildren(result.nodes);
+                    newParentNode.isExpanded = true;
+                    options.ok && options.ok(newParentNode);
+                }
+            });
+    }
+
+    /**
+     * 父节点是否变化
+     */
+    private isParentChange(originalParentId, newParentId) {
+        if (!originalParentId && !newParentId)
+            return false;
+        if (originalParentId === newParentId)
+            return false;
+        return true;
+    }
+
+    /**
+     * 删除节点,发送Http Delete请求
+     * @param options 配置
+     */
+    delete(options: {
+        /**
+         * 节点
+         */
+        node: NzTreeNode,
+        /**
+         * 删除请求地址
+         */
+        url?: string,
+        /**
+         * 删除成功处理函数
+         */
+        ok?: () => void;
+
+    }) {
+        if (!options)
+            return;
+        if (!options.node) {
+            this.util.message.warn(I18nKeys.noDeleteItemSelected);
+            return;
+        }
+        let url = options.url || this.url;
+        url = this.util.helper.trimEnd(url, "/");
+        url = this.util.helper.trimEnd(url, options.node.key);
+        url = this.util.helper.trimEnd(url, "/");
+        url = `${url}/${options.node.key}`;
+        this.util.message.confirm({
+            content: I18nKeys.deleteConfirmation,
+            onOk: () => {
+                this.util.webapi.delete<any>(url)
+                    .handle({
+                        ok: () => {
+                            options.node.remove();
+                            options.ok && options.ok();
+                        }
+                    });
+            }
+        });
+    }
+    
 }
