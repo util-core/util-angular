@@ -119,8 +119,11 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
             this.initPageSizeOptions();
             this.initPageSize();
             this.initOrder();
-            if (this.autoLoad)
+            this.initDataLineNumbers();
+            if (this.autoLoad) {
                 this.load();
+                return;
+            }            
         }, 0);
     }
 
@@ -156,6 +159,17 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
         if (!this.order)
             return;
         this.queryParam.order = this.order;
+    }
+
+    /**
+     * 初始化数据源行号
+     */
+    private initDataLineNumbers() {
+        if (this.dataSource && this.dataSource.length > 0) {
+            let data = new PageList<TModel>(this.dataSource, 1, this.queryParam.pageSize);
+            data.initLineNumbers();
+            this.dataSource = data.data;
+        }
     }
 
     /**

@@ -527,6 +527,8 @@ export class TreeExtendDirective implements OnInit {
         }
         let url = options.url || this.loadChildrenUrl || this.url;
         let param = options.param || this.queryParam;
+        if (parentNode.key)
+            param.parentId = parentNode.key;
         this.util.webapi.get<any>(url).param(param)
             .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
             .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
@@ -577,6 +579,10 @@ export class TreeExtendDirective implements OnInit {
          */
         param?,
         /**
+         * 父节点是否变化回调函数
+         */
+        isParentChange?: (originalParentId, newParentId) => boolean;
+        /**
          * 刷新成功处理函数
          */
         ok?: (node: NzTreeNode) => void;
@@ -592,21 +598,24 @@ export class TreeExtendDirective implements OnInit {
         originalNode.title = origin.title;
         originalNode.origin = origin;
         let newParentId = this.getParentId(origin);
-        if (!this.isParentChange(originalParentId, newParentId)) {
+        if (!this.isParentChange(originalParentId, newParentId, options.isParentChange)) {
             options.ok && options.ok(originalNode);
             return;
         }
         this.util.helper.remove(originalParentNode.children, t => t.key === origin.key);
         let newParentNode = this.tree.getTreeNodeByKey(newParentId);
         newParentNode.isLeaf = false;
+        originalNode.parentNode = newParentNode;
         if (this.hasChildren(newParentNode)) {
-            newParentNode.addChildren([origin]);
+            newParentNode.addChildren([originalNode]);
             newParentNode.isExpanded = true;
-            options.ok && options.ok(newParentNode);
+            options.ok && options.ok(originalNode);
             return;
         }
         let url = options.url || this.loadChildrenUrl || this.url;
         let param = options.param || this.queryParam;
+        if (newParentNode.key)
+            param.parentId = newParentNode.key;
         this.util.webapi.get<any>(url).param(param)
             .paramIf("loadMode", this.getLoadMode(), !isUndefined(this.getLoadMode()))
             .paramIf("is_expand_for_root_async", "false", this.isExpandForRootAsync === false)
@@ -615,7 +624,7 @@ export class TreeExtendDirective implements OnInit {
                     if (result && result.nodes && result.nodes.length > 0)
                         newParentNode.addChildren(result.nodes);
                     newParentNode.isExpanded = true;
-                    options.ok && options.ok(newParentNode);
+                    options.ok && options.ok(this.tree.getTreeNodeByKey(origin.key));
                 }
             });
     }
@@ -623,11 +632,13 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 父节点是否变化
      */
-    private isParentChange(originalParentId, newParentId) {
+    private isParentChange(originalParentId, newParentId, isParentChange?: (originalParentId, newParentId) => boolean) {        
         if (!originalParentId && !newParentId)
             return false;
         if (originalParentId === newParentId)
             return false;
+        if (isParentChange)
+            return isParentChange(originalParentId, newParentId);
         return true;
     }
 

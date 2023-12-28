@@ -218,7 +218,7 @@ export let toNumber = (value, precision?, isTruncate?: boolean) => {
  * @param value 输入值,范例: "a,b,c"
  */
 export let toArray = <T>(value: string): T[] => {
-    return split2(value,',');
+    return split2(value, ',');
 }
 
 /**
@@ -345,4 +345,22 @@ function getHostUrl(url: string, host: string) {
     if (host)
         return `${host}/api/${url}`;
     return `/api/${url}`;
+}
+
+/**
+ * 获取大小描述
+ * @param size 大小
+ * @param precision 小数位数,默认值: 2
+ */
+export let getSizeDescription = (size, precision = 2) => {
+    size = toNumber(size);
+    if (!size)
+        return null;
+    if (size >= 1024 * 1024 * 1024)
+        return toNumber(size / 1024 / 1024 / 1024, precision) + "GB";
+    if (size >= 1024 * 1024)
+        return toNumber(size / 1024 / 1024, precision) + "MB";
+    if (size >= 1024)
+        return toNumber(size / 1024, precision) + "KB";
+    return size + "B";
 }

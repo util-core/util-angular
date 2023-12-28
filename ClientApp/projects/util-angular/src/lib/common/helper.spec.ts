@@ -109,6 +109,17 @@ describe('util.helper', () => {
         expect(query.test).toEqual("a");
         expect(query.order).toEqual("b");
     });
+    it("getSizeDescription", async () => {
+        expect(helper.getSizeDescription('0')).toEqual(null);
+        expect(helper.getSizeDescription(0)).toEqual(null);
+        expect(helper.getSizeDescription(undefined)).toEqual(null);
+        expect(helper.getSizeDescription(3)).toEqual("3B");
+        expect(helper.getSizeDescription(3.1)).toEqual("3.1B");
+        expect(helper.getSizeDescription(1500)).toEqual("1.46KB");
+        expect(helper.getSizeDescription(1500000)).toEqual("1.43MB");
+        expect(helper.getSizeDescription(1500000,1)).toEqual("1.4MB");
+        expect(helper.getSizeDescription(1600000000)).toEqual("1.49GB");
+    });
 });
 
 /**
