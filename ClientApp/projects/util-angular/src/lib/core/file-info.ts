@@ -8,23 +8,39 @@
  */
 export class FileInfo {
     /**
-     * 标识
+     * 文件标识
      */
     id;
     /**
+     * 文件连接标识
+     */
+    connectionId;
+    /**
      * 文件名
      */
-    name;
+    name;    
+    /**
+     * 扩展名
+     */
+    extension;
     /**
      * 文件大小
      */
-    size;
+    size:number;
     /**
-     * 文件类型
+     * 文件路径
      */
-    type;
+    path;
+    /**
+     * 存储空间
+     */
+    bucket;
     /**
      * 文件地址
      */
     url;
+    /**
+     * 缩略图文件地址
+     */
+    thumbUrl;
 }

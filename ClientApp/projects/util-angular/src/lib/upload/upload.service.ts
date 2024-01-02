@@ -25,10 +25,11 @@ export class UploadService extends UploadServiceBase {
     toUploadFile(item: FileInfo): NzUploadFile {
         return {
             uid: item.id,
-            size: item.size,
             name: item.name,
-            type: item.type,
-            url: item.url
+            size: item.size,
+            type: item.extension,
+            url: item.url,
+            thumbUrl: item.thumbUrl
         };
     }
 }

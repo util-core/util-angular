@@ -348,8 +348,8 @@ function getHostUrl(url: string, host: string) {
 }
 
 /**
- * 获取大小描述
- * @param size 大小
+ * 获取文件大小描述
+ * @param size 文件大小
  * @param precision 小数位数,默认值: 2
  */
 export let getSizeDescription = (size, precision = 2) => {

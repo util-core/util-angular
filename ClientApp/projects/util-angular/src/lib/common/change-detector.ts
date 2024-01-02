@@ -24,4 +24,13 @@ export class ChangeDetector {
         if (detector)
             detector.detectChanges();
     }
+
+    /**
+     * 标记变更检测
+     */
+    markForCheck() {
+        let detector: ChangeDetectorRef = this.util.ioc.get(ChangeDetectorRef);
+        if (detector)
+            detector.markForCheck();
+    }
 }
