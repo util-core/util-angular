@@ -4,7 +4,8 @@
 //================================================
 import {
     trimEnd as trimEnd2, trimStart as trimStart2, remove as remove2, isEmpty as isEmpty2, groupBy as groupBy2,
-    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2, toPairs, uniqBy
+    hasIn, cloneDeep, assign as assign2, toString as toString2, split as split2, toPairs, uniqBy,
+    differenceBy, differenceWith
 } from "lodash-es";
 import { format as format2 } from 'date-fns'
 import { UUID } from './internal/uuid';
@@ -363,4 +364,37 @@ export let getSizeDescription = (size, precision = 2) => {
     if (size >= 1024)
         return toNumber(size / 1024, precision) + "KB";
     return size + "B";
+}
+
+/**
+* 获取文件扩展名,范例:a.jpg,返回.jpg
+* @param name 文件名
+*/
+export function getExtension(name: string) {
+    if (!name)
+        return null;
+    let index = name.lastIndexOf('.');
+    if (index === -1)
+        return null;
+    return name.slice(index).toLowerCase();
+}
+
+/**
+* 获取差集
+* @param source 源集合
+* @param target 目标集合
+* @param property 比较属性
+*/
+export let except = <T>(source: T[], target: T[], property?: (t: T) => any): T[] => {
+    return differenceBy(source, target, property);
+}
+
+/**
+ * 获取差集
+ * @param source 源集合
+ * @param target 目标集合
+ * @param comparator 比较器
+ */
+export let exceptWith = <T>(source: T[], target: T[], comparator?: (s, t) => boolean): T[] => {
+    return differenceWith(source, target, comparator);
 }

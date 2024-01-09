@@ -120,6 +120,15 @@ describe('util.helper', () => {
         expect(helper.getSizeDescription(1500000,1)).toEqual("1.4MB");
         expect(helper.getSizeDescription(1600000000)).toEqual("1.49GB");
     });
+    it("getExtension", async () => {
+        expect(helper.getExtension('')).toEqual(null);
+        expect(helper.getExtension('jpg')).toEqual(null);
+        expect(helper.getExtension('.jpg')).toEqual(".jpg");
+        expect(helper.getExtension('..jpg')).toEqual(".jpg");
+        expect(helper.getExtension('a.jpg')).toEqual(".jpg");
+        expect(helper.getExtension('a.b.jpg')).toEqual(".jpg");
+        expect(helper.getExtension('a.b.JPG')).toEqual(".jpg");
+    })
 });
 
 /**

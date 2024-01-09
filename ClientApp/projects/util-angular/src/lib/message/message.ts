@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //================================================
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzMessageService, NzMessageDataOptions } from 'ng-zorro-antd/message';
 import { NzModalService } from "ng-zorro-antd/modal";
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
@@ -33,7 +33,7 @@ export class Message {
     private getService() {
         return this.util.ioc.get<NzMessageService>(NzMessageService);
     }
-     
+
     /**
      * 成功消息
      * @param message 消息
@@ -43,8 +43,17 @@ export class Message {
             return;
         message = this.util.i18n.get(message);
         let service = this.getService();
-        service.success(message);
-    }    
+        service.success(message, this.getOptions());
+    }
+
+    /**
+     * 获取消息配置
+     */
+    private getOptions(): NzMessageDataOptions {
+        return {
+            nzDuration: this._config.message.duration
+        };
+    }
 
     /**
      * 信息消息
@@ -55,7 +64,7 @@ export class Message {
             return;
         message = this.util.i18n.get(message);
         let service = this.getService();
-        service.info(message);
+        service.info(message, this.getOptions());
     }
 
     /**
@@ -67,7 +76,7 @@ export class Message {
             return;
         message = this.util.i18n.get(message);
         let service = this.getService();
-        service.warning(message);
+        service.warning(message, this.getOptions());
     }
 
     /**
@@ -79,7 +88,7 @@ export class Message {
             return;
         message = this.util.i18n.get(message);
         let service = this.getService();
-        service.error(message);
+        service.error(message, this.getOptions());
     }
 
     /**
@@ -116,7 +125,7 @@ export class Message {
      */
     private getTitle(options: IConfirmOptions) {
         let result = options.title || I18nKeys.tips;
-        if( typeof result === "string" )
+        if (typeof result === "string")
             return this.util.i18n.get(result);
         return result;
     }

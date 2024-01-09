@@ -13,6 +13,9 @@ import { DefaultFormConfig } from "./default-form-config";
 import { DefaultTableConfig } from "./default-table-config";
 import { DefaultTinymceConfig } from "./default-tinymce-config";
 import { UploadConfig } from "./upload-config";
+import { DefaultUploadConfig } from "./default-upload-config";
+import { MessageConfig } from "./message-config";
+import { DefaultMessageConfig } from "./default-message-config";
 
 /**
  * 应用配置
@@ -51,6 +54,10 @@ export class AppConfig {
      * 上传配置
      */
     upload?: UploadConfig;
+    /**
+     * 消息配置
+     */
+    message?: MessageConfig;
 }
 
 /**
@@ -65,5 +72,6 @@ export function initAppConfig(config: AppConfig) {
     config.tinymce = assign(DefaultTinymceConfig, config.tinymce);
     config.loading = config.loading || new LoadingConfig();
     config.tenant = config.tenant || new TenantConfig();
-    config.upload = config.upload || new UploadConfig();
+    config.upload = assign(DefaultUploadConfig, config.upload);
+    config.message = assign(DefaultMessageConfig, config.message);
 }

@@ -5,11 +5,12 @@
 import { Directive, Input, Output, OnInit, OnDestroy, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged, debounceTime, filter, takeUntil, tap, map } from 'rxjs/operators';
-import { NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
+import { NzUploadFile, NzUploadComponent, NzUploadChangeParam, UploadFilter } from 'ng-zorro-antd/upload';
 import { Util } from "../util";
 import { AppConfig, initAppConfig } from '../config/app-config';
 import { ModuleConfig } from '../config/module-config';
 import { UploadServiceBase } from '../upload/upload.service'
+import { StateCode } from '../core/state-code';
 
 /**
  * NgZorro上传扩展指令
@@ -18,7 +19,7 @@ import { UploadServiceBase } from '../upload/upload.service'
     selector: '[x-upload-extend]',
     exportAs: 'xUploadExtend'
 })
-export class UploadExtendDirective implements OnInit,OnDestroy {
+export class UploadExtendDirective implements OnInit, OnDestroy {
     /**
      * 操作入口
      */
@@ -87,9 +88,12 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
      * @param config 应用配置
      * @param moduleConfig 模块配置
      * @param uploadService 上传服务
+     * @param cdr 变更检测
+     * @param instance 上传组件实例
      */
     constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig,
-        @Optional() public uploadService: UploadServiceBase, private cdr: ChangeDetectorRef) {
+        @Optional() public uploadService: UploadServiceBase, private cdr: ChangeDetectorRef,
+        @Optional() public instance: NzUploadComponent) {
         initAppConfig(config);
         this.util = new Util(null, config, moduleConfig);
         this.files = [];
@@ -145,7 +149,7 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
      * 设置文本框输入值
      */
     private setInputValue() {
-        if (this.data ) {
+        if (this.data) {
             this.inputValue = "1";
             if (this.data.length && this.data.length === 0)
                 this.inputValue = undefined;
@@ -158,20 +162,30 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
      * 上传变更处理
      * @param param 上传变更参数
      */
-    handleChange = (param: NzUploadChangeParam) => {        
+    handleChange = (param: NzUploadChangeParam) => {
         if (!param || !param.file)
             return;
         switch (param.file.status) {
             case 'uploading':
                 this.loading = true;
                 break;
-            case 'done':                
-                if (param.type === 'success') {                    
+            case 'done':
+                if (param.type === 'success') {
+                    let response = param.file.response;
+                    if (!response)
+                        return;
+                    if (response.code && response.code !== StateCode.Ok) {
+                        this.util.message.warn(response.message);
+                    }
                     if (this.isUploadComplete(param)) {
                         this.loading = false;
                         let model = this.getModel(param);
                         this.modelChange$.next(model);
-                        this.onUploadComplete.emit(model);                        
+                        this.onUploadComplete.emit(model);
+                        if (!model && this.isClearFiles) {
+                            this.files = [];
+                            this.cdr.markForCheck();
+                        }
                         return;
                     }
                     this.updateModel(param);
@@ -181,8 +195,15 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
                 this.loading = false;
                 break;
             case 'error':
+                if (param.file.error && param.file.error.error) {
+                    this.util.message.warn(param.file.error.error);
+                }
                 if (this.isUploadComplete(param)) {
                     this.loading = false;
+                    if (this.isClearFiles) {
+                        this.files = [];
+                        this.cdr.markForCheck();
+                    }
                     return;
                 }
                 break;
@@ -210,7 +231,7 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
         if (this.nzMultiple)
             return [...(this.data || []), item];
         return item;
-    }  
+    }
 
     /**
      * 解析模型数据项
@@ -221,7 +242,7 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
         if (!param.file.response)
             return null;
         return param.file.response.data || param.file.response;
-    }      
+    }
 
     /**
      * 更新模型
@@ -229,6 +250,131 @@ export class UploadExtendDirective implements OnInit,OnDestroy {
     private updateModel = (param: NzUploadChangeParam) => {
         this.data = this.getModel(param);
         this.modelChange.emit(this.data);
+    }
+
+    /**
+     * 上传过滤器
+     */
+    filters: UploadFilter[] = [
+        {
+            name: 'type',
+            fn: (files: NzUploadFile[]) => {
+                if (!this.instance || (!this.instance.nzAccept && !this.instance.nzFileType))
+                    return files;
+                let validFiles: NzUploadFile[];
+                if (this.instance.nzAccept) {
+                    let accepts = (<string>this.instance.nzAccept).split(',').map(extension => this.util.helper.getExtension(`.${extension}`));
+                    validFiles = files.filter(file => !file.name || ~accepts.indexOf(this.util.helper.getExtension(file.name)));
+                }
+                if (!validFiles && this.instance.nzFileType) {
+                    const types = this.instance.nzFileType.split(',');
+                    validFiles = files.filter(file => ~types.indexOf(file.type));
+                }
+                let invalidFiles = this.util.helper.except(files, validFiles);
+                if (invalidFiles && invalidFiles.length > 0)
+                    this.util.message.warn(this.getMessageByType(invalidFiles));
+                return validFiles;
+            }
+        },
+        {
+            name: 'size',
+            fn: (files: NzUploadFile[]) => {
+                if (!this.instance || this.instance.nzSize === 0)
+                    return files;
+                let validFiles = files.filter(file => file.size / 1024 <= this.instance.nzSize);
+                let invalidFiles = this.util.helper.except(files, validFiles);
+                if (invalidFiles && invalidFiles.length > 0)
+                    this.util.message.warn(this.getMessageBySize(invalidFiles, this.instance.nzSize));
+                return validFiles;
+            }
+        },
+        {
+            name: 'limit',
+            fn: (files: NzUploadFile[]) => {
+                if (!this.instance || !this.instance.nzMultiple || !this.instance.nzLimit)
+                    return files;
+                if (files.length > this.instance.nzLimit) {
+                    this.util.message.warn(this.getMessageByLimit(this.instance.nzLimit));
+                    return [];
+                }
+                return files;
+            }
+        }
+    ];
+
+    /**
+     * 验证文件类型
+     * @param file 文件
+     * @param accept 接受扩展名列表
+     */
+    validateType(file: NzUploadFile, accept: string): boolean {
+        if (!accept)
+            return true;
+        let accepts = accept.split(',').map(extension => this.util.helper.getExtension(`.${extension}`));
+        if (~accepts.indexOf(this.util.helper.getExtension(file.name)))
+            return true;
+        this.util.message.warn(this.getMessageByType([file]));
+        return false;
+    }
+
+    /**
+     * 验证文件大小
+     * @param file 文件
+     * @param sizeLimit 大小限制
+     */
+    validateSize(file: NzUploadFile, sizeLimit: number): boolean {
+        if (!sizeLimit)
+            return true;
+        if (file.size / 1024 > sizeLimit) {
+            this.util.message.warn(this.getMessageBySize([file], sizeLimit));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证上传文件数量
+     * @param file 文件
+     * @param files 文件列表
+     * @param limit 最大数量
+     */
+    validateLimit(file: NzUploadFile, files: NzUploadFile[], limit: number): boolean {
+        if (!file || !files || files.length === 0 || !limit)
+            return true;
+        if (files.length > limit) {
+            if (file.uid === files[0].uid)
+                this.util.message.warn(this.getMessageByLimit(limit));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 获取文件类型错误消息
+     */
+    private getMessageByType(files: NzUploadFile[]) {
+        return `${files.map(t => this.replace(this.config.upload.typeLimitMessage, t.name) + '<br/>').join('')}`;
+    }
+
+    /**
+     * 获取文件大小错误消息
+     */
+    private getMessageBySize(files: NzUploadFile[], size) {
+        return `${files.map(t => this.replace(this.config.upload.sizeLimitMessage, t.name, size) + '<br/>').join('')}`;
+    }
+
+    /**
+     * 获取文件数量错误消息
+     */
+    private getMessageByLimit(limit) {
+        return this.replace(this.config.upload.fileLimitMessage, limit);
+    }
+
+    /**
+     * 替换{0},{1}
+     */
+    private replace(message, value1, value2 = null) {
+        return message.replace(/\{0\}/, String(value1)).replace(/\{1\}/, String(value2));
     }
 
     /**

@@ -21,6 +21,7 @@ import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
 import { RequiredExtendDirective } from "./zorro/required.extend.directive";
 import { UploadExtendDirective } from "./zorro/upload.extend.directive";
 import { InputExtendDirective } from "./zorro/input.extend.directive";
+import { TagExtendDirective } from "./zorro/tag.extend.directive";
 import { TenantInterceptor } from "./tenant/tenant.interceptor";
 import { LanguageInterceptor } from "./language/language.interceptor";
 import { UploadServiceBase, UploadService } from "./upload/upload.service";
@@ -36,7 +37,8 @@ import { UploadServiceBase, UploadService } from "./upload/upload.service";
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
         TinymceExtendDirective, DrawerFooterComponent,
-        UploadExtendDirective, InputExtendDirective
+        UploadExtendDirective, InputExtendDirective,
+        TagExtendDirective
     ],
     imports: [
         CommonModule,FormsModule,NzButtonModule
@@ -48,7 +50,7 @@ import { UploadServiceBase, UploadService } from "./upload/upload.service";
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
         TinymceExtendDirective, UploadExtendDirective,
-        InputExtendDirective
+        InputExtendDirective, TagExtendDirective
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true },

@@ -119,21 +119,12 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      * @param moduleConfig 模块配置
      */
     constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
-        this.initAppConfig();
+        initAppConfig(this.config);
         this.util = new Util(null, config, moduleConfig);
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
         this.searchDelay = 500;
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
     }
 
     /**
