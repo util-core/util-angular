@@ -6,6 +6,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { TableExtendDirective } from "./zorro/table.extend.directive";
 import { EditTableDirective } from "./zorro/edit-table.directive";
@@ -41,10 +42,10 @@ import { UploadServiceBase, UploadService } from "./upload/upload.service";
         TagExtendDirective
     ],
     imports: [
-        CommonModule,FormsModule,NzButtonModule
+        CommonModule, FormsModule,ClipboardModule,NzButtonModule
     ],
     exports: [
-        TableExtendDirective,
+        ClipboardModule,TableExtendDirective,
         EditTableDirective, EditRowDirective, EditControlDirective,
         RequiredExtendDirective,ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,

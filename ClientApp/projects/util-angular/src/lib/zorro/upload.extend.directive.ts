@@ -171,12 +171,9 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
                 break;
             case 'done':
                 if (param.type === 'success') {
-                    let response = param.file.response;
-                    if (!response)
-                        return;
-                    if (response.code && response.code !== StateCode.Ok) {
+                    let response = param.file.response;       
+                    if (response && response.code && response.code !== StateCode.Ok)
                         this.util.message.warn(response.message);
-                    }
                     if (this.isUploadComplete(param)) {
                         this.loading = false;
                         let model = this.getModel(param);

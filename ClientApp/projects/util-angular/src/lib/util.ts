@@ -24,6 +24,7 @@ import { Event } from "./common/event";
 import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
 import { ContextMenu } from "./common/context-menu";
+import { ClipboardService } from "./common/clipboard.service";
 import { TenantService } from "./tenant/tenant.service";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
@@ -117,6 +118,10 @@ export class Util {
      * 租户操作
      */
     private _tenant: TenantService;
+    /**
+     * 剪贴板操作
+     */
+    private _clipboard: ClipboardService;
 
     /**
      * 初始化操作入口
@@ -329,6 +334,15 @@ export class Util {
         if (!this._tenant)
             this._tenant = new TenantService(this);
         return this._tenant;
+    };
+
+    /**
+     * 剪贴板操作
+     */
+    get clipboard() {
+        if (!this._clipboard)
+            this._clipboard = new ClipboardService(this);
+        return this._clipboard;
     };
 
     /**
