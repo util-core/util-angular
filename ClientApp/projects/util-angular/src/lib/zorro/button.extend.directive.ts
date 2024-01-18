@@ -7,7 +7,7 @@ import { NgForm } from '@angular/forms';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { Util } from "../util";
 import { AppConfig, initAppConfig } from '../config/app-config';
-import { isEmpty } from '../common/helper';
+import { I18nKeys } from '../config/i18n-keys';
 
 /**
  * NgZorro按钮扩展指令
@@ -32,17 +32,10 @@ export class ButtonExtendDirective  {
      * @param form 表单
      * @param button 按钮
      */
-    constructor(@Optional() protected config: AppConfig, @Optional() protected form: NgForm, @Optional() protected button: NzButtonComponent) {
-        this.initAppConfig();
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
+    constructor(@Optional() protected config: AppConfig, @Optional() protected form: NgForm,
+        @Optional() protected button: NzButtonComponent) {
         initAppConfig(this.config);
+        this.util = new Util(null, this.config);
     }
 
     /**
@@ -53,7 +46,7 @@ export class ButtonExtendDirective  {
             return;
         if (!this.config.form.isInvalidFormDisableButton)
             return;
-        if (isEmpty(this.disabled) === false)
+        if (this.util.helper.isEmpty(this.disabled) === false)
             return;
         this.button.disabled = !this.form.valid;
     }
@@ -77,5 +70,19 @@ export class ButtonExtendDirective  {
             }
         });
     }
-}
 
+    /**
+     * 复制到剪贴板
+     * @param value 值
+     */
+    copyToClipboard(value) {
+        if (!value)
+            return;
+        let result = this.util.clipboard.copy(value);
+        if (result) {
+            this.util.message.success(I18nKeys.copySucceeded);
+            return;
+        }
+        this.util.message.error(I18nKeys.copyFailed);
+    }
+}

@@ -22,6 +22,8 @@ export class ClipboardService {
      */
     copy(value: string) {
         let clipboard = this.util.ioc.get(Clipboard);
+        if (!clipboard)
+            return false;
         return clipboard.copy(value);
     }
 }

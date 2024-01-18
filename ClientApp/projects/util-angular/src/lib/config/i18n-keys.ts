@@ -36,6 +36,14 @@ export class I18nKeys {
      */
     static deleteSuccessed = "util.deleteSuccessed";
     /**
+     * 复制成功
+     */
+    static copySucceeded = "util.copySucceeded";
+    /**
+     * 复制失败
+     */
+    static copyFailed = "util.copyFailed";
+    /**
      * 无需保存
      */
     static noNeedSave = "util.noNeedSave";
