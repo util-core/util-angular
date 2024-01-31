@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<SpaRoot>ClientApp\</SpaRoot>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Util.Data.Core" Version="7.1.129" />
-		<PackageReference Include="Util.Domain.Biz" Version="7.1.129" />
-		<PackageReference Include="Util.Logging.Serilog" Version="7.1.129" />
-		<PackageReference Include="Util.Ui.NgAlain" Version="7.1.129" />
-		<PackageReference Include="Util.Ui.NgZorro" Version="7.1.129" />
+		<PackageReference Include="Util.Data.Core" Version="8.0.0" />
+		<PackageReference Include="Util.Domain.Biz" Version="8.0.0" />
+		<PackageReference Include="Util.Logging.Serilog" Version="8.0.0" />
+		<PackageReference Include="Util.Ui.NgAlain" Version="8.0.0" />
+		<PackageReference Include="Util.Ui.NgZorro" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
