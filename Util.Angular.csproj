@@ -8,11 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Util.Data.Core" Version="8.0.0" />
-		<PackageReference Include="Util.Domain.Biz" Version="8.0.0" />
-		<PackageReference Include="Util.Logging.Serilog" Version="8.0.0" />
-		<PackageReference Include="Util.Ui.NgAlain" Version="8.0.0" />
-		<PackageReference Include="Util.Ui.NgZorro" Version="8.0.0" />
+		<PackageReference Include="Util.Data.Core" Version="8.0.1" />
+		<PackageReference Include="Util.Domain.Biz" Version="8.0.1" />
+		<PackageReference Include="Util.Logging.Serilog" Version="8.0.1" />
+		<PackageReference Include="Util.Ui.NgAlain" Version="8.0.1" />
+		<PackageReference Include="Util.Ui.NgZorro" Version="8.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,6 +33,10 @@
 		<None Remove="clear-bin.ps1" />
 		<None Remove="ClientApp\build.ps1" />
 		<None Remove="ClientApp\clear-node-modules.ps1" />
+		<None Remove="ClientApp\start.ps1" />
+		<None Remove="ClientApp\test.ps1" />
+		<None Remove="LICENSE.txt" />
+		<None Remove="readme.md" />
 		<None Remove="$(SpaRoot)dist\**" />
 	</ItemGroup>
 

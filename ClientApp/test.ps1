@@ -1,5 +1,5 @@
 Write-Host "install npm..."
-yarn --ignore-optional
+yarn
 
 Write-Host "ng test..."
 ng test util-angular

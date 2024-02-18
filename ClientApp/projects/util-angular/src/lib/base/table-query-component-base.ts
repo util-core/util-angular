@@ -154,4 +154,13 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
             return null;
         return this.table.getCheckedNode();
     }
+
+    /**
+     * 是否勾选
+     */
+    isChecked() {
+        if (!this.table)
+            return false;
+        return this.table.isChecked();
+    }
 }

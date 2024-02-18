@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, Input, Output, EventEmitter, Optional } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
 import { IKey } from "../core/key";
 import { TreeNode } from "../core/tree-node";
 import { PageList } from "../core/page-list";
@@ -74,9 +74,10 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      * 初始化树形表格扩展指令
      * @param config 应用配置
      * @param moduleConfig 模块配置
+     * @param cdr 变更检测
      */
-    constructor(@Optional() config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
-        super(config, moduleConfig);
+    constructor(@Optional() config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
+        super(config, moduleConfig, cdr);
     }
 
     /**

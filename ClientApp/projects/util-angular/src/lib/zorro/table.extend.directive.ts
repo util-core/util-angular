@@ -2,7 +2,7 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=======================================================
-import { Directive, Input, Output, OnInit, EventEmitter, Optional } from '@angular/core';
+import { Directive, Input, Output, OnInit, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Util } from "../util";
 import { IKey } from "../core/key";
@@ -90,8 +90,9 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 初始化表格扩展指令
      * @param config 应用配置
      * @param moduleConfig 模块配置
+     * @param cdr 变更检测
      */
-    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
+    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
         this.initAppConfig();
         this.util = new Util(null, config, moduleConfig);
         this.queryParam = new QueryParameter();
@@ -123,7 +124,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
             if (this.autoLoad) {
                 this.load();
                 return;
-            }            
+            }
         }, 0);
     }
 
@@ -326,7 +327,9 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
      * 是否选中状态
      * @param row 行
      */
-    isChecked(row) {
+    isChecked(row?) {
+        if (!row)
+            return !this.checkedSelection.isEmpty();
         return this.checkedSelection.isSelected(row);
     }
 
@@ -462,6 +465,7 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
                 options.ok && options.ok(result);
                 this.loadAfter(result);
                 this.onLoad.emit(result);
+                this.cdr.markForCheck();
             },
             fail: options.fail,
             complete: () => {

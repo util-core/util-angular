@@ -1,0 +1,41 @@
+﻿<nz-modal nzCentered [(nzVisible)]="isVisible" [nzTitle]="'util.tableSettings'|i18n"
+          nzWidth="800px" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+    <ng-container *nzModalContent>
+        <div nz-row>
+            <div nz-col nzSpan="16">
+                <div style="margin-bottom:16px">
+                    <strong>{{ 'util.optionalColumns' | i18n }}</strong>
+                </div>
+                <div style="margin-bottom:12px">
+                    <label nz-checkbox [(ngModel)]="allChecked" [nzIndeterminate]="indeterminate" (ngModelChange)="handleAllChecked()">
+                        {{ allChecked ? ('util.deselectAll' | i18n) : ('util.selectAll' | i18n) }}
+                    </label>
+                </div>
+                <nz-checkbox-wrapper style="width: 100%;">
+                    <div nz-row [nzGutter]=[8,8]>
+                        <ng-container *ngFor="let item of initColumns">
+                            <div nz-col nzXs="12" nzSm="12" nzMd="8" nzLg="8" nzXl="6" nzXXl="6">
+                                <label nz-checkbox [(ngModel)]="item.default" (ngModelChange)="handleChecked(item)">
+                                    {{ item.value | i18n }}
+                                </label>
+                            </div>
+                        </ng-container>
+                    </div>
+                </nz-checkbox-wrapper>
+            </div>
+            <div nz-col nzSpan="8">
+                <div style="margin-bottom:12px;">
+                    <strong>{{ 'util.selectedColumns' | i18n }}</strong>
+                </div>
+                <div cdkDropList (cdkDropListDropped)="handleDropped($event)">
+                    <ng-container *ngFor="let item of tempColumns">
+                        <div cdkDrag *ngIf="item.default" style="line-height:28px" [cdkDragData]="item">
+                            <i nz-icon style="font-size:16px;margin-right:10px" nzTheme="outline" nzType="holder"></i>
+                            <span>{{ item.value | i18n }}</span>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</nz-modal>

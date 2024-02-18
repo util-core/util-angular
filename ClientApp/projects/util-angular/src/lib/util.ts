@@ -26,6 +26,7 @@ import { SessionService } from "./common/session.service";
 import { ContextMenu } from "./common/context-menu";
 import { ClipboardService } from "./common/clipboard.service";
 import { TenantService } from "./tenant/tenant.service";
+import { Acl } from "./common/acl";
 import { AppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 import { ModuleConfig } from './config/module-config';
@@ -122,6 +123,10 @@ export class Util {
      * 剪贴板操作
      */
     private _clipboard: ClipboardService;
+    /**
+     * 访问控制操作
+     */
+    private _acl: Acl;
 
     /**
      * 初始化操作入口
@@ -343,6 +348,15 @@ export class Util {
         if (!this._clipboard)
             this._clipboard = new ClipboardService(this);
         return this._clipboard;
+    };
+
+    /**
+     * 访问控制操作
+     */
+    get acl() {
+        if (!this._acl)
+            this._acl = new Acl(this);
+        return this._acl;
     };
 
     /**

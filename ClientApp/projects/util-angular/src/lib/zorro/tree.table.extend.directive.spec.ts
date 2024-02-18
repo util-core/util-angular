@@ -2,8 +2,10 @@
 //Copyright 2023 何镇汐
 //Licensed under the MIT license
 //=================================================================
+import { TestBed } from '@angular/core/testing';
 import { TreeTableExtendDirective } from './tree.table.extend.directive';
 import { TreeViewModel } from "../core/tree-view-model";
+import { ChangeDetectorRef } from '@angular/core';
 
 describe('TreeExtendDirective', () => {
     /**
@@ -15,7 +17,7 @@ describe('TreeExtendDirective', () => {
      * 测试初始化
      */
     beforeEach(async () => {
-        directive = new TreeTableExtendDirective(null,null);
+        directive = new TreeTableExtendDirective(null, null, TestBed.get(ChangeDetectorRef));
         directive.dataSource = [
             getNodeA(), getNodeA1(), getNodeA11(), getNodeA12(), getNodeA2(), getNodeA21(), getNodeA22(),
             getNodeB(), getNodeB1(), getNodeB11(), getNodeB12(), getNodeB2(), getNodeB21(), getNodeB22(),
@@ -74,7 +76,7 @@ describe('TreeExtendDirective', () => {
      */
     it('getAllChildren_ContainsParentNode', () => {
         let node = getNodeA();
-        let children = directive.getAllChildren(node,true)
+        let children = directive.getAllChildren(node, true)
         expect(children.length).toEqual(7);
         expect(children[0].id).toEqual(getNodeA().id);
         expect(children[1].id).toEqual(getNodeA1().id);
@@ -171,7 +173,7 @@ describe('TreeExtendDirective', () => {
         //初始化数据源
         let nodeA = getNodeA();
         let nodeB = getNodeB();
-        let nodeC = getNodeC();        
+        let nodeC = getNodeC();
         directive.dataSource = [nodeA, nodeB, nodeC];
 
         //移动C到A下面
@@ -239,7 +241,7 @@ describe('TreeExtendDirective', () => {
         expect(directive.dataSource[3].id).toEqual(nodeA2.id);
         expect(directive.dataSource[4].id).toEqual(nodeA21.id);
         expect(directive.dataSource[5].id).toEqual(nodeA22.id);
-        expect(directive.dataSource[6].id).toEqual(nodeC.id);        
+        expect(directive.dataSource[6].id).toEqual(nodeC.id);
         expect(directive.dataSource[7].id).toEqual(nodeB.id);
     });
 
@@ -325,7 +327,7 @@ describe('TreeExtendDirective', () => {
         //验证索引
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeB.id);
-        expect(directive.dataSource[2].id).toEqual(nodeC.id);        
+        expect(directive.dataSource[2].id).toEqual(nodeC.id);
         expect(directive.dataSource[3].id).toEqual(nodeC2.id);
         expect(directive.dataSource[4].id).toEqual(nodeC21.id);
         expect(directive.dataSource[5].id).toEqual(nodeC22.id);
@@ -348,7 +350,7 @@ describe('TreeExtendDirective', () => {
  * 树形测试模型
  */
 class TreeModel extends TreeViewModel {
-    constructor(id: string, public name: string, parentId: string=null,level:number=1) {
+    constructor(id: string, public name: string, parentId: string = null, level: number = 1) {
         super();
         this.id = id;
         this.parentId = parentId;
@@ -360,62 +362,62 @@ function getNodeA() {
     return new TreeModel("1", "a");
 }
 function getNodeA1() {
-    return new TreeModel("11", "a1", "1",2);
+    return new TreeModel("11", "a1", "1", 2);
 }
 function getNodeA11() {
-    return new TreeModel("111", "a11", "11",3);
+    return new TreeModel("111", "a11", "11", 3);
 }
 function getNodeA12() {
-    return new TreeModel("112", "a12", "11",3);
+    return new TreeModel("112", "a12", "11", 3);
 }
 function getNodeA2() {
-    return new TreeModel("12", "a2", "1",2);
+    return new TreeModel("12", "a2", "1", 2);
 }
 function getNodeA21() {
-    return new TreeModel("121", "a21", "12",3);
+    return new TreeModel("121", "a21", "12", 3);
 }
 function getNodeA22() {
-    return new TreeModel("122", "a22", "12",3);
+    return new TreeModel("122", "a22", "12", 3);
 }
 function getNodeB() {
     return new TreeModel("2", "b");
 }
 function getNodeB1() {
-    return new TreeModel("21", "b1", "2",2);
+    return new TreeModel("21", "b1", "2", 2);
 }
 function getNodeB11() {
-    return new TreeModel("211", "b11", "21",3);
+    return new TreeModel("211", "b11", "21", 3);
 }
 function getNodeB12() {
-    return new TreeModel("212", "b12", "21",3);
+    return new TreeModel("212", "b12", "21", 3);
 }
 function getNodeB2() {
-    return new TreeModel("22", "b2", "2",2);
+    return new TreeModel("22", "b2", "2", 2);
 }
 function getNodeB21() {
-    return new TreeModel("221", "b21", "22",3);
+    return new TreeModel("221", "b21", "22", 3);
 }
 function getNodeB22() {
-    return new TreeModel("222", "b22", "22",3);
+    return new TreeModel("222", "b22", "22", 3);
 }
 function getNodeC() {
     return new TreeModel("3", "c");
 }
 function getNodeC1() {
-    return new TreeModel("31", "c1", "3",2);
+    return new TreeModel("31", "c1", "3", 2);
 }
 function getNodeC11() {
-    return new TreeModel("311", "c11", "31",3);
+    return new TreeModel("311", "c11", "31", 3);
 }
 function getNodeC12() {
-    return new TreeModel("312", "c12", "31",3);
+    return new TreeModel("312", "c12", "31", 3);
 }
 function getNodeC2() {
-    return new TreeModel("32", "c2", "3",2);
+    return new TreeModel("32", "c2", "3", 2);
 }
 function getNodeC21() {
-    return new TreeModel("321", "c21", "32",3);
+    return new TreeModel("321", "c21", "32", 3);
 }
 function getNodeC22() {
-    return new TreeModel("322", "c22", "32",3);
+    return new TreeModel("322", "c22", "32", 3);
 }

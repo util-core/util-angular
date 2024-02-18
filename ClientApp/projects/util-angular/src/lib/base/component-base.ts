@@ -17,6 +17,10 @@ export abstract class ComponentBase {
      * 公共操作
      */
     protected util: Util;
+    /**
+     * 是否展开
+     */
+    expand: boolean;
 
     /**
      * 初始化组件
@@ -24,6 +28,7 @@ export abstract class ComponentBase {
      */
     constructor(injector: Injector) {
         this.util = new Util(injector);
+        this.expand = false;
     }
 
     /**

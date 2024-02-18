@@ -16,11 +16,7 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     /**
      * 查询参数
      */
-    queryParam: TQuery;
-    /**
-     * 是否展开
-     */
-    expand;
+    queryParam: TQuery;    
     /**
      * 复选框或单选框选中的标识列表
      */

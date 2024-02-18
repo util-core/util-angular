@@ -82,6 +82,7 @@ export * from "./lib/zorro/required.extend.directive";
 export * from "./lib/zorro/upload.extend.directive";
 export * from "./lib/zorro/input.extend.directive";
 export * from "./lib/zorro/tag.extend.directive";
+export * from "./lib/zorro/table-settings.component";
 
 //导出tinymce
 export * from "./lib/tinymce/tinymce.extend.directive";
