@@ -14,6 +14,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzFlexModule } from 'ng-zorro-antd/flex';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzListModule } from 'ng-zorro-antd/list';
+import { NzResizableModule } from 'ng-zorro-antd/resizable';
 import { AlainThemeModule } from '@delon/theme';
 import { DelonACLModule } from '@delon/acl';
 import { TableExtendDirective } from "./zorro/table.extend.directive";
@@ -27,6 +28,7 @@ import { TreeTableExtendDirective } from "./zorro/tree.table.extend.directive";
 import { TreeExtendDirective } from "./zorro/tree.extend.directive";
 import { TinymceExtendDirective } from "./tinymce/tinymce.extend.directive";
 import { DrawerFooterComponent } from "./drawer/drawer-footer.component";
+import { DrawerContainerComponent } from './drawer/drawer-container.component';
 import { RequiredExtendDirective } from "./zorro/required.extend.directive";
 import { UploadExtendDirective } from "./zorro/upload.extend.directive";
 import { InputExtendDirective } from "./zorro/input.extend.directive";
@@ -46,14 +48,15 @@ import { UploadServiceBase, UploadService } from "./upload/upload.service";
         RequiredExtendDirective,ButtonExtendDirective,
         ValidationExtendDirective, SelectExtendDirective,
         TreeTableExtendDirective, TreeExtendDirective,
-        TinymceExtendDirective, DrawerFooterComponent,
+        TinymceExtendDirective, DrawerFooterComponent, DrawerContainerComponent,
         UploadExtendDirective, InputExtendDirective,        
         TagExtendDirective, TableSettingsComponent
     ],
     imports: [
-        CommonModule, FormsModule, DragDropModule,
+        CommonModule, FormsModule, DragDropModule, 
         NzButtonModule, NzModalModule, NzListModule,
-        NzCheckboxModule, NzGridModule, NzFlexModule, NzIconModule,
+        NzCheckboxModule, NzGridModule, NzFlexModule,
+        NzIconModule, NzResizableModule,
         AlainThemeModule,DelonACLModule
     ],
     exports: [
@@ -64,7 +67,7 @@ import { UploadServiceBase, UploadService } from "./upload/upload.service";
         TreeTableExtendDirective, TreeExtendDirective,
         TinymceExtendDirective, UploadExtendDirective,
         InputExtendDirective, TagExtendDirective,
-        TableSettingsComponent
+        TableSettingsComponent, DrawerContainerComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true },

@@ -33,6 +33,7 @@ export * from "./lib/dialog/dialog-options";
 
 //导出drawer
 export * from "./lib/drawer/drawer-options";
+export * from "./lib/drawer/drawer-container.component";
 
 //导出message
 export * from "./lib/message/confirm-options";

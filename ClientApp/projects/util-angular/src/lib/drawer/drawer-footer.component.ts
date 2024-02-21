@@ -13,6 +13,7 @@ import { AppConfig, initAppConfig } from '../config/app-config';
  */
 @Component({
     selector: 'drawer-footer',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ng-template #footer>
           <div style="float: right">
@@ -69,17 +70,8 @@ export class DrawerFooterComponent {
      * @param config 应用配置
      */
     constructor(@Optional() protected config: AppConfig) {
-        this.initAppConfig();
-        this.isValid = true;
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
         initAppConfig(this.config);
+        this.isValid = true;
     }
 
     /**

@@ -1,8 +1,8 @@
 ﻿//============== 抽屉操作 ========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { ComponentRef } from '@angular/core';
+import { Component, ComponentRef, TemplateRef } from '@angular/core';
 import { NzDrawerService, NzDrawerOptions, NzDrawerRef, NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
 import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
@@ -183,11 +183,18 @@ export class Drawer {
     }
 
     /**
+     * 获取抽屉实例
+     */
+    getDrawer():NzDrawerRef {
+        return this.util.ioc.get(NzDrawerRef);
+    }
+
+    /**
      * 关闭抽屉
      * @param result 返回结果
      */
     close(result?) {
-        let drawerRef: NzDrawerRef = this.util.ioc.get(NzDrawerRef);
+        let drawerRef: NzDrawerRef = this.getDrawer();
         drawerRef && drawerRef.close(result);
     }
 

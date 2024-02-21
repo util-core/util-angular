@@ -65,9 +65,11 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NgxTinymceModule } from 'ngx-tinymce';
 import { AlainThemeModule } from '@delon/theme';
+import { DelonACLModule } from '@delon/acl';
+import { NzResizableModule } from 'ng-zorro-antd/resizable';
+import { PortalModule } from '@angular/cdk/portal';
 //µº»Îutil
 import { UtilModule } from "util-angular";
-
 
 @NgModule({
     exports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NzButtonModule, NzCardModule, NzIconModule, NzTypographyModule, NzDividerModule,
@@ -79,8 +81,8 @@ import { UtilModule } from "util-angular";
         NzCollapseModule, NzCommentModule, NzEmptyModule, NzImageModule, NzListModule, NzTableModule, NzTimelineModule, NzTreeViewModule,
         NzAlertModule, NzDrawerModule, NzModalModule, NzPopconfirmModule, NzProgressModule, NzResultModule, NzSkeletonModule, NzSpinModule, NzAnchorModule,
         NzMessageModule, NzTreeModule,
-        AlainThemeModule,
-        NgxTinymceModule,UtilModule]
+        AlainThemeModule, DelonACLModule, NzResizableModule, PortalModule,
+        NgxTinymceModule, UtilModule]
 })
 export class ShareModule {
 }
