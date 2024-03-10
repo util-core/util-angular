@@ -6,7 +6,7 @@ import { Injector, ViewChild, OnInit, Component } from '@angular/core';
 import { PageList } from "../core/page-list";
 import { TreeViewModel } from "../core/tree-view-model";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
-import { TreeTableExtendDirective } from "../zorro/tree.table.extend.directive";
+import { TreeTableExtendDirective } from "../zorro/tree-table-extend.directive";
 import { QueryComponentBase } from "./query-component-base";
 
 /**

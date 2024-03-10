@@ -1,5 +1,5 @@
 ﻿//============== 弹出层操作 ======================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { EventEmitter } from "@angular/core";
@@ -241,18 +241,27 @@ export class Dialog {
      * @param result 返回结果
      */
     close(result?) {
+        let dialogRef = this.getDialog();
+        if (dialogRef)
+            dialogRef.close(result);
+    }
+
+    /**
+     * 获取弹出层实例
+     */
+    getDialog() {
         let dialog: NzModalService = this.getModalService();
         if (!dialog)
-            return;
+            return null;
         if (!dialog.openModals || dialog.openModals.length === 0)
-            return;
+            return null;
         let dialogRef: NzModalRef = dialog.openModals[dialog.openModals.length - 1];
         if (!dialogRef)
-            return;
+            return null;
         let content = dialogRef.getContentComponent();
         if (!content && dialog.openModals.length > 1)
             dialogRef = dialog.openModals[dialog.openModals.length - 2];
-        dialogRef.close(result);
+        return dialogRef;
     }
 
     /**

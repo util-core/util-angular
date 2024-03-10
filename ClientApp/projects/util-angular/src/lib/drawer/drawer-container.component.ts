@@ -21,6 +21,9 @@ import { AppConfig, initAppConfig } from '../config/app-config';
         </div>
     `,
     styles: [`
+      ::ng-deep .ant-drawer-body {
+        padding: 0;
+      }
       .drawer-body {
         width: 100%;
         height: 100%;
@@ -57,6 +60,7 @@ export class DrawerContainerComponent implements OnInit {
         initAppConfig(config);
         this.util = new Util(injector, config);
         this.minWidth = 380;
+        this.direction = "right";
     }
 
     /**
@@ -64,6 +68,8 @@ export class DrawerContainerComponent implements OnInit {
      */
     ngOnInit() {
         let drawer = this.util.drawer.getDrawer();
+        if (!drawer)
+            return;
         if (drawer.nzPlacement == "left") {
             this.direction = "right";
             return;
@@ -80,7 +86,10 @@ export class DrawerContainerComponent implements OnInit {
     handleResize({ width }: NzResizeEvent): void {
         cancelAnimationFrame(this.id);
         this.id = requestAnimationFrame(() => {
-            this.util.drawer.getDrawer().nzWidth = width;
+            let drawer = this.util.drawer.getDrawer();
+            if (!drawer)
+                return;
+            drawer.nzWidth = width;
         });
     }
 }

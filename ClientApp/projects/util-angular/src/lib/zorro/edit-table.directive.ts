@@ -3,7 +3,7 @@
 //Licensed under the MIT license
 //===========================================================
 import { Directive, HostListener, Input, Self, ElementRef } from '@angular/core';
-import { TableExtendDirective } from "./table.extend.directive";
+import { TableExtendDirective } from "./table-extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
 import { HttpMethod } from '../http/http-method';

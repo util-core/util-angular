@@ -1,5 +1,5 @@
 ﻿//============== 编辑组件基类=====================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Injector, Component, ViewChild, Input, OnInit } from '@angular/core';
@@ -91,6 +91,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
                 let model = this.toModel(result);
                 this.loadModel(model);
                 this.onLoad(model);
+                this.util.changeDetector.markForCheck();
             }
         });
     }
@@ -163,7 +164,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
             button: button,
             back: this.isBack(),
             closeDialog: this.isCloseDialog(),
-            closeDrawer: this.isCloseDrawer(),            
+            closeDrawer: this.isCloseDrawer(),
             before: data => this.onSubmitBefore(data),
             ok: result => this.onSubmit(result)
         });

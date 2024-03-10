@@ -1,5 +1,5 @@
 ﻿//============== 列表配置项 ======================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { SelectItem } from "./select-item";
@@ -20,6 +20,10 @@ export class SelectOption {
      * 禁用
      */
     disabled?: boolean;
+    /**
+     * 图标
+     */
+    icon?: string;
 
     /**
      * 初始化列表配置项
@@ -29,5 +33,6 @@ export class SelectOption {
         this.text = item.text;
         this.value = item.value;
         this.disabled = item.disabled;
+        this.icon = item.icon;
     }
 }

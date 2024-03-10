@@ -15,6 +15,8 @@ export * from "./lib/core/fail-result";
 export * from "./lib/core/state-code";
 export * from "./lib/core/load-mode";
 export * from "./lib/core/file-info";
+export * from "./lib/core/column-info";
+export * from "./lib/core/table-info";
 
 //导出config
 export * from "./lib/config/app-config";
@@ -30,6 +32,7 @@ export * from "./lib/data/data-loader";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
+export * from "./lib/dialog/dialog-container.component";
 
 //导出drawer
 export * from "./lib/drawer/drawer-options";
@@ -56,9 +59,6 @@ export * from "./lib/auth/auth.service";
 export * from "./lib/tenant/tenant.service";
 export * from "./lib/tenant/tenant-info";
 
-//导出upload
-export * from "./lib/upload/upload.service";
-
 //导出base
 export * from "./lib/base/component-base";
 export * from "./lib/base/query-component-base";
@@ -70,20 +70,25 @@ export * from "./lib/base/table-edit-component-base";
 export * from "./lib/base/service-base";
 
 //导出ng-zorro
-export * from "./lib/zorro/table.extend.directive";
+export * from "./lib/zorro/table-extend.directive";
 export * from "./lib/zorro/edit-table.directive";
 export * from "./lib/zorro/edit-row.directive";
 export * from "./lib/zorro/edit-control.directive";
-export * from "./lib/zorro/button.extend.directive";
-export * from "./lib/zorro/validation.extend.directive";
-export * from "./lib/zorro/select.extend.directive";
-export * from "./lib/zorro/tree.table.extend.directive";
-export * from "./lib/zorro/tree.extend.directive";
-export * from "./lib/zorro/required.extend.directive";
-export * from "./lib/zorro/upload.extend.directive";
-export * from "./lib/zorro/input.extend.directive";
-export * from "./lib/zorro/tag.extend.directive";
+export * from "./lib/zorro/button-extend.directive";
+export * from "./lib/zorro/validation-extend.directive";
+export * from "./lib/zorro/select-extend.directive";
+export * from "./lib/zorro/tree-table-extend.directive";
+export * from "./lib/zorro/tree-extend.directive";
+export * from "./lib/zorro/required-extend.directive";
+export * from "./lib/zorro/upload-extend.directive";
+export * from "./lib/zorro/input-extend.directive";
+export * from "./lib/zorro/range-picker-extend.directive";
+export * from "./lib/zorro/tag-extend.directive";
 export * from "./lib/zorro/table-settings.component";
+export * from "./lib/zorro/segmented-extend.directive";
+export * from "./lib/zorro/table-head-align.directive";
+export * from "./lib/zorro/upload.service";
+export * from "./lib/zorro/table-settings.service";
 
 //导出tinymce
 export * from "./lib/tinymce/tinymce.extend.directive";

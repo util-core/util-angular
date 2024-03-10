@@ -157,7 +157,7 @@ export class Form {
     /**
      * 成功处理函数
      */
-    private okHandler(options: IFormSubmitOptions, result) {
+    private okHandler(options: IFormSubmitOptions, result) {        
         options.ok && options.ok(result);
         if (options.showMessage !== false)
             this.util.message.success(options.message || I18nKeys.succeeded);

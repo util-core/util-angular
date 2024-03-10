@@ -6,7 +6,7 @@ import { Injector, ViewChild, Component, AfterViewInit } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { QueryComponentBase } from "./query-component-base";
-import { TableExtendDirective } from "../zorro/table.extend.directive";
+import { TableExtendDirective } from "../zorro/table-extend.directive";
 
 /**
  * 表格查询基类

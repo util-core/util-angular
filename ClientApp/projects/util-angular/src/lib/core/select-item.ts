@@ -1,5 +1,5 @@
 ﻿//============== 列表项 =============================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===================================================
 import { ISort } from './sort';
@@ -45,4 +45,8 @@ export class SelectItem implements ISort {
      * 选中
      */
     selected?: boolean;
+    /**
+     * 图标
+     */
+    icon?: string;
 }

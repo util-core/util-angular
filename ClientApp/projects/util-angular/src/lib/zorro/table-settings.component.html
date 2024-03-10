@@ -1,41 +1,192 @@
 ﻿<nz-modal nzCentered [(nzVisible)]="isVisible" [nzTitle]="'util.tableSettings'|i18n"
-          nzWidth="800px" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+          nzWidth="1000px" (nzOnCancel)="handleCancel()">
     <ng-container *nzModalContent>
-        <div nz-row>
-            <div nz-col nzSpan="16">
-                <div style="margin-bottom:16px">
-                    <strong>{{ 'util.optionalColumns' | i18n }}</strong>
-                </div>
-                <div style="margin-bottom:12px">
-                    <label nz-checkbox [(ngModel)]="allChecked" [nzIndeterminate]="indeterminate" (ngModelChange)="handleAllChecked()">
-                        {{ allChecked ? ('util.deselectAll' | i18n) : ('util.selectAll' | i18n) }}
-                    </label>
-                </div>
-                <nz-checkbox-wrapper style="width: 100%;">
-                    <div nz-row [nzGutter]=[8,8]>
-                        <ng-container *ngFor="let item of initColumns">
-                            <div nz-col nzXs="12" nzSm="12" nzMd="8" nzLg="8" nzXl="6" nzXXl="6">
-                                <label nz-checkbox [(ngModel)]="item.default" (ngModelChange)="handleChecked(item)">
-                                    {{ item.value | i18n }}
+        <x-dialog-container>
+            <div nz-row nzGutter="12">
+                <div nz-col nzXs="24" nzSm="8" nzMd="8" nzLg="8" nzXl="6" nzXXl="6">
+                    <nz-card [nzTitle]="'util.optionalColumns' | i18n">
+                        <div>
+                            <nz-list>
+                                <label nz-checkbox [(ngModel)]="allChecked" [nzIndeterminate]="indeterminate" (ngModelChange)="handleAllChecked()">
+                                    {{ allChecked ? ('util.deselectAll' | i18n) : ('util.selectAll' | i18n) }}
                                 </label>
-                            </div>
-                        </ng-container>
-                    </div>
-                </nz-checkbox-wrapper>
-            </div>
-            <div nz-col nzSpan="8">
-                <div style="margin-bottom:12px;">
-                    <strong>{{ 'util.selectedColumns' | i18n }}</strong>
-                </div>
-                <div cdkDropList (cdkDropListDropped)="handleDropped($event)">
-                    <ng-container *ngFor="let item of tempColumns">
-                        <div cdkDrag *ngIf="item.default" style="line-height:28px" [cdkDragData]="item">
-                            <i nz-icon style="font-size:16px;margin-right:10px" nzTheme="outline" nzType="holder"></i>
-                            <span>{{ item.value | i18n }}</span>
+                                <nz-divider></nz-divider>
+                                <div style="min-height: 200px; max-height: 500px; overflow-y: scroll">
+                                    <ng-container *ngFor="let item of initColumns">
+                                        <nz-checkbox-wrapper style="width: 100%;">
+                                            <label nz-checkbox [(ngModel)]="item.enabled" (ngModelChange)="handleChecked(item)" style="line-height:36px">
+                                                {{ item.title | i18n }}
+                                            </label>
+                                        </nz-checkbox-wrapper>
+                                    </ng-container>
+                                </div>
+                            </nz-list>
                         </div>
-                    </ng-container>
+                    </nz-card>
+                </div>
+                <div nz-col nzXs="24" nzSm="16" nzMd="16" nzLg="16" nzXl="18" nzXXl="18">
+                    <nz-card [nzTitle]="'util.tableSettings'|i18n" style="padding-bottom:0; margin-bottom:16px">
+                        <form nz-form>
+                            <div nz-row>
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                    <nz-form-item>
+                                        <nz-form-label [nzSpan]="8">{{'util.tableSize'|i18n}}</nz-form-label>
+                                        <nz-form-control [nzSpan]="16">
+                                            <nz-segmented name="tableSize" x-segmented-extend #x_tableSize="xSegmentedExtend"
+                                                          [data]="tableSizeOptions" [(value)]="info.size"
+                                                          [nzOptions]="x_tableSize.options" [(ngModel)]="x_tableSize.index"
+                                                          (nzValueChange)="x_tableSize.handleValueChange($event)">
+                                            </nz-segmented>
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                    <nz-form-item>
+                                        <nz-form-label [nzSpan]="8">{{'util.tableBorder'|i18n}}</nz-form-label>
+                                        <nz-form-control [nzSpan]="16">
+                                            <nz-switch name="tableBordered" [(ngModel)]="info.bordered"></nz-switch>
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                            </div>
+                            <div nz-row>
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                    <nz-form-item>
+                                        <nz-form-label [nzSpan]="8">{{'util.scrollWidth'|i18n}}</nz-form-label>
+                                        <nz-form-control [nzSpan]="16">
+                                            <input nz-input name="tableWidth" [(ngModel)]="info.width" />
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                    <nz-form-item>
+                                        <nz-form-label [nzSpan]="8">{{'util.scrollHeight'|i18n}}</nz-form-label>
+                                        <nz-form-control [nzSpan]="16">
+                                            <input nz-input name="tableHeight" [(ngModel)]="info.height" />
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                            </div>
+                        </form>
+                    </nz-card>
+                    <nz-card [nzTitle]="'util.selectedColumns'|i18n">
+                        <nz-table #tb_column_settings [nzShowPagination]="false" nzSize="small"
+                                  [nzScroll]="{ x: enableFixedColumn ? '1020px' : '820px', y: '360px' }"
+                                  [nzData]="info.columns">
+                            <thead>
+                                <tr>
+                                    <th nzWidth="130px" nzLeft="0px" titleAlign="center">{{'util.action'|i18n}}</th>
+                                    <th nzWidth="50px" nzLeft="130px" titleAlign="center">{{'util.lineNumber'|i18n}}</th>
+                                    <th nzWidth="200px" nzLeft="180px" titleAlign="center">{{'util.column'|i18n}}</th>
+                                    <th nzWidth="80px" titleAlign="center">{{'util.columnWidth'|i18n}}</th>
+                                    <th nzWidth="100px" *ngIf="enableFixedColumn">{{'util.fixToLeft'|i18n}}</th>
+                                    <th nzWidth="100px" *ngIf="enableFixedColumn">{{'util.fixToRight'|i18n}}</th>
+                                    <th nzWidth="130px">
+                                        {{'util.headerAlignment'|i18n}}
+                                        <nz-filter-trigger [(nzVisible)]="isTitleAlignVisible" [nzDropdownMenu]="menuTitleAlign">
+                                            <span nz-icon nzType="setting" style="color: rgba(0,0,0,0.85)"></span>
+                                        </nz-filter-trigger>
+                                    </th>
+                                    <th nzWidth="130px">
+                                        {{'util.contentAlignment'|i18n}}
+                                        <nz-filter-trigger [(nzVisible)]="isAlignVisible" [nzDropdownMenu]="menuAlign">
+                                            <span nz-icon nzType="setting" style="color: rgba(0,0,0,0.85)"></span>
+                                        </nz-filter-trigger>
+                                    </th>
+                                    <th nzWidth="100px">
+                                        {{'util.ellipsisDisplay'|i18n}}
+                                        <nz-filter-trigger [(nzVisible)]="isEllipsisVisible" [nzDropdownMenu]="menuEllipsis">
+                                            <span nz-icon nzType="setting" style="color: rgba(0,0,0,0.85)"></span>
+                                        </nz-filter-trigger>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody cdkDropList (cdkDropListDropped)="handleDropped($event)">
+                                <ng-container *ngFor="let column of info.columns;">
+                                    <tr cdkDrag *ngIf="column.enabled" [cdkDragData]="column">
+                                        <td nzLeft="0px" nzAlign="center">
+                                            <a (click)="removeColumn(column)" class="ant-btn-dangerous">
+                                                {{'util.hide'|i18n}}
+                                            </a>
+                                            <ng-container *ngIf="editId === column.title">
+                                                <nz-divider nzType="vertical"></nz-divider>
+                                                <a (click)="stopEdit()">{{'util.unedit'|i18n}}</a>
+                                            </ng-container>
+                                        </td>
+                                        <td nzLeft="130px">{{column.line}}</td>
+                                        <td nzLeft="180px">
+                                            <i nz-icon style="font-size:16px;margin-right:10px" nzTheme="outline" nzType="holder"></i>
+                                            <span>{{ column.title | i18n }}</span>
+                                        </td>
+                                        <td (click)="startEdit(column.title)">
+                                            <div *ngIf="editId !== column.title">
+                                                {{ column.width }}
+                                            </div>
+                                            <input *ngIf="editId === column.title" type="text" nz-input [(ngModel)]="column.width"
+                                                   (blur)="stopEdit()" (ngModelChange)="handleWidthChange()" />
+                                        </td>
+                                        <td *ngIf="enableFixedColumn">
+                                            <nz-switch [(ngModel)]="column.left" (ngModelChange)="handleWidthChange()"></nz-switch>
+                                        </td>
+                                        <td *ngIf="enableFixedColumn">
+                                            <nz-switch [(ngModel)]="column.right" (ngModelChange)="handleWidthChange()"></nz-switch>
+                                        </td>
+                                        <td>
+                                            <nz-segmented name="columnTitleAlign" x-segmented-extend #x_columnTitleAlign="xSegmentedExtend"
+                                                          [data]="tableAlignOptions" [(value)]="column.titleAlign"
+                                                          [nzOptions]="x_columnTitleAlign.options" [(ngModel)]="x_columnTitleAlign.index"
+                                                          (nzValueChange)="x_columnTitleAlign.handleValueChange($event)">
+                                            </nz-segmented>
+                                        </td>
+                                        <td>
+                                            <nz-segmented name="columnAlign" x-segmented-extend #x_columnAlign="xSegmentedExtend"
+                                                          [data]="tableAlignOptions" [(value)]="column.align"
+                                                          [nzOptions]="x_columnAlign.options" [(ngModel)]="x_columnAlign.index"
+                                                          (nzValueChange)="x_columnAlign.handleValueChange($event)">
+                                            </nz-segmented>
+                                        </td>
+                                        <td>
+                                            <nz-switch [(ngModel)]="column.ellipsis"></nz-switch>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </nz-table>
+                        <nz-dropdown-menu #menuTitleAlign="nzDropdownMenu">
+                            <div class="ant-table-filter-dropdown" style="min-width:0">
+                                <nz-segmented name="tableTitleAlign" x-segmented-extend #x_tableTitleAlign="xSegmentedExtend"
+                                              [data]="tableAlignOptions" [nzOptions]="x_tableTitleAlign.options"
+                                              (nzValueChange)="handleTitleAlignChange($event)">
+                                </nz-segmented>
+                            </div>
+                        </nz-dropdown-menu>
+                        <nz-dropdown-menu #menuAlign="nzDropdownMenu">
+                            <div class="ant-table-filter-dropdown" style="min-width:0">
+                                <nz-segmented name="tableAlign" x-segmented-extend #x_tableAlign="xSegmentedExtend"
+                                              [data]="tableAlignOptions" [nzOptions]="x_tableAlign.options"
+                                              (nzValueChange)="handleAlignChange($event)">
+                                </nz-segmented>
+                            </div>
+                        </nz-dropdown-menu>
+                        <nz-dropdown-menu #menuEllipsis="nzDropdownMenu">
+                            <div class="ant-table-filter-dropdown" style="min-width:0">
+                                <nz-switch [(ngModel)]="ellipsisValue" (ngModelChange)="handleEllipsisChange($event)" nzSize="small"></nz-switch>
+                            </div>
+                        </nz-dropdown-menu>
+                    </nz-card>
                 </div>
             </div>
-        </div>
+        </x-dialog-container>
     </ng-container>
+    <div *nzModalFooter>
+        <button nz-button nzType="default" (click)="handleCancel()">
+            {{'util.cancel'|i18n}}
+        </button>
+        <button nz-button nzType="default" (click)="handleReset()">
+            {{'util.reset'|i18n}}
+        </button>
+        <button nz-button nzType="primary" (click)="handleOk()" [nzLoading]="loading">
+            {{'util.ok'|i18n}}
+        </button>
+    </div>
 </nz-modal>
