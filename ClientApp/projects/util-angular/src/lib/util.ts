@@ -27,7 +27,7 @@ import { ContextMenu } from "./common/context-menu";
 import { ClipboardService } from "./common/clipboard.service";
 import { TenantService } from "./tenant/tenant.service";
 import { Acl } from "./common/acl";
-import { AppConfig } from './config/app-config';
+import { AppConfig, initAppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 import { ModuleConfig } from './config/module-config';
 
@@ -383,8 +383,9 @@ export class Util {
      * 获取应用配置
      */
     getAppConfig() {
-        if (this.appConfig)
-            return this.appConfig;
-        return this.ioc.get(AppConfig);
+        if (!this.appConfig)
+            this.appConfig = this.ioc.get(AppConfig);
+        initAppConfig(this.appConfig);
+        return this.appConfig;
     }
 }

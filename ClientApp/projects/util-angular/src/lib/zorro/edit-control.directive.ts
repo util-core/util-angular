@@ -1,5 +1,5 @@
 ﻿//============== NgZorro表格编辑控件扩展指令=================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===========================================================
 import { Directive, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, Self, Optional } from '@angular/core';
@@ -90,8 +90,9 @@ export class EditControlDirective implements OnInit, OnDestroy {
                 this.instance.focus();
                 return;
             }
-            if ( this.element && this.element.nativeElement )
+            if (this.element && this.element.nativeElement) {
                 this.element.nativeElement.focus();
+            }
         }, 0 );
     }
 

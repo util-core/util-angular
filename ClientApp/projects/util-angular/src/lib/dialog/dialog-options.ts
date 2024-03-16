@@ -1,5 +1,5 @@
 ﻿//============== 弹出层配置 ======================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { TemplateRef } from '@angular/core';
@@ -25,7 +25,11 @@ export interface IDialogOptions {
     /**
      * 是否垂直居中显示
      */
-    centered?:boolean,
+    centered?: boolean,
+    /**
+     * 是否可拖动,默认值: true
+     */
+    draggable?: boolean;
     /**
      * 标题
      */

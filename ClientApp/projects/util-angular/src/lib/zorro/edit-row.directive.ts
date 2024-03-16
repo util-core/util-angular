@@ -1,8 +1,8 @@
 ﻿//============== NgZorro表格编辑行扩展指令=======================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===============================================================
-import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy, ElementRef, Self } from '@angular/core';
 import { EditTableDirective } from "./edit-table.directive";
 import { remove } from "../common/helper";
 
@@ -33,9 +33,10 @@ export class EditRowDirective implements OnInit, OnDestroy {
 
     /**
      * 初始化表格编辑行扩展指令
+     * @param element 行元素
      * @param table 编辑表格扩展指令
      */
-    constructor(private table: EditTableDirective) {
+    constructor(@Self() private element: ElementRef, private table: EditTableDirective) {
         this.controls = [];
     }
 
@@ -54,6 +55,13 @@ export class EditRowDirective implements OnInit, OnDestroy {
     ngOnDestroy() {
         if (this.data)
             this.table && this.table.unRegister(this.data.id);
+    }
+
+    /**
+     * 获取元素
+     */
+    getNativeElement() {
+        return this.element.nativeElement;
     }
 
     /**
@@ -97,12 +105,20 @@ export class EditRowDirective implements OnInit, OnDestroy {
      */
     @HostListener('mousedown', ['$event.target'])
     handleClick(element) {
-        setTimeout(() => {
-            if (this.controls.length === 0)
-                return;
-            let control = this.controls.find(t => element.contains(t.getNativeElement()));
+        setTimeout(() => {            
+            let control = this.getControl(element);
             control && control.focus();
-        }, 100);
+        }, 300);
+    }
+
+    /**
+     * 获取控件
+     * @param element 元素
+     */
+    getControl(element) {
+        if (this.controls.length === 0)
+            return null;
+        return this.controls.find(t => element.contains(t.getNativeElement()));
     }
 
     /**

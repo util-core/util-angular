@@ -23,24 +23,26 @@ import { TableSettingsServiceBase } from './table-settings.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './table-settings.component.html',
     styles: [`
-       ::ng-deep .dialog-body{
-            background-color:#80808014;
-            padding:16px !important;
+        .x-table-settings-dialog-container ::ng-deep .dialog-body {
+           background-color:#80808014;
         }
-        ::ng-deep .ant-checkbox-wrapper:hover{
+        .x-table-settings-dialog ::ng-deep .ant-checkbox-wrapper:hover {
             background-color:#f8f8f8;
         }
-        ::ng-deep .ant-divider-horizontal{
+        .x-table-settings-dialog ::ng-deep .ant-divider-horizontal {
             margin:14px 0;
         }
-        ::ng-deep .cdk-drag-preview {
+        .x-table-settings-dialog ::ng-deep .cdk-drag-preview {
             display: table;
         }
-        ::ng-deep .cdk-drag-placeholder {
+        .x-table-settings-dialog ::ng-deep .cdk-drag-placeholder {
             opacity: 0;
         }
-        ::ng-deep .ant-card-body {
-            padding-bottom: 0px;
+        .x-table-settings-dialog .card-table-config {
+            margin-bottom:16px;
+        }
+        .x-table-settings-dialog .card-table-config ::ng-deep .ant-card-body {
+            padding-bottom: 0;
         }
     `]
 })
@@ -87,9 +89,21 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     protected info: TableInfo;
     /**
+     * 初始表格信息
+     */
+    protected initInfo: TableInfo;
+    /**
+     * 表格设置对话框宽度
+     */
+    width;
+    /**
      * 是否显示表格设置对话框
      */
     isVisible = false;
+    /**
+     * 是否隐藏表格配置区域,默认值: false
+     */
+    isHideTableConfig?: boolean;
     /**
      * 是否显示表格标题对齐设置下拉菜单
      */
@@ -172,7 +186,9 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     constructor(@Optional() protected config: AppConfig, protected service: TableSettingsServiceBase, protected cdr: ChangeDetectorRef) {
         initAppConfig(config);
         this.util = new Util(null, config);
-        this.size = 'default';
+        this.size = config.table.tableSize;
+        this.width = config.table.tableSettingsWidth;
+        this.isHideTableConfig = config.table.isHideTableConfig;
         this.loading = false;
         this.initResizeColumn();
     }
@@ -185,17 +201,16 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
             takeUntil(this.destroy$),
             filter(value => value !== null),
             tap(item => {
-                this.columns = this.columns.map(column => {
-                    return column.value === item.title ? { ...column, width: item.width } : column;
+                this.info.columns = this.info.columns.map(column => {
+                    return column.title === item.title ? { ...column, width: this.util.helper.toNumber(item.width, 0).toString() } : column;
                 });
+                this.handleWidthChange();
+                this.restoreConfig();
             }),
-            debounceTime(2000)
+            debounceTime(3000)
         ).subscribe(async item => {
-            this.info.columns = this.info.columns.map(column => {
-                return column.title === item.title ? { ...column, width: this.util.helper.toNumber(item.width, 0).toString() } : column;
-            });
-            this.handleWidthChange();
-            await this.save(this.info);
+            if (this.config.table.isResizeColumnSave)
+                await this.save(this.info);
         });
     }
 
@@ -220,6 +235,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     ngOnInit() {
         setTimeout(() => {
+            this.loadInitColumns();
+            this.backTableInfo();
             this.load();
             this.cdr.markForCheck();
         }, 10);
@@ -234,11 +251,24 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * 备份初始表格信息
+     */
+    protected backTableInfo() {
+        this.initInfo = new TableInfo();
+        this.initInfo.size = this.initSize;
+        this.initInfo.bordered = this.initBordered;  
+        this.initInfo.width = this.scrollWidth;
+        this.initInfo.height = this.scrollHeight;
+        this.initInfo.columns = this.util.helper.clone(this.initColumns);
+    }
+
+    /**
      * 加载表格配置
      */
-    protected load() {
-        this.loadInitColumns();
+    protected load() {        
         this.loadTableInfo();
+        this.initAllChecked();
+        this.handleWidthChange();
         this.restoreConfig();
     }
 
@@ -309,7 +339,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
             }
             item.width = this.getWidthNumber(item.width).toString();
             this.info.columns.splice(i, 0, item);
-        }        
+        }
         this.initLines();
     }
 
@@ -352,13 +382,32 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * 初始化全选状态
+     */
+    protected initAllChecked() {
+        if (this.initColumns.every(item => item.enabled)) {
+            this.allChecked = true;
+            this.indeterminate = false;
+            return;
+        }
+        if (this.initColumns.every(item => !item.enabled)) {
+            this.allChecked = false;
+            this.indeterminate = false;
+            return;
+        }
+        this.allChecked = false;
+        this.indeterminate = true;
+    }
+
+    /**
      * 还原表格配置
      * @param info 表格配置
      */
     protected restoreConfig() {
         if (!this.info)
             return;
-        this.size = this.info.size;
+        if (this.info.size)
+            this.size = this.info.size;
         this.bordered = this.info.bordered;
         this.scroll = this.getScroll();
         this.columns = [...this.toColumns(this.info.columns)];
@@ -412,47 +461,22 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * 显示表格设置弹出框
      */
     show() {
-        this.loadInitColumns();
-        this.loadTableInfo();
-        this.initAllChecked();
-        this.handleWidthChange();
-        this.isVisible = true;        
+        this.isVisible = true;
         this.cdr.detectChanges();
-    }
-
-    /**
-     * 初始化全选状态
-     */
-    protected initAllChecked() {
-        if (this.initColumns.every(item => item.enabled)) {
-            this.allChecked = true;
-            this.indeterminate = false;
-            return;
-        }
-        if (this.initColumns.every(item => !item.enabled)) {
-            this.allChecked = false;
-            this.indeterminate = false;
-            return;
-        }
-        this.allChecked = false;
-        this.indeterminate = true;
     }
 
     /**
      * 全选变更事件处理
      */
-    handleAllChecked() {
-        this.indeterminate = false;
+    handleAllChecked() {        
         if (this.allChecked) {
-            this.initColumns = this.initColumns.map(item => ({ ...item, enabled: true }));
-            this.info.columns = [...this.initColumns];
+            this.handleInit();
+            return;
         }
-        else {
-            this.initColumns = this.initColumns.map(item => ({ ...item, enabled: false }));
-            this.info.columns = [...this.initColumns];
-        }
-        this.initLines();
-        this.handleWidthChange();
+        this.initColumns = this.initColumns.map(item => ({ ...item, enabled: false }));
+        this.info.columns = [...this.initColumns];
+        this.indeterminate = false;
+        this.info.width = 0;
     }
 
     /**
@@ -491,6 +515,24 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     handleReset() {
         this.loadTableInfo();
         this.initAllChecked();
+    }
+
+    /**
+     * 恢复初始设置
+     */
+    handleInit() {
+        this.loadInitColumns();
+        this.info = this.util.helper.clone(this.initInfo);
+        this.info.columns = this.info.columns.map(column => {
+            return {
+                ...column,
+                width: this.getWidthNumber(column.width).toString(),
+                titleAlign: column.titleAlign || this.config.table.titleAlign
+            };
+        });
+        this.initLines();
+        this.initAllChecked();
+        this.handleWidthChange();
     }
 
     /**
@@ -727,7 +769,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     getTitleAlign(title: string) {
         let result = this.config.table.titleAlign;
         if (!this.info)
-            return result;        
+            return result;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)
             return result;

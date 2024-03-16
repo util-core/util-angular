@@ -1,5 +1,5 @@
 ﻿//================ 表格编辑基类 ==================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Component, Injector, ViewChild } from '@angular/core';
@@ -56,6 +56,16 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
     }
 
     /**
+     * 是否编辑状态
+     * @param id 标识
+     */
+    isEdit(id) {
+        if (!this.editTable)
+            return false;
+        return this.editTable.isEdit(id);
+    }
+
+    /**
      * 编辑行
      * @param id 行标识
      */
@@ -66,6 +76,15 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
             rowId: id,
             after: () => setTimeout(() => this.editTable.focusToFirst(), 0)
         });
+    }
+
+    /**
+     * 取消编辑状态
+     */
+    unedit() {
+        if (!this.editTable)
+            return;
+        this.editTable.clearEditRow();
     }
 
     /**

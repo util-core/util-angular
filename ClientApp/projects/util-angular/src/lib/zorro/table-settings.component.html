@@ -1,8 +1,9 @@
-﻿<nz-modal nzCentered [(nzVisible)]="isVisible" [nzTitle]="'util.tableSettings'|i18n"
-          nzWidth="1000px" (nzOnCancel)="handleCancel()">
-    <ng-container *nzModalContent>
-        <x-dialog-container>
-            <div nz-row nzGutter="12">
+﻿<nz-modal nzCentered nzDraggable 
+          [(nzVisible)]="isVisible" [nzTitle]="'util.tableSettings'|i18n"
+          [nzWidth]="width" (nzOnCancel)="handleCancel()">
+    <div *nzModalContent >
+        <x-dialog-container class="x-table-settings-dialog-container">
+            <div nz-row nzGutter="12" class="x-table-settings-dialog">
                 <div nz-col nzXs="24" nzSm="8" nzMd="8" nzLg="8" nzXl="6" nzXXl="6">
                     <nz-card [nzTitle]="'util.optionalColumns' | i18n">
                         <div>
@@ -25,10 +26,10 @@
                     </nz-card>
                 </div>
                 <div nz-col nzXs="24" nzSm="16" nzMd="16" nzLg="16" nzXl="18" nzXXl="18">
-                    <nz-card [nzTitle]="'util.tableSettings'|i18n" style="padding-bottom:0; margin-bottom:16px">
+                    <nz-card *ngIf="!isHideTableConfig" [nzTitle]="'util.tableSettings'|i18n" class="card-table-config">
                         <form nz-form>
                             <div nz-row>
-                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="12" nzXXl="12">
                                     <nz-form-item>
                                         <nz-form-label [nzSpan]="8">{{'util.tableSize'|i18n}}</nz-form-label>
                                         <nz-form-control [nzSpan]="16">
@@ -40,7 +41,7 @@
                                         </nz-form-control>
                                     </nz-form-item>
                                 </div>
-                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="12" nzXXl="12">
                                     <nz-form-item>
                                         <nz-form-label [nzSpan]="8">{{'util.tableBorder'|i18n}}</nz-form-label>
                                         <nz-form-control [nzSpan]="16">
@@ -50,7 +51,7 @@
                                 </div>
                             </div>
                             <div nz-row>
-                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="12" nzXXl="12">
                                     <nz-form-item>
                                         <nz-form-label [nzSpan]="8">{{'util.scrollWidth'|i18n}}</nz-form-label>
                                         <nz-form-control [nzSpan]="16">
@@ -58,7 +59,7 @@
                                         </nz-form-control>
                                     </nz-form-item>
                                 </div>
-                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12" nzXXl="12">
+                                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="12" nzXXl="12">
                                     <nz-form-item>
                                         <nz-form-label [nzSpan]="8">{{'util.scrollHeight'|i18n}}</nz-form-label>
                                         <nz-form-control [nzSpan]="16">
@@ -177,10 +178,13 @@
                 </div>
             </div>
         </x-dialog-container>
-    </ng-container>
+    </div>
     <div *nzModalFooter>
         <button nz-button nzType="default" (click)="handleCancel()">
             {{'util.cancel'|i18n}}
+        </button>
+        <button nz-button nzType="default" (click)="handleInit()">
+            {{'util.init'|i18n}}
         </button>
         <button nz-button nzType="default" (click)="handleReset()">
             {{'util.reset'|i18n}}

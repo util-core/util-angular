@@ -1,5 +1,5 @@
 ﻿//================ 应用配置 ==============================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //========================================================
 import { Injectable } from '@angular/core';
@@ -16,6 +16,8 @@ import { UploadConfig } from "./upload-config";
 import { DefaultUploadConfig } from "./default-upload-config";
 import { MessageConfig } from "./message-config";
 import { DefaultMessageConfig } from "./default-message-config";
+import { DialogConfig } from "./dialog-config";
+import { DefaultDialogConfig } from "./default-dialog-config";
 
 /**
  * 应用配置
@@ -58,6 +60,10 @@ export class AppConfig {
      * 消息配置
      */
     message?: MessageConfig;
+    /**
+     * 弹出层配置
+     */
+    dialog?: DialogConfig;
 }
 
 /**
@@ -74,4 +80,5 @@ export function initAppConfig(config: AppConfig) {
     config.tenant = config.tenant || new TenantConfig();
     config.upload = assign(DefaultUploadConfig, config.upload);
     config.message = assign(DefaultMessageConfig, config.message);
+    config.dialog = assign(DefaultDialogConfig, config.dialog);
 }

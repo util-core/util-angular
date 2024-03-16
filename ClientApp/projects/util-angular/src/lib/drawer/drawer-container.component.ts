@@ -4,6 +4,7 @@
 //====================================================
 import { ChangeDetectionStrategy, Component, Injector, Input, OnInit } from '@angular/core';
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { NzDrawerRef } from 'ng-zorro-antd/drawer';
 import { Util } from '../util';
 import { AppConfig, initAppConfig } from '../config/app-config';
 
@@ -21,9 +22,6 @@ import { AppConfig, initAppConfig } from '../config/app-config';
         </div>
     `,
     styles: [`
-      ::ng-deep .ant-drawer-body {
-        padding: 0;
-      }
       .drawer-body {
         width: 100%;
         height: 100%;
@@ -70,6 +68,14 @@ export class DrawerContainerComponent implements OnInit {
         let drawer = this.util.drawer.getDrawer();
         if (!drawer)
             return;
+        this.setDirection(drawer);
+        this.setPadding(drawer);
+    }
+
+    /**
+     * 设置手柄方向
+     */
+    private setDirection(drawer: NzDrawerRef) {
         if (drawer.nzPlacement == "left") {
             this.direction = "right";
             return;
@@ -78,6 +84,13 @@ export class DrawerContainerComponent implements OnInit {
             this.direction = "left";
             return;
         }
+    }
+
+    /**
+     * 设置抽屉Padding为 0
+     */
+    setPadding(drawer: NzDrawerRef) {
+        drawer.nzBodyStyle = { "padding": "0" };
     }
 
     /**

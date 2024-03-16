@@ -1,5 +1,5 @@
 ﻿//============== 数据容器 ==========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //==================================================
 import { SelectionModel } from '@angular/cdk/collections';
@@ -119,6 +119,8 @@ export class DataContainer<TModel extends IKey> {
             this.util.helper.insert(this.data, model, 0);
             this.total = this.total + 1;
         });
+        this.data = [...this.data];
+        this.util.changeDetector.markForCheck();
     }
 
     /**
@@ -287,7 +289,9 @@ export class DataContainer<TModel extends IKey> {
      * 是否选中
      * @param item 数据项
      */
-    isSelected(item) {
+    isSelected(item?) {
+        if (!item)
+            return !this.selectedSelection.isEmpty();
         return this.selectedSelection.isSelected(item);
     }
 
@@ -295,7 +299,9 @@ export class DataContainer<TModel extends IKey> {
      * 是否选中
      * @param item 数据项
      */
-    isChecked(item) {
+    isChecked(item?) {
+        if (!item)
+            return !this.checkedSelection.isEmpty();
         return this.checkedSelection.isSelected(item);
     }
 

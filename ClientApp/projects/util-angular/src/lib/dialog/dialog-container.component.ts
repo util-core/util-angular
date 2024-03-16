@@ -2,8 +2,9 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //======================================================
-import { ChangeDetectionStrategy, Component, Injector, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, Input, OnInit } from '@angular/core';
 import { NzResizeEvent, NzResizeDirection } from 'ng-zorro-antd/resizable';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 import { Util } from '../util';
 import { AppConfig, initAppConfig } from '../config/app-config';
 
@@ -21,9 +22,6 @@ import { AppConfig, initAppConfig } from '../config/app-config';
         </div>
     `,
     styles: [`
-      ::ng-deep .ant-modal-body {
-        padding: 0;
-      }
       .dialog-body {
         width: 100%;
         height: 100%;
@@ -31,7 +29,7 @@ import { AppConfig, initAppConfig } from '../config/app-config';
       }
     `]
 })
-export class DialogContainerComponent {
+export class DialogContainerComponent implements OnInit {
     /**
      * 操作入口
      */
@@ -61,6 +59,27 @@ export class DialogContainerComponent {
         this.util = new Util(injector, config);
         this.directions = ['left', 'right'];
         this.minWidth = 600;
+    }
+
+    /**
+     * 初始化
+     */
+    ngOnInit() {
+        setTimeout(() => {
+            let dialog = this.util.dialog.getDialog();
+            if (!dialog)
+                return;
+            this.setPadding(dialog);
+        }, 0);
+    }
+
+    /**
+     * 设置弹出层Padding为 0
+     */
+    setPadding(dialog: NzModalRef) {
+        let config = dialog.getConfig();
+        config.nzBodyStyle = { "padding": "0" };
+        dialog.updateConfig(config);
     }
 
     /**

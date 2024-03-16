@@ -1,5 +1,5 @@
 ﻿//============== 数据加载器 ===========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=====================================================
 import { Subscription } from "rxjs";
@@ -44,6 +44,19 @@ export class DataLoader<T extends IKey> {
      */
     constructor(private util: Util) {
         this.container = new DataContainer<T>(util);
+        this.initOnScrollToBottomLoad();
+    }
+
+    /**
+     * 初始化滚动到底部加载事件
+     */
+    initOnScrollToBottomLoad() {
+        this._scrollEvent && this._scrollEvent.unsubscribe();
+        this._scrollEvent = this.util.event.onScrollToBottom({
+            handler: () => {
+                this.scrollToBottomLoad();
+            }
+        });
     }
 
     /**
@@ -62,19 +75,7 @@ export class DataLoader<T extends IKey> {
     param(param): DataLoader<T> {
         this._queryParam = param;
         return this;
-    }
-
-    /**
-     * 初始化滚动到底部加载事件
-     */
-    initOnScrollToBottomLoad() {
-        this._scrollEvent && this._scrollEvent.unsubscribe();
-        this._scrollEvent = this.util.event.onScrollToBottom({
-            handler: () => {
-                this.scrollToBottomLoad();
-            }
-        });
-    }
+    }    
 
     /**
      * 查询
@@ -156,6 +157,7 @@ export class DataLoader<T extends IKey> {
                     else {
                         this.container.setData(data, result.total);
                     }
+                    this.util.changeDetector.markForCheck();
                     options.ok && options.ok(result);
                 },
                 fail: options.fail,
@@ -211,7 +213,8 @@ export class DataLoader<T extends IKey> {
             ok: () => {
                 this.util.message.success(I18nKeys.deleteSuccessed);
                 if (this._isScrollLoad) {
-                    this.container.removeData(ids);                    
+                    this.container.removeData(ids);
+                    this.util.changeDetector.markForCheck();
                     ok && ok();
                     return;
                 }
@@ -271,11 +274,28 @@ export class DataLoader<T extends IKey> {
     }
 
     /**
+     * 刷新
+     * @param queryParam 查询参数
+     * @param button 刷新按钮
+     * @param handler 刷新成功回调函数
+     */
+    refresh(queryParam?, button?, handler?: (result) => void) {
+        this._isScrollLoad = false;
+        this.initOnScrollToBottomLoad();
+        this.container.clear();
+        this.query({
+            page: 1,
+            param: queryParam,
+            button: button,
+            ok: handler
+        });
+    }
+
+    /**
      * 清理
      */
     clear() {
         this._scrollEvent && this._scrollEvent.unsubscribe();
-        this._isScrollLoad = false;
-        this.container.clear();
+        this.refresh();
     }
 }

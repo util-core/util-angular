@@ -8,7 +8,11 @@
  */
 export class TableConfig {
     /**
-     * 表格单元格默认宽度,默认值: "180px"
+     * 表格尺寸,默认值: 'default'
+     */
+    tableSize?: 'default' | 'middle' | 'small';
+    /**
+     * 表格单元格默认宽度,默认值: "120px"
      */
     defaultWidth?: string;
     /**
@@ -43,4 +47,16 @@ export class TableConfig {
      * 分页长度列表
      */
     pageSizeOptions?: number[];
+    /**
+     * 表格设置对话框的宽度,默认值: 60%
+     */
+    tableSettingsWidth?: string;
+    /**
+     * 是否隐藏表格设置界面中的表格配置区域,默认值: false
+     */
+    isHideTableConfig?: boolean;
+    /**
+     * 拖动列宽时是否保存表格设置,默认值: true
+     */
+    isResizeColumnSave?: boolean;
 }

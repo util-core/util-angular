@@ -1,8 +1,8 @@
 ﻿//============== NgZorro表格编辑扩展指令 ====================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, HostListener, Input, Self, ElementRef } from '@angular/core';
+import { Directive, HostListener, Input, Self, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { TableExtendDirective } from "./table-extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
@@ -58,8 +58,9 @@ export class EditTableDirective {
      * 初始化编辑表格扩展指令
      * @param table 表格扩展指令
      * @param element 表格元素
+     * @param cdr 变更检测
      */
-    constructor(private table: TableExtendDirective<any>, @Self() private element: ElementRef) {
+    constructor(private table: TableExtendDirective<any>, @Self() private element: ElementRef, private cdr: ChangeDetectorRef) {
         this.util = table.util;
         this.dblClickStartEdit = true;
         this.rows = new Map<string, EditRowDirective>();
@@ -117,7 +118,7 @@ export class EditTableDirective {
             return;
         setTimeout(() => {
             if (!element.contains(this.element.nativeElement))
-                return;
+                return;          
             this.clearEditRow();
         }, 100);
     }
@@ -139,6 +140,18 @@ export class EditTableDirective {
         if (!this.currentRow)
             return true;
         return this.currentRow.isValid();
+    }
+
+    /**
+     * 是否编辑状态
+     * @param rowId 行标识
+     */
+    isEdit(rowId) {
+        if (!rowId)
+            return false;
+        if (this.editId === rowId)
+            return true;
+        return false;
     }
 
     /**
@@ -234,6 +247,7 @@ export class EditTableDirective {
         this.editId = rowId;
         this.currentRow = row;
         options.after && options.after(row);
+        this.cdr.markForCheck();
     }
 
     /**
@@ -292,6 +306,7 @@ export class EditTableDirective {
     clearEditRow() {
         this.editId = null;
         this.currentRow = null;
+        this.cdr.markForCheck();
     }
 
     /**

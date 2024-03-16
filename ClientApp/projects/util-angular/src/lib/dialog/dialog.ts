@@ -145,6 +145,7 @@ export class Dialog {
             nzContent: options.component || options.content,
             nzData: options.data,
             nzCentered: options.centered,
+            nzDraggable: this.getDraggable(options),
             nzWidth: options.width,
             nzCancelText: this.getCancelText(options),
             nzCancelLoading: options.cancelLoading,
@@ -181,6 +182,15 @@ export class Dialog {
         if (this.util.helper.isString(options.title))
             return this.util.i18n.get(<string>options.title);
         return options.title;
+    }
+
+    /**
+     * 获取是否可拖动
+     */
+    private getDraggable(options: IDialogOptions) {
+        if (this.util.helper.isUndefined(options.draggable))
+            return this.util.getAppConfig().dialog.draggable;
+        return options.draggable;
     }
 
     /**
