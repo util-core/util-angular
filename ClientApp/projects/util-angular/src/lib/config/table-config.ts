@@ -12,7 +12,7 @@ export class TableConfig {
      */
     tableSize?: 'default' | 'middle' | 'small';
     /**
-     * 表格单元格默认宽度,默认值: "120px"
+     * 表格单元格默认宽度,默认值: "150px"
      */
     defaultWidth?: string;
     /**
@@ -32,7 +32,7 @@ export class TableConfig {
      */
     indentUnitWidth?: string;
     /**
-     * 表格标题对齐方式,默认值: "center"
+     * 表格标题对齐方式,默认值: "left"
      */
     titleAlign?: 'left' | 'center' | 'right';
     /**

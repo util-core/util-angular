@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, OnInit, EventEmitter,Optional } from '@angular/core';
+import { Directive, Input, Output, OnInit, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
 import { NzTreeNodeOptions, NzTreeNode, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
 import { NzTreeSelectComponent } from "ng-zorro-antd/tree-select";
 import { Util } from "../util";
@@ -121,9 +121,10 @@ export class TreeExtendDirective implements OnInit {
      * @param treeSelectComponent 下拉树形组件
      * @param config 应用配置
      * @param moduleConfig 模块配置
+     * @param cdr 变更检测
      */
     constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent,
-        @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
+        @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
         this.initAppConfig();
         this.util = new Util(null, config, moduleConfig);
         this.tree = treeComponent || treeSelectComponent;
@@ -221,6 +222,7 @@ export class TreeExtendDirective implements OnInit {
                     options.ok && options.ok(result);
                     this.loadAfter(result);
                     this.onLoad.emit(result);
+                    this.cdr.markForCheck();
                 },
                 fail: options.fail,
                 complete: () => {
@@ -350,6 +352,7 @@ export class TreeExtendDirective implements OnInit {
                 ok: result => {
                     this.handleLoadChildren(node, result);
                     this.onLoadChildren.emit({ node: node, result: result });
+                    this.cdr.markForCheck();
                 },
                 complete: () => {
                     node.isLoading = false;

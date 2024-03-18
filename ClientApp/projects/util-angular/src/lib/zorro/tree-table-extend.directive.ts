@@ -249,7 +249,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
             let lastIndex = getLastIndex(lastNode);
             this.dataSource.splice(lastIndex + 1, 0, node);
             lastNode = node;
-        });
+        });        
     }
 
     /**
@@ -450,6 +450,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                     options.ok && options.ok(result);
                     this.loadAfter(result);
                     this.onLoad.emit(result);
+                    this.cdr.markForCheck();
                 },
                 fail: options.fail,
                 complete: () => {
@@ -540,6 +541,7 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
                     this.handleLoadChildren(node, result);
                     handler && handler(node, result);
                     this.onLoadChildren.emit({ node: node, result: result });
+                    this.cdr.markForCheck();
                 },
                 complete: () => {
                     this.loading = false;
@@ -822,10 +824,11 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
         if (!data.id)
             return;
         if (isNew(data))
-            refreshNewNode(data);        
+            refreshNewNode(data);
         else
             refreshUpdateNode(data);
         this.dataSource = [...this.dataSource];
+        this.cdr.markForCheck();
     }
 }
 

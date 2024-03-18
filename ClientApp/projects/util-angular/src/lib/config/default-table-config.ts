@@ -9,11 +9,11 @@ import { TableConfig } from "./table-config";
  */
 export const DefaultTableConfig: TableConfig = {
     tableSize: "default",
-    defaultWidth: "120px",
+    defaultWidth: "150px",
     lineNumberWidth: "70px",
     checkboxWidth: "30px",
     radioWidth: "36px",
-    titleAlign: "center",
+    titleAlign: "left",
     align: "left",
     indentUnitWidth: "20",
     isShowNoNeedSaveMessage: true,

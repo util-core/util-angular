@@ -233,4 +233,13 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
     protected getCreateData(data?) {
         return { parent: data };
     }
+
+    /**
+     * 是否勾选
+     */
+    isChecked() {
+        if (!this.table)
+            return false;
+        return this.table.isChecked();
+    }
 }

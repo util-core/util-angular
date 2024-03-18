@@ -145,6 +145,10 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     columns: NzCustomColumn[];
     /**
+     * 是否树形表格
+     */
+    @Input() isTreeTable: boolean;
+    /**
      * 存储键
      */
     @Input() key;
@@ -190,6 +194,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         this.width = config.table.tableSettingsWidth;
         this.isHideTableConfig = config.table.isHideTableConfig;
         this.loading = false;
+        this.isTreeTable = false;
         this.initResizeColumn();
     }
 
@@ -256,7 +261,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     protected backTableInfo() {
         this.initInfo = new TableInfo();
         this.initInfo.size = this.initSize;
-        this.initInfo.bordered = this.initBordered;  
+        this.initInfo.bordered = this.initBordered;
         this.initInfo.width = this.scrollWidth;
         this.initInfo.height = this.scrollHeight;
         this.initInfo.columns = this.util.helper.clone(this.initColumns);
@@ -265,7 +270,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     /**
      * 加载表格配置
      */
-    protected load() {        
+    protected load() {
         this.loadTableInfo();
         this.initAllChecked();
         this.handleWidthChange();
@@ -468,7 +473,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     /**
      * 全选变更事件处理
      */
-    handleAllChecked() {        
+    handleAllChecked() {
         if (this.allChecked) {
             this.handleInit();
             return;
@@ -561,6 +566,18 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * 是否禁止拖动
+     * @param index 列索引
+     */
+    isDragDisabled(index) {
+        if (!this.isTreeTable)
+            return false;
+        if (index === 0)
+            return true;
+        return false;
+    }
+
+    /**
      * 拖拽事件处理
      */
     handleDropped(event: CdkDragDrop<any>) {
@@ -569,6 +586,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         let current = list.find((v, i) => i === event.currentIndex);
         let previousIndex = this.info.columns.findIndex(t => t.title === previous.data.title);
         let currentIndex = this.info.columns.findIndex(t => t.title === current.data.title);
+        if (this.isTreeTable && (previousIndex === 0 || currentIndex === 0))
+            return;
         moveItemInArray(this.info.columns, previousIndex, currentIndex);
         this.initLines();
     }
@@ -705,6 +724,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     isLeft(title: string) {
         if (!this.info)
             return false;
+        if (!this.info.columns)
+            return false;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)
             return false;
@@ -728,6 +749,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     isRight(title: string) {
         if (!this.info)
+            return false;
+        if (!this.info.columns)
             return false;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)
@@ -754,6 +777,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         let result = this.config.table.align;
         if (!this.info)
             return result;
+        if (!this.info.columns)
+            return result;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)
             return result;
@@ -770,6 +795,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         let result = this.config.table.titleAlign;
         if (!this.info)
             return result;
+        if (!this.info.columns)
+            return result;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)
             return result;
@@ -784,6 +811,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     getEllipsis(title: string) {
         if (!this.info)
+            return false;
+        if (!this.info.columns)
             return false;
         let column = this.info.columns.find(t => t.title === title);
         if (!column)

@@ -12,10 +12,17 @@ import { Directive, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
     exportAs: 'xRangePickerExtend'
 })
 export class RangePickerExtendDirective implements OnInit, OnChanges {
+    private _rangeDates: Date[];
     /**
      * 范围日期
      */
-    rangeDates: Date[];
+    get rangeDates(): Date[] {
+        return this._rangeDates;
+    }
+    set rangeDates(value: Date[]) {
+        this._rangeDates = value;
+        this.restore();
+    }
     /**
      * 起始日期
      */
@@ -41,6 +48,18 @@ export class RangePickerExtendDirective implements OnInit, OnChanges {
     }
 
     /**
+     * 变更检测
+     */
+    ngOnChanges(changes: SimpleChanges) {
+        const { beginDate, endDate } = changes;
+        if (beginDate && beginDate.currentValue !== beginDate.previousValue ||
+            endDate && endDate.currentValue !== endDate.previousValue) {
+            this.setRangeDates();
+            return;
+        }
+    }
+
+    /**
      * 设置范围日期
      */
     setRangeDates() {
@@ -60,28 +79,17 @@ export class RangePickerExtendDirective implements OnInit, OnChanges {
     }
 
     /**
-     * 变更检测
+     * 还原范围日期
      */
-    ngOnChanges(changes: SimpleChanges) {
-        const { beginDate, endDate } = changes;
-        if (beginDate && beginDate.currentValue !== beginDate.previousValue ||
-            endDate && endDate.currentValue !== endDate.previousValue) {
-            this.setRangeDates();
-        }
-    }
-
-    /**
-     * 范围日期变更事件处理
-     */
-    handleRangeDateChange(dates: Date[]) {
-        if (!dates || dates.length < 2)
+    restore() {
+        if (!this.rangeDates || this.rangeDates.length < 2)
             return;
-        if (this.beginDate != dates[0]) {
-            this.beginDate = dates[0];
+        if (this.beginDate != this.rangeDates[0]) {
+            this.beginDate = this.rangeDates[0];
             this.beginDateChange.emit(this.beginDate);
         }
-        if (this.endDate != dates[1]) {
-            this.endDate = dates[1];
+        if (this.endDate != this.rangeDates[1]) {
+            this.endDate = this.rangeDates[1];
             this.endDateChange.emit(this.endDate);
         }
     }

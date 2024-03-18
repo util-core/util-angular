@@ -103,8 +103,8 @@
                                 </tr>
                             </thead>
                             <tbody cdkDropList (cdkDropListDropped)="handleDropped($event)">
-                                <ng-container *ngFor="let column of info.columns;">
-                                    <tr cdkDrag *ngIf="column.enabled" [cdkDragData]="column">
+                                <ng-container *ngFor="let column of info.columns;index as index">
+                                    <tr *ngIf="column.enabled">
                                         <td nzLeft="0px" nzAlign="center">
                                             <a (click)="removeColumn(column)" class="ant-btn-dangerous">
                                                 {{'util.hide'|i18n}}
@@ -115,8 +115,8 @@
                                             </ng-container>
                                         </td>
                                         <td nzLeft="130px">{{column.line}}</td>
-                                        <td nzLeft="180px">
-                                            <i nz-icon style="font-size:16px;margin-right:10px" nzTheme="outline" nzType="holder"></i>
+                                        <td nzLeft="180px" cdkDrag [cdkDragDisabled]="isDragDisabled(index)" [cdkDragData]="column">
+                                            <i nz-icon *ngIf="!isDragDisabled(index)" style="font-size:16px;margin-right:10px" nzTheme="outline" nzType="holder"></i>
                                             <span>{{ column.title | i18n }}</span>
                                         </td>
                                         <td (click)="startEdit(column.title)">
