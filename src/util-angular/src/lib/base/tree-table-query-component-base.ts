@@ -1,5 +1,5 @@
 ﻿//=============== 树形表格查询基类================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Injector, ViewChild, OnInit, Component } from '@angular/core';
@@ -25,7 +25,7 @@ export abstract class TreeTableQueryComponentBase<TViewModel extends TreeViewMod
      * 初始化树形表格查询基类
      * @param injector 注入器
      */
-    constructor(injector: Injector) {
+    constructor(injector?: Injector) {
         super(injector);
     }
 

@@ -1,5 +1,5 @@
 ﻿//============== 树形编辑组件基类=====================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //====================================================
 import { Injector, Input, OnInit, Component } from '@angular/core';
@@ -22,7 +22,7 @@ export abstract class TreeEditComponentBase<TViewModel extends TreeViewModel> ex
      * 初始化组件
      * @param injector 注入器
      */
-    constructor(injector: Injector) {
+    constructor(injector?: Injector) {
         super(injector);
         this.initParentByDialog();
     }

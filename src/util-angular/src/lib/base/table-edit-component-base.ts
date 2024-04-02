@@ -24,7 +24,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      * 初始化表格编辑组件
      * @param injector 注入器
      */
-    constructor(injector: Injector) {
+    constructor(injector?: Injector) {
         super(injector);
     }
 

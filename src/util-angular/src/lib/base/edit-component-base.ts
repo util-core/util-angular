@@ -39,7 +39,7 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
      * 初始化组件
      * @param injector 注入器
      */
-    constructor(injector: Injector) {
+    constructor(injector?: Injector) {
         super(injector);
         this.isNew = true;
         this.model = <TViewModel>{};

@@ -30,7 +30,7 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
      * 初始化组件
      * @param injector 注入器
      */
-    constructor(injector: Injector) {
+    constructor(injector?: Injector) {
         super(injector);
         this.queryParam = <TQuery>new QueryParameter();
         this.initDataByDialog();
