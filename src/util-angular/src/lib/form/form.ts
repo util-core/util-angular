@@ -1,5 +1,5 @@
 ﻿//============== 表单操作 ========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { HttpMethod } from "../http/http-method";
@@ -37,7 +37,7 @@ export class Form {
             onOk: () => this.submitFormAsync(options),
             onCancel: options.complete
         });
-    }    
+    }
 
     /**
      * 提交表单验证
@@ -102,8 +102,8 @@ export class Form {
                 before: () => {
                     return options.before && options.before(options.data);
                 },
-                ok: result => {
-                    this.okHandler(options, result);
+                ok: (result, message) => {
+                    this.okHandler(options, result, message);
                 },
                 fail: result => {
                     this.failHandler(options, result);
@@ -123,8 +123,8 @@ export class Form {
                 before: () => {
                     return options.before && options.before(options.data);
                 },
-                ok: result => {
-                    this.okHandler(options, result);
+                ok: (result, message) => {
+                    this.okHandler(options, result, message);
                 },
                 fail: result => {
                     this.failHandler(options, result);
@@ -157,10 +157,10 @@ export class Form {
     /**
      * 成功处理函数
      */
-    private okHandler(options: IFormSubmitOptions, result) {        
+    private okHandler(options: IFormSubmitOptions, result, message) {
         options.ok && options.ok(result);
         if (options.showMessage !== false)
-            this.util.message.success(options.message || I18nKeys.succeeded);
+            this.util.message.success(options.message || message || I18nKeys.succeeded);
         result = result || "ok";
         if (options.closeDialog)
             this.util.dialog.close(result);

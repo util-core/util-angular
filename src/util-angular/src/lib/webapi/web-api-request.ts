@@ -230,7 +230,7 @@ export class WebApiRequest<T> {
         if (!result)
             return;
         if (result.code === StateCode.Ok) {
-            options.ok && options.ok(result.data);
+            options.ok && options.ok(result.data, result.message);
             return;
         }
         if (result.code === StateCode.Unauthorized) {
