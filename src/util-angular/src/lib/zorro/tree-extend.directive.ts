@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, Injector, OnInit, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
+import { Directive, Input, Output, OnInit, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
 import { NzTreeNodeOptions, NzTreeNode, NzFormatEmitEvent, NzTreeComponent } from "ng-zorro-antd/tree";
 import { NzTreeSelectComponent } from "ng-zorro-antd/tree-select";
 import { Util } from "../util";
@@ -10,8 +10,6 @@ import { isUndefined } from "../common/helper";
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TreeQueryParameter } from "../core/tree-query-parameter";
-import { AppConfig, initAppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -19,7 +17,8 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 @Directive({
     selector: '[x-tree-extend]',
-    exportAs: 'xTreeExtend'
+    exportAs: 'xTreeExtend',
+    standalone: true
 })
 export class TreeExtendDirective implements OnInit {
     /**
@@ -117,32 +116,19 @@ export class TreeExtendDirective implements OnInit {
 
     /**
      * 初始化树形扩展指令
-     * @param injector 注入器
      * @param treeComponent 树形组件
      * @param treeSelectComponent 下拉树形组件
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
      * @param cdr 变更检测
      */
-    constructor(@Optional() injector: Injector, @Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent,
-        @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
-        this.initAppConfig();
-        this.util = new Util(injector, config, moduleConfig);
+    constructor(@Optional() treeComponent: NzTreeComponent, @Optional() treeSelectComponent: NzTreeSelectComponent,
+        protected cdr: ChangeDetectorRef) {
+        this.util = Util.create();
         this.tree = treeComponent || treeSelectComponent;
         this.dataSource = new Array<any>();
         this.autoLoad = true;
         this.queryParam = new TreeQueryParameter();
         this.checkedKeys = [];
         this.selectedKeys = [];
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
     }
 
     /**

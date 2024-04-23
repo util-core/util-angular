@@ -2,22 +2,24 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===============================================================
-import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy, ElementRef, Self } from '@angular/core';
-import { EditTableDirective } from "./edit-table.directive";
+import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy, ElementRef, Self, ChangeDetectorRef } from '@angular/core';
 import { remove } from "../common/helper";
+import { EditTableDirective } from "./edit-table.directive";
+import { EditControlDirective } from './edit-control.directive';
 
 /**
  * NgZorro表格编辑行扩展指令
  */
 @Directive({
     selector: '[x-edit-row]',
-    exportAs: 'xEditRow'
+    exportAs: 'xEditRow',
+    standalone: true
 })
 export class EditRowDirective implements OnInit, OnDestroy {
     /**
      * 编辑控件列表
      */
-    controls: any[];
+    controls: EditControlDirective[];
     /**
      * 是否新行
      */
@@ -36,7 +38,7 @@ export class EditRowDirective implements OnInit, OnDestroy {
      * @param element 行元素
      * @param table 编辑表格扩展指令
      */
-    constructor(@Self() private element: ElementRef, private table: EditTableDirective) {
+    constructor(@Self() private element: ElementRef, private table: EditTableDirective, private cdr: ChangeDetectorRef) {
         this.controls = [];
     }
 
@@ -105,7 +107,9 @@ export class EditRowDirective implements OnInit, OnDestroy {
      */
     @HostListener('mousedown', ['$event.target'])
     handleClick(element) {
-        setTimeout(() => {            
+        setTimeout(() => {
+            if (!this.isValid())
+                return;
             let control = this.getControl(element);
             control && control.focus();
         }, 300);
@@ -132,19 +136,26 @@ export class EditRowDirective implements OnInit, OnDestroy {
      * 设置焦点到验证失败的组件
      */
     focusToInvalid() {
-        if (this.controls.length === 0)
-            return;
-        let control = this.controls.find(control => !control.isValid());
-        control && control.focus();
+        setTimeout(() => {
+            if (this.controls.length === 0)
+                return;
+            let control = this.controls.find(control => !control.isValid());
+            if (!control)
+                return;
+            control.dirty();
+            control.focus();
+        }, 300);        
     }
 
     /**
      * 设置焦点到第一个组件
      */
     focusToFirst() {
-        if (this.controls.length === 0)
-            return;
-        let control = this.controls[0];
-        control.focus();
+        setTimeout(() => {
+            if (this.controls.length === 0)
+                return;
+            let control = this.controls[0];
+            control.focus();
+        }, 300);
     }
 }

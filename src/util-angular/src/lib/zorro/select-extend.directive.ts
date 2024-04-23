@@ -2,26 +2,30 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Injector, Output, OnInit, OnDestroy, EventEmitter, Optional } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, takeUntil, switchMap } from 'rxjs/operators';
+import { Directive, Input, Output, OnInit, EventEmitter, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
 import { SelectOption } from '../core/select-option';
 import { SelectOptionGroup } from "../core/select-option-group";
 import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
-import { AppConfig, initAppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 
 /**
  * NgZorro选择框扩展指令
  */
 @Directive({
     selector: '[x-select-extend]',
-    exportAs: 'xSelectExtend'
+    exportAs: 'xSelectExtend',
+    standalone: true
 })
-export class SelectExtendDirective implements OnInit, OnDestroy {
+export class SelectExtendDirective implements OnInit {
+    /**
+     * 清理对象
+     */
+    private readonly destroy$ = inject(DestroyRef);
     /**
      * 操作入口
      */
@@ -30,10 +34,6 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      * 文本框是否被修改过
      */
     private _isDirty: boolean;
-    /**
-     * 清理对象
-     */
-    private destroy$ = new Subject<void>();
     /**
      * 搜索变更对象
      */
@@ -115,25 +115,13 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
 
     /**
      * 初始化选择框扩展指令
-     * @param injector 注入器
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
      */
-    constructor(@Optional() injector: Injector, @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig) {
-        initAppConfig(this.config);
-        this.util = new Util(injector, config, moduleConfig);
+    constructor() {
+        this.util = Util.create();
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
         this.searchDelay = 500;
-    }
-
-    /**
-     * 指令清理
-     */
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     /**
@@ -174,7 +162,7 @@ export class SelectExtendDirective implements OnInit, OnDestroy {
      */
     private initSearch() {
         let client$ = this.searchChange$.pipe(
-            takeUntil(this.destroy$),
+            takeUntilDestroyed(this.destroy$),
             filter(value => value !== null),
             debounceTime(this.searchDelay),
             distinctUntilChanged(),

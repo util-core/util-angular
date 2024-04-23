@@ -8,7 +8,7 @@
  */
 export class MessageConfig {
     /**
-     * 消息框持续时间,单位: 毫秒，当设置为 0 时不消失
+     * 消息框持续时间,单位: 毫秒，默认值: 6000, 当设置为 0 时不消失
      */
     duration?: number;
 }

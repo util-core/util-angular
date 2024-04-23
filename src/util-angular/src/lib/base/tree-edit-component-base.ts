@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //====================================================
-import { Injector, Input, OnInit, Component } from '@angular/core';
+import { Input, OnInit, Component } from '@angular/core';
 import { TreeViewModel } from "../core/tree-view-model";
 import { EditComponentBase } from "./edit-component-base";
 
@@ -20,10 +20,9 @@ export abstract class TreeEditComponentBase<TViewModel extends TreeViewModel> ex
 
     /**
      * 初始化组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        super(injector);
+    constructor() {
+        super();
         this.initParentByDialog();
     }
 

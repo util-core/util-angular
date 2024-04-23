@@ -1,5 +1,5 @@
-//============== Url²Ù×÷²âÊÔ =========================
-//Copyright 2023 ºÎÕòÏ«
+//============== Urlæ“ä½œæµ‹è¯• =========================
+//Copyright 2023 ä½•é•‡æ±
 //Licensed under the MIT license
 //=====================================================
 import { Util } from "../util";
@@ -12,7 +12,7 @@ describe('Url', () => {
     let appConfig:AppConfig;
 
     /**
-     * ²âÊÔ³õÊ¼»¯
+     * æµ‹è¯•åˆå§‹åŒ–
      */
     beforeEach(() => {
         appConfig = new AppConfig();

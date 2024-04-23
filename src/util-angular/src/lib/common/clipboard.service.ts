@@ -1,9 +1,9 @@
 ﻿//============== 剪贴板操作 =============================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=======================================================
-import { Util } from "../util";
 import { Clipboard } from '@angular/cdk/clipboard';
+import { Util } from "../util";
 
 /**
  * 剪贴板操作

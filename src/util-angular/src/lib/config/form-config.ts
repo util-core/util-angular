@@ -1,5 +1,5 @@
 ﻿//================ 表单配置 ==============================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //========================================================
 
@@ -8,7 +8,7 @@
  */
 export class FormConfig {
     /**
-     * 无效表单是否禁用提交按钮,默认值: true
+     * 表单无效是否禁用提交按钮,默认值: true
      */
-    isInvalidFormDisableButton?: boolean;
+    invalidDisableSubmit?: boolean;
 }

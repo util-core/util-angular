@@ -8,5 +8,5 @@ import { FormConfig } from "./form-config";
  * 默认表单配置
  */
 export const DefaultFormConfig: FormConfig = {
-    isInvalidFormDisableButton: true
+    invalidDisableSubmit: true
 };

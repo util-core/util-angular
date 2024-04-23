@@ -2,15 +2,13 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, Input, Output, Injector, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
+import { Directive, Input, Output, EventEmitter } from '@angular/core';
 import { IKey } from "../core/key";
 import { TreeNode } from "../core/tree-node";
 import { PageList } from "../core/page-list";
 import { FailResult } from "../core/fail-result";
 import { LoadMode } from "../core/load-mode";
 import { TableExtendDirective } from "./table-extend.directive";
-import { AppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -18,7 +16,8 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 @Directive({
     selector: '[x-tree-table-extend]',
-    exportAs: 'xTreeTableExtend'
+    exportAs: 'xTreeTableExtend',
+    standalone: true
 })
 export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDirective<TModel> {
     /**
@@ -69,17 +68,6 @@ export class TreeTableExtendDirective<TModel extends IKey> extends TableExtendDi
      * 子节点加载完成事件
      */
     @Output() onLoadChildren: EventEmitter<any> = new EventEmitter();
-
-    /**
-     * 初始化树形表格扩展指令
-     * @param injector 注入器
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
-     * @param cdr 变更检测
-     */
-    constructor(@Optional() injector: Injector, @Optional() config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
-        super(injector, config, moduleConfig, cdr);
-    }
 
     /**
      * 获取上级节点

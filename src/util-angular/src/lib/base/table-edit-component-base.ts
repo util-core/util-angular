@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Component, Injector, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { EditTableDirective } from "../zorro/edit-table.directive";
@@ -22,10 +22,9 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
 
     /**
      * 初始化表格编辑组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        super(injector);
+    constructor() {
+        super();
     }
 
     /**
@@ -74,7 +73,7 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
             return;
         this.editTable.editRow({
             rowId: id,
-            after: () => setTimeout(() => this.editTable.focusToFirst(), 0)
+            after: () => this.editTable.focusToFirst()
         });
     }
 
@@ -84,14 +83,14 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
     unedit() {
         if (!this.editTable)
             return;
-        this.editTable.clearEditRow();
+        this.editTable.unedit();
     }
 
     /**
-     * 删除行
+     * 移除行
      * @param id 标识
      */
-    delete(id?) {
+    remove(id?) {
         if (!this.editTable)
             return;
         this.editTable.remove(id);
@@ -107,6 +106,22 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
         if (!this.editTable)
             return;
         this.editTable.clear();
+    }
+
+    /**
+     * 保存单行
+     * @param button 按钮
+     */
+    saveRow(button?) {
+        if (!this.editTable)
+            return;
+        this.editTable.saveRow({
+            button: button,
+            confirm: this.getConfirm(),
+            before: data => this.onSaveBefore(data),
+            ok: result => this.onSave(result),
+            url: this.getSaveUrl()
+        });
     }
 
     /**
@@ -170,5 +185,23 @@ export abstract class TableEditComponentBase<TViewModel extends ViewModel, TQuer
      */
     protected getSaveUrl() {
         return null;
+    }
+
+    /**
+     * 删除
+     * @param id 标识
+     */
+    delete(id?) {
+        if (!this.table)
+            return;
+        if (!this.editTable)
+            return;
+        this.table.delete({
+            ids: id,
+            ok: () => {
+                this.editTable.clear();
+                this.onDelete();
+            }
+        });
     }
 }

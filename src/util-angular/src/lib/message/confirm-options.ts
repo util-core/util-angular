@@ -1,5 +1,5 @@
 ﻿//============== 确认框配置 ======================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { TemplateRef } from '@angular/core';

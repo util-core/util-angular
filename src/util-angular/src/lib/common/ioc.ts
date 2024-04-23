@@ -1,5 +1,5 @@
 ﻿//============== Ioc操作==========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { Injector, Type, InjectionToken } from '@angular/core';
@@ -10,24 +10,18 @@ import { Injector, Type, InjectionToken } from '@angular/core';
 export class Ioc {
     /**
      * 初始化Ioc操作
-     * @param injector 全局注入器
-     * @param componentInjector 组件注入器
+     * @param injector 注入器
      */
-    constructor(private injector: Injector, private componentInjector: Injector) {
+    constructor(public injector: Injector) {
     }
 
     /**
      * 获取实例
-     * @param token 实例标记，一般为类或接口名称,范例：util.ioc.get(Http)
+     * @param token 注入令牌
      */
     get<T>(token: Type<T> | InjectionToken<T>): T;
     get(token: any): any;
     get(token: any): any {
-        if (this.componentInjector) {
-            let result = this.componentInjector.get(token, null, { optional: true });
-            if (result != null)
-                return result;
-        }
         if (this.injector)
             return this.injector.get(token, null, { optional: true });
         return null;

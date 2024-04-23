@@ -37,7 +37,7 @@ export class Url {
      * @param paths 路径
      */
     get(url: string, ...paths: string[]): string {
-        let apiEndpoint = this.util.getAppConfig().apiEndpoint;
+        let apiEndpoint = this.util.config.apiEndpoint;
         let path = this.getPath(paths);
         let result = this.util.helper.getUrl(this.getUrl(url), apiEndpoint, path)
         let queryString = this.util.helper.toQueryString(this._query);

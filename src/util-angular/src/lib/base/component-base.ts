@@ -2,8 +2,8 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Component, Injector, inject } from '@angular/core';
-import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
+import { Component } from '@angular/core';
+import { NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { Util } from "../util";
 
 /**
@@ -24,11 +24,9 @@ export abstract class ComponentBase {
 
     /**
      * 初始化组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        injector = injector || inject(Injector);
-        this.util = new Util(injector);
+    constructor() {
+        this.util = Util.create();
         this.expand = false;
     }
 
@@ -40,5 +38,33 @@ export abstract class ComponentBase {
     createContextMenu($event: MouseEvent, menu: NzDropdownMenuComponent) {
         $event.stopPropagation();
         return this.util.contextMenu.create($event, menu);
+    }
+
+    /**
+     * 是否PC
+     */
+    get isPc() {
+        return this.util.responsive.isPc();
+    }
+
+    /**
+     * 是否平板
+     */
+    get isPad() {
+        return this.util.responsive.isPad();
+    }
+
+    /**
+     * 是否手机
+     */
+    get isPhone() {
+        return this.util.responsive.isPhone();
+    }
+
+    /**
+     * 是否极宽尺寸, ≥1600px
+     */
+    get isXxl() {
+        return this.util.responsive.isXxl();
     }
 }

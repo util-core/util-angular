@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector, ViewChild, Component, AfterViewInit } from '@angular/core';
+import { ViewChild, Component, AfterViewInit } from '@angular/core';
 import { ViewModel } from "../core/view-model";
 import { QueryParameter } from "../core/query-parameter";
 import { QueryComponentBase } from "./query-component-base";
@@ -22,10 +22,9 @@ export abstract class TableQueryComponentBase<TViewModel extends ViewModel, TQue
 
     /**
      * 初始化组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        super(injector);
+    constructor() {
+        super();
     }
 
     /**

@@ -2,9 +2,8 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //====================================================
-import { Injectable, Optional } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Util } from '../util';
-import { AppConfig, initAppConfig } from '../config/app-config';
 import { TableInfo } from '../core/table-info';
 
 /**
@@ -36,12 +35,10 @@ export class TableSettingsService extends TableSettingsServiceBase {
 
     /**
      * 初始化
-     * @param config 应用配置
      */
-    constructor(@Optional() protected config: AppConfig) {
+    constructor() {
         super();
-        initAppConfig(config);
-        this.util = new Util(null, config);
+        this.util = Util.create();
     }
 
     /**

@@ -1,8 +1,8 @@
 //================ 查询组件基类 ==================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Input,Injector, Component } from '@angular/core';
+import { Input, Component } from '@angular/core';
 import { ComponentBase } from './component-base';
 import { QueryParameter } from "../core/query-parameter";
 
@@ -16,11 +16,11 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     /**
      * 查询参数
      */
-    queryParam: TQuery;    
+    queryParam: TQuery;
     /**
      * 复选框或单选框选中的标识列表
      */
-    @Input() checkedIds:[];
+    @Input() checkedIds: [];
     /**
      * 传入数据
      */
@@ -28,10 +28,9 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
 
     /**
      * 初始化组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        super(injector);
+    constructor() {
+        super();
         this.queryParam = <TQuery>new QueryParameter();
         this.initDataByDialog();
     }
@@ -109,7 +108,6 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     openCreateDialog(data?) {
         this.util.dialog.open({
             component: this.getCreateComponent(),
-            centered: true,
             title: this.getCreateTitle(),
             data: this.getCreateData(data),
             width: this.getCreateWidth(true),
@@ -157,13 +155,11 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     }
 
     /**
-     * 获取弹出框宽度，默认值：Dialog为 60% , Drawer为 30%
+     * 获取弹出框宽度
      * @param isDialog true表示Dialog,false表示Drawer
      */
     protected getWidth(isDialog?: boolean): string {
-        if (isDialog )
-            return "60%";
-        return "30%";
+        return null;
     }
 
     /**
@@ -196,7 +192,6 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     openEditDialog(data) {
         this.util.dialog.open({
             component: this.getEditComponent(),
-            centered: true,
             title: this.getEditTitle(),
             data: this.getEditData(data),
             width: this.getEditWidth(true),
@@ -274,11 +269,11 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
     openDetailDialog(data) {
         this.util.dialog.open({
             component: this.getDetailComponent(),
-            centered: true,
             title: this.getDetailTitle(),
             data: this.getDetailData(data),
             width: this.getDetailWidth(true),
-            showOk: false
+            showOk: false,
+            wrapClassName: "detail-dialog"
         });
     }
 
@@ -320,7 +315,6 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
             data: this.getCreateData(data),
             width: this.getCreateWidth(false),
             disableClose: true,
-            showFooter: this.isShowDrawerFooter(),
             onOpenBefore: () => {
                 return this.onCreateOpenBefore();
             },
@@ -329,18 +323,8 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
             },
             onClose: result => {
                 this.onCreateClose(result);
-            },
-            onOk: (instance,btn) => {
-                instance.submit(btn);
             }
         });
-    }
-
-    /**
-     * 是否显示抽屉页脚,默认值: true
-     */
-    protected isShowDrawerFooter() {
-        return true;
     }
 
     /**
@@ -353,7 +337,6 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
             data: this.getEditData(data),
             width: this.getEditWidth(false),
             disableClose: true,
-            showFooter: this.isShowDrawerFooter(),
             onOpenBefore: () => {
                 return this.onEditOpenBefore();
             },
@@ -362,9 +345,6 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
             },
             onClose: result => {
                 this.onEditClose(result);
-            },
-            onOk: (instance, btn) => {
-                instance.submit(btn);
             }
         });
     }
@@ -377,9 +357,15 @@ export abstract class QueryComponentBase<TQuery extends QueryParameter> extends 
             component: this.getDetailComponent(),
             title: this.getDetailTitle(),
             data: this.getDetailData(data),
-            width: this.getDetailWidth(false),
-            showFooter: this.isShowDrawerFooter(),
-            showOk: false
+            width: this.getDetailWidth(false)
         });
+    }
+
+    /**
+     * 关闭
+     */
+    close() {
+        this.util.dialog.close();
+        this.util.drawer.close();
     }
 }

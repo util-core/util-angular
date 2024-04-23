@@ -1,5 +1,5 @@
 ﻿//============== WebApi请求操作 =========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=======================================================
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,8 +31,8 @@ export class WebApiRequest<T> {
      * @param request Http请求操作
      * @param message 消息操作
      */
-    constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {        
-    }    
+    constructor(private request?: HttpRequest<Result<T>>, private util?: Util) {
+    }
 
     /**
      * 设置请求重试次数
@@ -40,6 +40,15 @@ export class WebApiRequest<T> {
      */
     retry(value: number): WebApiRequest<T> {
         this.request.retry(value);
+        return this;
+    }
+
+    /**
+     * 设置超时时间
+     * @param value 超时时间, 单位:毫秒, 默认值: 120秒
+     */
+    timeout(value: number): WebApiRequest<T> {
+        this.request.timeout(value);
         return this;
     }
 
@@ -188,7 +197,7 @@ export class WebApiRequest<T> {
             return;
         client.subscribe({
             next: (result: Result<T>) => this.handleOk(options, result),
-            error: (error: HttpErrorResponse) => this.handleFail(options, undefined, error),
+            error: (error: HttpErrorResponse) => this.handleFail(options, error),
             complete: () => this.handleComplete(options)
         });
     }
@@ -202,7 +211,7 @@ export class WebApiRequest<T> {
             return;
         this.request.handle(
             (result: Result<T>) => this.handleOk(options, result),
-            (error: HttpErrorResponse) => this.handleFail(options, undefined, error),
+            (error: HttpErrorResponse) => this.handleFail(options, error),
             () => this.handleBefore(options),
             () => this.handleComplete(options)
         );
@@ -217,7 +226,7 @@ export class WebApiRequest<T> {
             return;
         await this.request.handleAsync(
             (result: Result<T>) => this.handleOk(options, result),
-            (error: HttpErrorResponse) => this.handleFail(options, undefined, error),
+            (error: HttpErrorResponse) => this.handleFail(options, error),
             () => this.handleBefore(options),
             () => this.handleComplete(options)
         );
@@ -237,7 +246,8 @@ export class WebApiRequest<T> {
             this.handleUnauthorize(options);
             return;
         }
-        this.handleFail(options, result);
+        if (result.code === StateCode.Fail)
+            this.handleBusinessException(options,result);
     }
 
     /**
@@ -252,28 +262,44 @@ export class WebApiRequest<T> {
     }
 
     /**
+     * 处理业务异常
+     */
+    private handleBusinessException(options?: WebApiHandleOptions<T>,result?: Result<T>) {
+        if (options && options.fail) {
+            options.fail(new FailResult(result));
+            return;
+        }
+        if (result)
+            this.util.message.error(result.message);
+    }
+
+    /**
      * 处理失败响应
      */
-    private handleFail(options: WebApiHandleOptions<T>, result?: Result<T>, errorResponse?: HttpErrorResponse) {
-        let failResult = new FailResult(result, errorResponse);
-        this.handleHttpException(failResult);
+    private handleFail(options: WebApiHandleOptions<T>, errorResponse?: HttpErrorResponse) {
+        let failResult = new FailResult(null, errorResponse);
+        this.handleHttpException(options, failResult);
         this.handleComplete(options);
-        if (options.fail) {
-            options.fail(failResult);
-            return;
-        }
-        if (result) {
-            this.handleBusinessException(result);
-            return;
-        }
     }
 
     /**
      * 处理Http异常
      */
-    private handleHttpException(failResult: FailResult) {
+    private handleHttpException(options: WebApiHandleOptions<T>, failResult: FailResult) {
         if (failResult.errorResponse)
             console.log(this.getHttpExceptionMessage(failResult));
+        if (options.fail) {
+            options.fail(failResult);
+            return;
+        }
+        if (failResult.errorResponse.name.toString() === 'TimeoutError') {
+            if (options.timeout) {
+                options.timeout(failResult);
+                return;
+            }
+            this.util.message.error(I18nKeys.timeoutMessage);
+            return;
+        }        
     }
 
     /**
@@ -290,19 +316,10 @@ export class WebApiRequest<T> {
     }
 
     /**
-     * 处理业务异常
-     */
-    private handleBusinessException(result: Result<T>) {
-        if (result.code === StateCode.Fail) {
-            this.util.message.error(result.message);
-        }
-    }
-
-    /**
      * 发送前操作
      */
     private handleBefore(options: WebApiHandleOptions<T>): boolean {
-        let result = options && options.before && options.before();
+        let result = options.before && options.before();
         if (result === false)
             return false;
         this.showLoading();
@@ -323,7 +340,7 @@ export class WebApiRequest<T> {
      * 完成操作
      */
     private handleComplete(options: WebApiHandleOptions<T>) {
-        options && options.complete && options.complete();
+        options.complete && options.complete();
         this.closeLoading();
     }
 
@@ -333,7 +350,7 @@ export class WebApiRequest<T> {
     private closeLoading() {
         if (this.btn) {
             this.btn.nzLoading = false;
-            this.btn.cdr.detectChanges();
+            this.btn.cdr?.detectChanges();
         }
         if (this.isShowLoading)
             this.util.loading.close();
@@ -360,7 +377,7 @@ export class WebApiRequest<T> {
                         return null;
                     }
                     if (result.code === StateCode.Fail) {
-                        this.handleBusinessException(result);
+                        this.handleBusinessException(null,result);
                         return null;
                     }
                 }

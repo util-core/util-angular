@@ -1,23 +1,24 @@
-//============== NgZorroÊ÷ÐÎ±í¸ñÀ©Õ¹Ö¸Áî²âÊÔ=======================
-//Copyright 2024 ºÎÕòÏ«
+//============== NgZorroæ ‘å½¢è¡¨æ ¼æ‰©å±•æŒ‡ä»¤æµ‹è¯•=======================
+//Copyright 2024 ä½•é•‡æ±
 //Licensed under the MIT license
 //=================================================================
 import { TestBed } from '@angular/core/testing';
 import { TreeTableExtendDirective } from './tree-table-extend.directive';
 import { TreeViewModel } from "../core/tree-view-model";
-import { ChangeDetectorRef } from '@angular/core';
 
-describe('TreeExtendDirective', () => {
+describe('TreeTableExtendDirective', () => {
     /**
-     * Ê÷ÐÎ±í¸ñÀ©Õ¹Ö¸Áî
+     * æ ‘å½¢è¡¨æ ¼æ‰©å±•æŒ‡ä»¤
      */
     let directive: TreeTableExtendDirective<TreeModel>;
 
     /**
-     * ²âÊÔ³õÊ¼»¯
+     * æµ‹è¯•åˆå§‹åŒ–
      */
     beforeEach(async () => {
-        directive = new TreeTableExtendDirective(null,null, null, TestBed.get(ChangeDetectorRef));
+        TestBed.runInInjectionContext(() => {
+            directive = new TreeTableExtendDirective();
+        });        
         directive.dataSource = [
             getNodeA(), getNodeA1(), getNodeA11(), getNodeA12(), getNodeA2(), getNodeA21(), getNodeA22(),
             getNodeB(), getNodeB1(), getNodeB11(), getNodeB12(), getNodeB2(), getNodeB21(), getNodeB22(),
@@ -26,7 +27,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡¸¸½Úµã
+     * æµ‹è¯•èŽ·å–çˆ¶èŠ‚ç‚¹
      */
     it('getParent', () => {
         let node = getNodeA12();
@@ -35,7 +36,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ËùÓÐÉÏ¼¶½ÚµãÁÐ±í
+     * æµ‹è¯•èŽ·å–æ‰€æœ‰ä¸Šçº§èŠ‚ç‚¹åˆ—è¡¨
      */
     it('getParents', () => {
         let node = getNodeA12();
@@ -46,7 +47,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡Ö±½ÓÏÂ¼¶½ÚµãÁÐ±í
+     * æµ‹è¯•èŽ·å–ç›´æŽ¥ä¸‹çº§èŠ‚ç‚¹åˆ—è¡¨
      */
     it('getChildren', () => {
         let node = getNodeA();
@@ -57,7 +58,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ËùÓÐÏÂ¼¶½ÚµãÁÐ±í
+     * æµ‹è¯•èŽ·å–æ‰€æœ‰ä¸‹çº§èŠ‚ç‚¹åˆ—è¡¨
      */
     it('getAllChildren', () => {
         let node = getNodeA();
@@ -72,7 +73,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ËùÓÐÏÂ¼¶½ÚµãÁÐ±í - °üº¬¸¸½Úµã
+     * æµ‹è¯•èŽ·å–æ‰€æœ‰ä¸‹çº§èŠ‚ç‚¹åˆ—è¡¨ - åŒ…å«çˆ¶èŠ‚ç‚¹
      */
     it('getAllChildren_ContainsParentNode', () => {
         let node = getNodeA();
@@ -88,7 +89,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ÏÂ¼¶×îºóÒ»¸ö½Úµã
+     * æµ‹è¯•èŽ·å–ä¸‹çº§æœ€åŽä¸€ä¸ªèŠ‚ç‚¹
      */
     it('getLastChild', () => {
         let node = getNodeB();
@@ -97,7 +98,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ÏÂ¼¶×îºóÒ»¸ö½Úµã - ÅÅ³ýÖ¸¶¨½Úµã
+     * æµ‹è¯•èŽ·å–ä¸‹çº§æœ€åŽä¸€ä¸ªèŠ‚ç‚¹ - æŽ’é™¤æŒ‡å®šèŠ‚ç‚¹
      */
     it('getLastChild_exclude', () => {
         let node = getNodeB();
@@ -109,10 +110,10 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔ»ñÈ¡ÏÂ¼¶×îºóÒ»¸ö½Úµã - ÅÅ³ýÖ¸¶¨½ÚµãÏÂ·½µÄ×Ó½Úµã
+     * æµ‹è¯•èŽ·å–ä¸‹çº§æœ€åŽä¸€ä¸ªèŠ‚ç‚¹ - æŽ’é™¤æŒ‡å®šèŠ‚ç‚¹ä¸‹æ–¹çš„å­èŠ‚ç‚¹
      */
     it('getLastChild_exclude_children', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeA1 = getNodeA1();
         let nodeB = getNodeB();
@@ -131,7 +132,7 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÊÇ·ñ´æÔÚ×Ó½Úµã
+     * æµ‹è¯•æ˜¯å¦å­˜åœ¨å­èŠ‚ç‚¹
      */
     it('hasChildren_1', () => {
         let result = directive.hasChildren(getNodeA())
@@ -142,10 +143,10 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÊÇ·ñ´æÔÚ×Ó½Úµã - ÅÅ³ý½Úµã
+     * æµ‹è¯•æ˜¯å¦å­˜åœ¨å­èŠ‚ç‚¹ - æŽ’é™¤èŠ‚ç‚¹
      */
     it('hasChildren_2', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeA1 = getNodeA1();
         let nodeB = getNodeB();
@@ -167,35 +168,35 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - Ô´½ÚµãºÍÄ¿±ê½Úµã¶¼Ã»ÓÐÏÂ¼¶½Úµã
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - æºèŠ‚ç‚¹å’Œç›®æ ‡èŠ‚ç‚¹éƒ½æ²¡æœ‰ä¸‹çº§èŠ‚ç‚¹
      */
     it('moveNode_1', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeB = getNodeB();
         let nodeC = getNodeC();
         directive.dataSource = [nodeA, nodeB, nodeC];
 
-        //ÒÆ¶¯Cµ½AÏÂÃæ
+        //ç§»åŠ¨Cåˆ°Aä¸‹é¢
         nodeC.parentId = nodeA.id;
         directive.moveNode(nodeC, nodeA);
 
-        //ÑéÖ¤Ë÷Òý
+        //éªŒè¯ç´¢å¼•
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeC.id);
         expect(directive.dataSource[2].id).toEqual(nodeB.id);
 
-        //ÑéÖ¤²ã¼¶
+        //éªŒè¯å±‚çº§
         expect(nodeA.level).toEqual(1);
         expect(nodeB.level).toEqual(1);
         expect(nodeC.level).toEqual(2);
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - Ä¿±ê½ÚµãÓÐ2¸öÖ±½ÓÏÂ¼¶½Úµã
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - ç›®æ ‡èŠ‚ç‚¹æœ‰2ä¸ªç›´æŽ¥ä¸‹çº§èŠ‚ç‚¹
      */
     it('moveNode_2', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeA1 = getNodeA1();
         let nodeA2 = getNodeA2();
@@ -203,11 +204,11 @@ describe('TreeExtendDirective', () => {
         let nodeC = getNodeC();
         directive.dataSource = [nodeA, nodeA1, nodeA2, nodeB, nodeC];
 
-        //ÒÆ¶¯Cµ½AÏÂÃæ
+        //ç§»åŠ¨Cåˆ°Aä¸‹é¢
         nodeC.parentId = nodeA.id;
         directive.moveNode(nodeC, nodeA);
 
-        //ÑéÖ¤
+        //éªŒè¯
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeA1.id);
         expect(directive.dataSource[2].id).toEqual(nodeA2.id);
@@ -216,10 +217,10 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - Ä¿±ê½ÚµãÓÐ¶à¸öÏÂ¼¶½Úµã
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - ç›®æ ‡èŠ‚ç‚¹æœ‰å¤šä¸ªä¸‹çº§èŠ‚ç‚¹
      */
     it('moveNode_3', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeA1 = getNodeA1();
         let nodeA11 = getNodeA11();
@@ -230,11 +231,11 @@ describe('TreeExtendDirective', () => {
         let nodeC = getNodeC();
         directive.dataSource = [nodeA, nodeA1, nodeA11, nodeA2, nodeA21, nodeA22, nodeB, nodeC];
 
-        //ÒÆ¶¯Cµ½AÏÂÃæ
+        //ç§»åŠ¨Cåˆ°Aä¸‹é¢
         nodeC.parentId = nodeA.id;
         directive.moveNode(nodeC, nodeA);
 
-        //ÑéÖ¤
+        //éªŒè¯
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeA1.id);
         expect(directive.dataSource[2].id).toEqual(nodeA11.id);
@@ -246,10 +247,10 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - Ô´½ÚµãÓÐ¶à¸öÏÂ¼¶½Úµã
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - æºèŠ‚ç‚¹æœ‰å¤šä¸ªä¸‹çº§èŠ‚ç‚¹
      */
     it('moveNode_4', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeB = getNodeB();
         let nodeC = getNodeC();
@@ -260,11 +261,11 @@ describe('TreeExtendDirective', () => {
         let nodeC22 = getNodeC22();
         directive.dataSource = [nodeA, nodeB, nodeC, nodeC1, nodeC11, nodeC2, nodeC21, nodeC22];
 
-        //ÒÆ¶¯Cµ½AÏÂÃæ
+        //ç§»åŠ¨Cåˆ°Aä¸‹é¢
         nodeC.parentId = nodeA.id;
         directive.moveNode(nodeC, nodeA);
 
-        //ÑéÖ¤Ë÷Òý
+        //éªŒè¯ç´¢å¼•
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeC.id);
         expect(directive.dataSource[2].id).toEqual(nodeC1.id);
@@ -274,7 +275,7 @@ describe('TreeExtendDirective', () => {
         expect(directive.dataSource[6].id).toEqual(nodeC22.id);
         expect(directive.dataSource[7].id).toEqual(nodeB.id);
 
-        //ÑéÖ¤²ã¼¶
+        //éªŒè¯å±‚çº§
         expect(nodeA.level).toEqual(1);
         expect(nodeB.level).toEqual(1);
         expect(nodeC.level).toEqual(2);
@@ -286,14 +287,14 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - Ô´½ÚµãºÍÄ¿±ê½Úµã¶¼ÓÐ¶à¸öÏÂ¼¶½Úµã
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - æºèŠ‚ç‚¹å’Œç›®æ ‡èŠ‚ç‚¹éƒ½æœ‰å¤šä¸ªä¸‹çº§èŠ‚ç‚¹
      */
     it('moveNode_5', () => {
-        //ÒÆ¶¯Cµ½AÏÂÃæ
+        //ç§»åŠ¨Cåˆ°Aä¸‹é¢
         getNodeC().parentId = getNodeA().id;
         directive.moveNode(getNodeC(), getNodeA());
 
-        //ÑéÖ¤Ë÷Òý
+        //éªŒè¯ç´¢å¼•
         expect(directive.dataSource[0].id).toEqual(getNodeA().id);
         expect(directive.dataSource[1].id).toEqual(getNodeA1().id);
         expect(directive.dataSource[2].id).toEqual(getNodeA11().id);
@@ -306,10 +307,10 @@ describe('TreeExtendDirective', () => {
     });
 
     /**
-     * ²âÊÔÒÆ¶¯½Úµã - ¸¸½ÚµãÎª¿Õ,ÒÆ¶¯µ½¸ù
+     * æµ‹è¯•ç§»åŠ¨èŠ‚ç‚¹ - çˆ¶èŠ‚ç‚¹ä¸ºç©º,ç§»åŠ¨åˆ°æ ¹
      */
     it('moveNode_6', () => {
-        //³õÊ¼»¯Êý¾ÝÔ´
+        //åˆå§‹åŒ–æ•°æ®æº
         let nodeA = getNodeA();
         let nodeB = getNodeB();
         let nodeC = getNodeC();
@@ -320,11 +321,11 @@ describe('TreeExtendDirective', () => {
         let nodeC22 = getNodeC22();
         directive.dataSource = [nodeA, nodeB, nodeC, nodeC1, nodeC11, nodeC2, nodeC21, nodeC22];
 
-        //½«C1ÒÆ¶¯µ½¸ù
+        //å°†C1ç§»åŠ¨åˆ°æ ¹
         nodeC1.parentId = null;
         directive.moveNode(nodeC1);
 
-        //ÑéÖ¤Ë÷Òý
+        //éªŒè¯ç´¢å¼•
         expect(directive.dataSource[0].id).toEqual(nodeA.id);
         expect(directive.dataSource[1].id).toEqual(nodeB.id);
         expect(directive.dataSource[2].id).toEqual(nodeC.id);
@@ -334,7 +335,7 @@ describe('TreeExtendDirective', () => {
         expect(directive.dataSource[6].id).toEqual(nodeC1.id);
         expect(directive.dataSource[7].id).toEqual(nodeC11.id);
 
-        //ÑéÖ¤²ã¼¶
+        //éªŒè¯å±‚çº§
         expect(nodeA.level).toEqual(1);
         expect(nodeB.level).toEqual(1);
         expect(nodeC.level).toEqual(1);
@@ -347,7 +348,7 @@ describe('TreeExtendDirective', () => {
 });
 
 /**
- * Ê÷ÐÎ²âÊÔÄ£ÐÍ
+ * æ ‘å½¢æµ‹è¯•æ¨¡åž‹
  */
 class TreeModel extends TreeViewModel {
     constructor(id: string, public name: string, parentId: string = null, level: number = 1) {

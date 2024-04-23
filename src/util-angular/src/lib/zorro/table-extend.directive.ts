@@ -2,15 +2,14 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=======================================================
-import { Directive, Input, Injector, Output, OnInit, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
+import { Directive, Input, Output, OnInit, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Util } from "../util";
+import { AppConfig } from "../config/app-config";
 import { IKey } from "../core/key";
 import { QueryParameter } from "../core/query-parameter";
 import { PageList } from "../core/page-list";
 import { FailResult } from "../core/fail-result";
-import { AppConfig, initAppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -18,13 +17,22 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 @Directive({
     selector: '[x-table-extend]',
-    exportAs: 'xTableExtend'
+    exportAs: 'xTableExtend',
+    standalone: true
 })
 export class TableExtendDirective<TModel extends IKey> implements OnInit {
     /**
      * 操作入口
      */
     util: Util;
+    /**
+     * 应用配置
+     */
+    config: AppConfig;
+    /**
+     * 变更检测
+     */
+    cdr: ChangeDetectorRef;
     /**
      * 是否显示进度条
      */
@@ -88,28 +96,16 @@ export class TableExtendDirective<TModel extends IKey> implements OnInit {
 
     /**
      * 初始化表格扩展指令
-     * @param injector 注入器
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
-     * @param cdr 变更检测
      */
-    constructor(@Optional() injector: Injector, @Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig, protected cdr: ChangeDetectorRef) {
-        this.initAppConfig();
-        this.util = new Util(injector, config, moduleConfig);
+    constructor() {
+        this.util = Util.create();
+        this.config = this.util.config;
+        this.cdr = this.util.ioc.get(ChangeDetectorRef);
         this.queryParam = new QueryParameter();
         this.dataSource = new Array<any>();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
         this.selectedSelection = new SelectionModel<TModel>(true, []);
         this.autoLoad = true;
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
     }
 
     /**

@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===========================================================
-import { Directive, HostListener, Input, Self, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Directive, Input, Self, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { TableExtendDirective } from "./table-extend.directive";
 import { EditRowDirective } from "./edit-row.directive";
 import { Util } from "../util";
@@ -14,7 +14,8 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 @Directive({
     selector: '[x-edit-table]',
-    exportAs: 'xEditTable'
+    exportAs: 'xEditTable',
+    standalone: true
 })
 export class EditTableDirective {
     /**
@@ -53,6 +54,10 @@ export class EditTableDirective {
      * 是否双击启动行编辑
      */
     @Input() dblClickStartEdit: boolean;
+    /**
+     * 是否批量编辑, false表示单行编辑模式
+     */
+    @Input() isBatch: boolean;
 
     /**
      * 初始化编辑表格扩展指令
@@ -103,24 +108,10 @@ export class EditTableDirective {
         if (!rowId)
             return;
         if (!this.rows.has(rowId))
-            return;
+            return;        
         let row = this.rows.get(rowId);
         row.onChange.unsubscribe();
         this.rows.delete(rowId);
-    }
-
-    /**
-     * 处理全局点击事件
-     */
-    @HostListener('document:click', ['$event.target'])
-    handleClick(element) {
-        if (!this.validate())
-            return;
-        setTimeout(() => {
-            if (!element.contains(this.element.nativeElement))
-                return;          
-            this.clearEditRow();
-        }, 100);
     }
 
     /**
@@ -140,6 +131,15 @@ export class EditTableDirective {
         if (!this.currentRow)
             return true;
         return this.currentRow.isValid();
+    }
+
+    /**
+     * 是否新增
+     */
+    isNew() {
+        if (!this.currentRow)
+            return true;
+        return this.currentRow.isNew;
     }
 
     /**
@@ -188,9 +188,9 @@ export class EditTableDirective {
             after: (row: EditRowDirective) => {
                 if (row)
                     row.isNew = true;
-                setTimeout(() => this.focusToFirst(), 0);
+                this.focusToFirst();
             }
-        }), 0);
+        }), 100);
     }
 
     /**
@@ -244,6 +244,34 @@ export class EditTableDirective {
             return;
         if (!this.validate())
             return;
+        if (!this.isBatch) {
+            this.saveDirty(options, rowId, row);
+            return;
+        }
+        this.setCurrentRow(options, rowId, row);
+    }
+
+    /**
+     * 保存已修改状态
+     */
+    private saveDirty(options, rowId, row) {
+        if (rowId === this.editId || !this.isDirty()) {
+            this.setCurrentRow(options, rowId, row);
+            return;
+        }
+        this.saveRow({
+            confirm: I18nKeys.saveDirtyConfirmation,
+            complete: () => {
+                this.setCurrentRow(options, rowId, row);
+                this.focusToFirst();
+            }
+        });
+    }
+
+    /**
+     * 设置当前行
+     */
+    private setCurrentRow(options,rowId,row) {
         this.editId = rowId;
         this.currentRow = row;
         options.after && options.after(row);
@@ -279,25 +307,53 @@ export class EditTableDirective {
         let result = this.table.removeRows(ids);
         if (!result)
             return;
+        if (!this.isBatch)
+            return;
         result.forEach(item => {
             if (this.creationIds.some(id => id === item.id)) {
                 this.util.helper.remove(this.creationIds, id => id === item.id);
+                this.cdr.markForCheck();
                 return;
             }
             this.util.helper.remove(this.updateIds, id => id === item.id);
             this.removeRows.push(item);
+            this.cdr.markForCheck();
         });
     }
 
     /**
      * 清理
      */
-    clear() {
-        this.clearEditRow();
-        this.rows.clear();
+    clear() {        
         this.creationIds = [];
         this.updateIds = [];
         this.removeRows = [];
+        this.clearEditRow();
+    }
+
+    /**
+     * 清理编辑行指令集合
+     */
+    clearRows() {
+        this.rows.clear();
+    }
+
+    /**
+     * 取消编辑状态
+     */
+    unedit() {
+        if (!this.currentRow)
+            return;        
+        if (this.currentRow.isValid()) {
+            this.clearEditRow();
+            return;
+        }
+        if (this.currentRow.isNew) {
+            this.remove(this.editId);
+            this.clearEditRow();
+            return;
+        }
+        this.currentRow.focusToInvalid();
     }
 
     /**
@@ -307,6 +363,92 @@ export class EditTableDirective {
         this.editId = null;
         this.currentRow = null;
         this.cdr.markForCheck();
+    }
+
+    /**
+     * 保存单行
+     * @param options 参数
+     */
+    saveRow(options?: {
+        /**
+         * 按钮
+         */
+        button?,
+        /**
+         * 服务端Api地址
+         */
+        url?: string,
+        /**
+         * 确认消息,
+         */
+        confirm?: string,
+        /**
+         * 保存前操作，返回 false 阻止保存
+         */
+        before?: (data) => boolean,
+        /**
+         * 保存成功回调函数
+         */
+        ok?: (result) => void;
+        /**
+         * 完成回调函数
+         */
+        complete?: () => void;
+    }) {
+        if (!options)
+            return;
+        if (!this.validate())
+            return;
+        let url = this.getSaveRowUrl(options.url);
+        if (!url) {
+            console.log("表格编辑saveUrl未设置");
+            return;
+        }
+        let data = this.currentRow.data;
+        if (!data)
+            return;
+        if (!this.isDirty()) {
+            if (this.util.config.table.isShowNoNeedSaveMessage)
+                this.util.message.warn(I18nKeys.noNeedSave);
+            return;
+        }
+        this.util.form.submit({
+            url: url,
+            data: data,
+            httpMethod: this.getSaveRowHttpMethod(options.url),
+            button: options.button,
+            confirm: options.confirm,
+            before: data => options.before && options.before(data),
+            ok: result => {
+                this.clear();
+                options.ok && options.ok(result);
+            },
+            complete: options.complete
+        });
+    }
+
+    /**
+     * 获取保存单行地址
+     */
+    private getSaveRowUrl(url) {
+        if (url)
+            return url;
+        if (this.saveUrl)
+            return this.saveUrl;
+        if (!this.table.url)
+            return null;
+        if (this.isNew)
+            return this.table.url;
+        return this.getUrl(this.table.url, this.editId);
+    }
+
+    /**
+     * 获取保存单行HttpMethod
+     */
+    private getSaveRowHttpMethod(url) {
+        if (url || this.saveUrl)
+            return HttpMethod.Post;
+        return this.isNew() ? HttpMethod.Post : HttpMethod.Put;
     }
 
     /**
@@ -343,6 +485,10 @@ export class EditTableDirective {
          * 保存成功回调函数
          */
         ok?: (result) => void;
+        /**
+         * 完成回调函数
+         */
+        complete?: () => void;
     }) {
         if (!options)
             return;
@@ -357,7 +503,7 @@ export class EditTableDirective {
         if (!data)
             return;
         if (!this.isDirty(data, options.isDirty)) {
-            if (this.table.config.table.isShowNoNeedSaveMessage)
+            if (this.util.config.table.isShowNoNeedSaveMessage)
                 this.util.message.warn(I18nKeys.noNeedSave);
             return;
         }
@@ -382,7 +528,8 @@ export class EditTableDirective {
                         }
                     }
                 });
-            }
+            },
+            complete: options.complete
         });
     }
 
@@ -410,7 +557,9 @@ export class EditTableDirective {
     /**
      * 是否已修改
      */
-    private isDirty(data, handler: (data) => boolean) {
+    private isDirty(data?, handler?: (data) => boolean) {
+        if (!this.isBatch)
+            return this.creationIds.some(id => id === this.editId) || this.updateIds.some(id => id === this.editId);
         if (data.creationList && data.creationList.length > 0)
             return true;
         if (data.updateList && data.updateList.length > 0)

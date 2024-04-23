@@ -83,7 +83,13 @@ export class AuthService {
      * 刷新令牌
      */
     refreshToken() {
-        return this.oauthService.refreshToken();
+        try {
+            return this.oauthService.refreshToken();
+        }
+        catch (error) {
+            console.error(error);
+            return this.logout();
+        }
     }
 
     /**

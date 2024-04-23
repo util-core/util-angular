@@ -1,5 +1,5 @@
 ﻿//============== 加载操作 ==========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //==================================================
 import { LoadingService } from '@delon/abc/loading';
@@ -26,7 +26,7 @@ export class Loading {
      */
     constructor(private util: Util) {
         this.loadingService = this.util.ioc.get(LoadingService);
-        this.loadingConfig = this.util.getAppConfig().loading || {};
+        this.loadingConfig = this.util.config.loading || {};
     }
 
     /**

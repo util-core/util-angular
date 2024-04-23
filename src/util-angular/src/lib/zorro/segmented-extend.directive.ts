@@ -2,10 +2,9 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=============================================================
-import { Directive, Input, Output, Injector, EventEmitter, Optional, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Util } from "../util";
 import { SelectItem } from '../core/select-item';
-import { AppConfig, initAppConfig } from '../config/app-config';
 import { QueryParameter } from '../core/query-parameter';
 
 /**
@@ -13,7 +12,8 @@ import { QueryParameter } from '../core/query-parameter';
  */
 @Directive({
     selector: '[x-segmented-extend]',
-    exportAs: 'xSegmentedExtend'
+    exportAs: 'xSegmentedExtend',
+    standalone: true
 })
 export class SegmentedExtendDirective implements OnInit, OnChanges {
     /**
@@ -77,12 +77,9 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
 
     /**
      * 初始化分段控制器扩展指令
-     * @param injector 注入器
-     * @param config 应用配置
      */
-    constructor(@Optional() injector: Injector, @Optional() protected config: AppConfig) {
-        initAppConfig(this.config);
-        this.util = new Util(injector, this.config);
+    constructor() {
+        this.util = Util.create();
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
@@ -98,7 +95,7 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
                 return;
             if (this.autoLoad)
                 this.loadUrl();
-        }, 0);
+        });
     }
 
     /**
@@ -131,9 +128,11 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
             return;
         const { value } = changes;
         if (value && value.currentValue !== value.previousValue) {
-            this.index = this.options.findIndex(t => t.value === this.value);
-            if (this.index === -1)
-                this.index = 0;
+            setTimeout(() => {
+                this.index = this.options.findIndex(t => t.value === this.value);
+                if (this.index === -1)
+                    this.index = 0;
+            });            
         }
     }
 

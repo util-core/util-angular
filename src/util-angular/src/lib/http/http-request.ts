@@ -1,9 +1,9 @@
 ﻿//============== Http请求操作=====================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, retry, lastValueFrom } from 'rxjs';
+import { Observable, retry, lastValueFrom, timeout, timer } from 'rxjs';
 import { HttpMethod } from "./http-method";
 import { HttpContentType } from "./http-content-type";
 import { Ioc } from '../common/ioc';
@@ -40,7 +40,11 @@ export class HttpRequest<T> {
     /**
     * 请求重试次数
     */
-    private retryTimes: number;
+    private _retryTimes: number;
+    /**
+     * 超时时间
+     */
+    private _timeout;
 
     /**
      * 初始化Http请求操作
@@ -53,7 +57,8 @@ export class HttpRequest<T> {
         this.headers = new HttpHeaders();
         this.parameters = new HttpParams();
         this.credentials = true;
-        this.retryTimes = 3;
+        this._retryTimes = 3;
+        this._timeout = 120 * 1000;
     }
 
     /**
@@ -61,7 +66,16 @@ export class HttpRequest<T> {
      * @param value 请求重试次数,默认值: 3
      */
     retry(value: number): HttpRequest<T> {
-        this.retryTimes = value;
+        this._retryTimes = value;
+        return this;
+    }
+
+    /**
+     * 设置超时时间
+     * @param value 超时时间, 单位:毫秒, 默认值: 120秒
+     */
+    timeout(value: number): HttpRequest<T> {
+        this._timeout = value;
         return this;
     }
 
@@ -266,7 +280,11 @@ export class HttpRequest<T> {
             return this._client;
         return this.request()
             .pipe(
-                retry(this.retryTimes)
+                timeout<T>(this._timeout),
+                retry({
+                    count: this._retryTimes,
+                    delay: (error, count) => timer(1000 * count)
+                })
             );
     }
 

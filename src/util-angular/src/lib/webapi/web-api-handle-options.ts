@@ -25,6 +25,10 @@ export class WebApiHandleOptions<T> {
      */
     unauthorize?: () => void;
     /**
+     * 超时处理函数
+     */
+    timeout?: (result: FailResult) => void;
+    /**
      * 请求完成处理函数
      */
     complete?: () => void;

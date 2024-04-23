@@ -1,5 +1,5 @@
-//============== ä¯ÀÀÆ÷±¾µØ´æ´¢²Ù×÷²âÊÔ =========================
-//Copyright 2023 ºÎÕòÏ«
+//============== æµè§ˆå™¨æœ¬åœ°å­˜å‚¨æ“ä½œæµ‹è¯• =========================
+//Copyright 2023 ä½•é•‡æ±
 //Licensed under the MIT license
 //===============================================================
 import { Util } from "../util";
@@ -10,7 +10,7 @@ describe('util.storage', () => {
     let time;
     
     /**
-     * ²âÊÔ³õÊ¼»¯
+     * æµ‹è¯•åˆå§‹åŒ–
      */
     beforeEach(() => {
         util = new Util();
@@ -19,7 +19,7 @@ describe('util.storage', () => {
         jasmine.clock().mockDate(new Date(time));
     });
     /**
-     * ²âÊÔÇåÀí
+     * æµ‹è¯•æ¸…ç†
      */
     afterEach(function () {
         jasmine.clock().uninstall();

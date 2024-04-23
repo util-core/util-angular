@@ -5,7 +5,6 @@
 import { Directive, Input, Optional } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Util } from "../util";
-import { AppConfig, initAppConfig } from '../config/app-config';
 import { I18nKeys } from '../config/i18n-keys';
 
 /**
@@ -13,7 +12,8 @@ import { I18nKeys } from '../config/i18n-keys';
  */
 @Directive({
     selector: '[x-validation-extend]',
-    exportAs: 'xValidationExtend'
+    exportAs: 'xValidationExtend',
+    standalone: true
 })
 export class ValidationExtendDirective {
     /**
@@ -78,18 +78,8 @@ export class ValidationExtendDirective {
      * @param controlModel 组件模型
      * @param config 应用配置
      */
-    constructor(@Optional() protected controlModel: NgModel, @Optional() public config: AppConfig) {
-        this.initAppConfig();
-        this.util = new Util(null, config);
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.config)
-            this.config = new AppConfig();
-        initAppConfig(this.config);
+    constructor(@Optional() protected controlModel: NgModel) {
+        this.util = Util.create();
     }
 
     /**

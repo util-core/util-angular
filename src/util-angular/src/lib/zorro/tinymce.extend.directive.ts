@@ -1,19 +1,19 @@
 ﻿//============== Tinymce富文本扩展指令 ====================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
 import { Directive, Input, Optional } from '@angular/core';
 import { TinymceOptions } from 'ngx-tinymce';
 import { Util } from "../util";
 import { isUndefined } from "../common/helper";
-import { AppConfig, initAppConfig } from '../config/app-config';
 
 /**
  * Tinymce富文本扩展指令
  */
 @Directive({
     selector: '[x-tinymce-extend]',
-    exportAs: 'xTinymceExtend'
+    exportAs: 'xTinymceExtend',
+    standalone: true
 })
 export class TinymceExtendDirective  {
      /**
@@ -51,21 +51,10 @@ export class TinymceExtendDirective  {
 
     /**
      * 初始化Tinymce富文本扩展指令
-     * @param appConfig 应用配置
      * @param options Tinymce富文本配置
      */
-    constructor(@Optional() protected appConfig: AppConfig,@Optional() protected options: TinymceOptions) {
-        this.initAppConfig();
-        this.util = new Util(null, this.appConfig);
-    }
-
-    /**
-     * 初始化应用配置
-     */
-    private initAppConfig() {
-        if (!this.appConfig)
-            this.appConfig = new AppConfig();
-        initAppConfig(this.appConfig);
+    constructor(@Optional() protected options: TinymceOptions) {
+        this.util = Util.create();
     }
 
     /**
@@ -102,8 +91,8 @@ export class TinymceExtendDirective  {
      * 获取是否显示品牌
      */
     private getBranding() {
-        if (isUndefined(this.branding))            
-            return this.appConfig.tinymce.branding;
+        if (isUndefined(this.branding))
+            return this.util.config.tinymce.branding;
         return this.branding;
     }
 
@@ -160,7 +149,7 @@ export class TinymceExtendDirective  {
      */
     private getPasteDataImages() {
         if (isUndefined(this.pasteDataImages))
-            return this.appConfig.tinymce.pasteDataImages;
+            return this.util.config.tinymce.pasteDataImages;
         return this.pasteDataImages;
     }
 
@@ -169,7 +158,7 @@ export class TinymceExtendDirective  {
      */
     private getMenubar() {
         if (isUndefined(this.menubar))
-            return this.appConfig.tinymce.menubar;
+            return this.util.config.tinymce.menubar;
         return this.menubar;
     }
 
@@ -178,7 +167,7 @@ export class TinymceExtendDirective  {
      */
     private getToolbarMode() {
         if (isUndefined(this.toolbarMode))
-            return this.appConfig.tinymce.toolbarMode;
+            return this.util.config.tinymce.toolbarMode;
         return this.toolbarMode;
     }
 
@@ -187,7 +176,7 @@ export class TinymceExtendDirective  {
      */
     private getPlugins() {
         if (isUndefined(this.plugins))
-            return this.appConfig.tinymce.plugins;
+            return this.util.config.tinymce.plugins;
         return this.plugins;
     }
 
@@ -196,7 +185,7 @@ export class TinymceExtendDirective  {
      */
     private getToolbar() {
         if (isUndefined(this.toolbar))
-            return this.appConfig.tinymce.toolbar;
+            return this.util.config.tinymce.toolbar;
         return this.toolbar;
     }
 }

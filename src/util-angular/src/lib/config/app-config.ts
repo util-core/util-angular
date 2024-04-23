@@ -18,6 +18,8 @@ import { MessageConfig } from "./message-config";
 import { DefaultMessageConfig } from "./default-message-config";
 import { DialogConfig } from "./dialog-config";
 import { DefaultDialogConfig } from "./default-dialog-config";
+import { DrawerConfig } from "./drawer-config";
+import { DefaultDrawerConfig } from "./default-drawer-config";
 
 /**
  * 应用配置
@@ -59,11 +61,19 @@ export class AppConfig {
     /**
      * 消息配置
      */
-    message?: MessageConfig;
+    message?: MessageConfig;    
     /**
      * 弹出层配置
      */
     dialog?: DialogConfig;
+    /**
+     * 弹出层配置,与 dialog 配置相同
+     */
+    modal?: DialogConfig;
+    /**
+     * 抽屉配置
+     */
+    drawer?: DrawerConfig;
 }
 
 /**
@@ -73,12 +83,13 @@ export class AppConfig {
 export function initAppConfig(config: AppConfig) {
     if (!config)
         config = new AppConfig();
-    config.form = assign(DefaultFormConfig, config.form);
-    config.table = assign(DefaultTableConfig, config.table);
-    config.tinymce = assign(DefaultTinymceConfig, config.tinymce);
+    config.form = assign({},DefaultFormConfig, config.form);
+    config.table = assign({}, DefaultTableConfig, config.table);
+    config.tinymce = assign({}, DefaultTinymceConfig, config.tinymce);
     config.loading = config.loading || new LoadingConfig();
     config.tenant = config.tenant || new TenantConfig();
-    config.upload = assign(DefaultUploadConfig, config.upload);
-    config.message = assign(DefaultMessageConfig, config.message);
-    config.dialog = assign(DefaultDialogConfig, config.dialog);
+    config.upload = assign({}, DefaultUploadConfig, config.upload);
+    config.message = assign({}, DefaultMessageConfig, config.message);    
+    config.dialog = assign({}, DefaultDialogConfig, config.dialog, config.modal);
+    config.drawer = assign({}, DefaultDrawerConfig, config.drawer);
 }

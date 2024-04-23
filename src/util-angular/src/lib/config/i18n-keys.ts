@@ -68,6 +68,10 @@ export class I18nKeys {
      */
     static saveConfirmation = "util.saveConfirmation";
     /**
+     * 保存修改确认
+     */
+    static saveDirtyConfirmation = "util.saveDirtyConfirmation";
+    /**
      * 必填验证消息
      */
     static requiredMessage = "util.requiredMessage";
@@ -99,4 +103,8 @@ export class I18nKeys {
      * 未授权异常消息
      */
     static unauthorizedMessage = "util.unauthorizedMessage";
+    /**
+     * 超时异常消息
+     */
+    static timeoutMessage = "util.timeoutMessage";
 }

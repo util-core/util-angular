@@ -32,11 +32,14 @@ export * from "./lib/data/data-loader";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
-export * from "./lib/dialog/dialog-container.component";
+export * from "./lib/dialog/dialog-resizable.component";
+export * from "./lib/dialog/dialog-close.component";
+export * from "./lib/dialog/dialog-fullscreen.service";
 
 //导出drawer
 export * from "./lib/drawer/drawer-options";
-export * from "./lib/drawer/drawer-container.component";
+export * from "./lib/drawer/drawer-resizable.component";
+export * from "./lib/drawer/drawer-footer.directive";
 
 //导出message
 export * from "./lib/message/confirm-options";
@@ -58,6 +61,17 @@ export * from "./lib/auth/auth.service";
 //导出tenant
 export * from "./lib/tenant/tenant.service";
 export * from "./lib/tenant/tenant-info";
+export * from "./lib/tenant/tenant.interceptor";
+
+//导出language
+export * from "./lib/language/language.interceptor";
+
+//导出全屏内容区
+export * from "./lib/full-content/fullscreen";
+export * from "./lib/full-content/fullscreen.service";
+export * from "./lib/full-content/full-content.service";
+export * from "./lib/full-content/full-content-close.component";
+export * from "./lib/full-content/full-content-footer.component";
 
 //导出base
 export * from "./lib/base/component-base";
@@ -87,12 +101,13 @@ export * from "./lib/zorro/tag-extend.directive";
 export * from "./lib/zorro/table-settings.component";
 export * from "./lib/zorro/segmented-extend.directive";
 export * from "./lib/zorro/table-head-align.directive";
+export * from "./lib/zorro/tinymce.extend.directive";
 export * from "./lib/zorro/upload.service";
 export * from "./lib/zorro/table-settings.service";
-
-//导出tinymce
-export * from "./lib/tinymce/tinymce.extend.directive";
 
 //导出util入口
 export * from "./lib/util";
 export * from "./lib/util.module";
+
+//导出provider
+export * from "./lib/provider";

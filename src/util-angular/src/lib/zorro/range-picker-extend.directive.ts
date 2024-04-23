@@ -9,7 +9,8 @@ import { Directive, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
  */
 @Directive({
     selector: '[x-range-picker-extend]',
-    exportAs: 'xRangePickerExtend'
+    exportAs: 'xRangePickerExtend',
+    standalone: true
 })
 export class RangePickerExtendDirective implements OnInit, OnChanges {
     private _rangeDates: Date[];

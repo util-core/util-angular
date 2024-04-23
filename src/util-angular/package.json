@@ -1,6 +1,6 @@
 {
   "name": "util-angular",
-  "version": "17.3.7",
+  "version": "17.4.0",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
@@ -15,23 +15,19 @@
     "angular"
   ],
   "peerDependencies": {
+    "@angular/cdk": "^17.0.0",
     "@angular/core": "^17.0.0",
     "@angular/common": "^17.0.0",
     "@angular/forms": "^17.0.0",
-    "@angular/cdk": "^17.0.0",
-    "ng-zorro-antd": "^17.3.0",
-    "@delon/abc": "^17.3.0",
-    "@delon/theme": "^17.3.0",
-    "@delon/util": "^17.3.0",
+    "ng-zorro-antd": "^17.0.0",
+    "@delon/abc": "^17.0.0",
+    "@delon/theme": "^17.0.0",
+    "@delon/util": "^17.0.0",
     "lodash-es": "^4.17.0",
-    "date-fns": "^2.30.0",
+    "date-fns": "^2.16.1",
     "ngx-tinymce": "^17.0.0",
     "ng-event-bus": "^6.0.0",
-    "angular-oauth2-oidc": "^17.0.0"
-  },
-  "dependencies": {
-    "tslib": "2.3.0"
-  },
-  "devDependencies": {
+    "angular-oauth2-oidc": "^17.0.0",
+    "uuid": "^9.0.0"
   }
 }

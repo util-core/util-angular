@@ -2,19 +2,18 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, EventEmitter, Optional, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
 import { QueryParameter } from '../core/query-parameter';
-import { AppConfig, initAppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 
 /**
  * NgZorro标签扩展指令
  */
 @Directive({
     selector: '[x-tag-extend]',
-    exportAs: 'xTagExtend'
+    exportAs: 'xTagExtend',
+    standalone: true
 })
 export class TagExtendDirective implements OnInit, OnChanges {
     /**
@@ -76,13 +75,10 @@ export class TagExtendDirective implements OnInit, OnChanges {
 
     /**
      * 初始化选择框扩展指令
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
      * @param cdr 变更检测
      */
-    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig, private cdr: ChangeDetectorRef) {
-        initAppConfig(this.config);
-        this.util = new Util(null, config, moduleConfig);
+    constructor(private cdr: ChangeDetectorRef) {
+        this.util = Util.create();
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.selectedItems = [];

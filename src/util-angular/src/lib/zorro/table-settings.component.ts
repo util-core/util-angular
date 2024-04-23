@@ -3,20 +3,40 @@
 //Licensed under the MIT license
 //====================================================
 import {
-    ChangeDetectionStrategy, Component, Input, Injector, TemplateRef, ViewChild, Optional,
-    ChangeDetectorRef, OnInit, OnDestroy
+    ChangeDetectionStrategy, Component, Input, inject, ChangeDetectorRef, OnInit,
+    ViewChild, TemplateRef, ViewEncapsulation, DestroyRef
 } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, CdkDrag } from '@angular/cdk/drag-drop';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, filter, takeUntil, tap, map } from 'rxjs/operators';
-import { NzCustomColumn, NzTheadComponent } from 'ng-zorro-antd/table';
-import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray, CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { debounceTime, filter, tap } from 'rxjs/operators';
+import { NzCustomColumn } from 'ng-zorro-antd/table';
+import { NzResizeEvent, NzResizableModule } from 'ng-zorro-antd/resizable';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { AlainThemeModule } from '@delon/theme';
 import { Util } from '../util';
-import { AppConfig, initAppConfig } from '../config/app-config';
+import { DialogResizableComponent } from '../dialog/dialog-resizable.component';
 import { I18nKeys } from '../config/i18n-keys';
 import { ColumnInfo } from '../core/column-info';
 import { TableInfo } from '../core/table-info';
 import { TableSettingsServiceBase } from './table-settings.service';
+import { SegmentedExtendDirective } from "./segmented-extend.directive";
+import { TableHeadAlignDirective } from './table-head-align.directive';
 
 /**
  * 表格设置组件
@@ -24,32 +44,44 @@ import { TableSettingsServiceBase } from './table-settings.service';
 @Component({
     selector: 'x-table-settings',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
     templateUrl: './table-settings.component.html',
+    encapsulation: ViewEncapsulation.None,
+    imports: [
+        CommonModule, FormsModule, DragDropModule,
+        NzCardModule, NzDividerModule, NzListModule, NzModalModule,
+        NzButtonModule, NzInputModule,
+        NzCheckboxModule, NzGridModule, NzTableModule,
+        NzFormModule, NzIconModule, NzResizableModule, NzSegmentedModule,
+        NzSwitchModule, NzDropDownModule,
+        AlainThemeModule, TableHeadAlignDirective,
+        DialogResizableComponent, SegmentedExtendDirective
+    ],
     styles: [`
-        .x-table-settings-dialog-container ::ng-deep .dialog-body {
+        .x-table-settings .x-dialog-container {
            background-color:#80808014;
         }
-        .x-table-settings-dialog ::ng-deep .ant-checkbox-wrapper:hover {
+        .x-table-settings-dialog .ant-checkbox-wrapper:hover {
             background-color:#f8f8f8;
         }
-        .x-table-settings-dialog ::ng-deep .ant-divider-horizontal {
+        .x-table-settings-dialog .ant-divider-horizontal {
             margin:14px 0;
         }
-        .x-table-settings-dialog ::ng-deep .cdk-drag-preview {
+        .x-table-settings-dialog .cdk-drag-preview {
             display: table;
         }
-        .x-table-settings-dialog ::ng-deep .cdk-drag-placeholder {
+        .x-table-settings-dialog .cdk-drag-placeholder {
             opacity: 0;
         }
         .x-table-settings-dialog .card-table-config {
             margin-bottom:16px;
         }
-        .x-table-settings-dialog .card-table-config ::ng-deep .ant-card-body {
+        .x-table-settings-dialog .card-table-config .ant-card-body {
             padding-bottom: 0;
         }
     `]
 })
-export class TableSettingsComponent implements OnInit, OnDestroy {
+export class TableSettingsComponent implements OnInit {
     /**
      * 表格尺寸配置
      */
@@ -68,13 +100,13 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         { value: 'right', icon: 'align-right' }
     ];
     /**
+     * 清理对象
+     */
+    private readonly destroy$ = inject(DestroyRef);
+    /**
      * 操作入口
      */
     protected util: Util;
-    /**
-     * 清理对象
-     */
-    protected destroy$ = new Subject<void>();
     /**
      * 列宽变更对象
      */
@@ -96,13 +128,25 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     protected initInfo: TableInfo;
     /**
-     * 表格设置对话框宽度
+     * 当前组件滚动高度
      */
-    width;
+    private _selfScrollHeight;
     /**
-     * 是否显示表格设置对话框
+     * 当前组件初始滚动高度
      */
-    isVisible = false;
+    private _initSelfScrollHeight = "360px";
+    /**
+     * 当前组件左侧列表最大高度
+     */
+    selfListMaxHeight;
+    /**
+     * 当前组件左侧列表最大初始高度
+     */
+    private _initSelfListMaxHeight = "500px";
+    /**
+     * 全屏变更事件订阅
+     */
+    private _fullScreenSubscription: Subscription;
     /**
      * 是否隐藏表格配置区域,默认值: false
      */
@@ -187,24 +231,29 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * 初始设置的列集合
      */
     @Input() initColumns: ColumnInfo[];
+    /**
+     * 对话框内容
+     */
+    @ViewChild("content") content: TemplateRef<{}>;
+    /**
+     * 对话框页脚
+     */
+    @ViewChild("footer") footer: TemplateRef<{}>;
 
     /**
      * 初始化表格设置组件
-     * @param injector 注入器
-     * @param config 应用配置
      * @param service 表格设置服务
      * @param cdr 变更检测
      */
-    constructor(@Optional() injector: Injector, @Optional() protected config: AppConfig, protected service: TableSettingsServiceBase,
-        protected cdr: ChangeDetectorRef) {
-        initAppConfig(config);
-        this.util = new Util(injector, config);
-        this.size = config.table.tableSize;
-        this.width = config.table.tableSettingsWidth;
-        this.isHideTableConfig = config.table.isHideTableConfig;
+    constructor(protected service: TableSettingsServiceBase, protected cdr: ChangeDetectorRef) {
+        this.util = Util.create();
+        this.size = this.util.config.table.tableSize;
+        this.isHideTableConfig = this.util.config.table.isHideTableConfig;
         this.loading = false;
         this.isTreeTable = false;
         this.columnInfos = [];
+        this._selfScrollHeight = this._initSelfScrollHeight;
+        this.selfListMaxHeight = this._initSelfListMaxHeight;        
         this.initResizeColumn();
     }
 
@@ -213,7 +262,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     protected initResizeColumn() {
         this.columnWidthChange$.pipe(
-            takeUntil(this.destroy$),
+            takeUntilDestroyed(this.destroy$),
             filter(value => value !== null),
             tap(item => {
                 this.info.columns = this.info.columns.map(column => {
@@ -224,7 +273,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
             }),
             debounceTime(3000)
         ).subscribe(async item => {
-            if (this.config.table.isResizeColumnSave)
+            if (this.util.config.table.isResizeColumnSave)
                 await this.save(this.info);
         });
     }
@@ -246,6 +295,22 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * 获取当前组件的左侧固定宽度
+     */
+    getSelfLeft(width) {
+        if (this.util.responsive.isPc())
+            return width;
+        return false;
+    }
+
+    /**
+     * 获取当前组件的滚动宽高
+     */
+    getSelfScroll() {
+        return { x: this.enableFixedColumn ? '1020px' : '820px', y: this._selfScrollHeight };
+    }
+
+    /**
      * 初始化
      */
     ngOnInit() {
@@ -256,14 +321,6 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
             this.restoreConfig();
             this.cdr.markForCheck();
         }, 10);
-    }
-
-    /**
-     * 清理
-     */
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     /**
@@ -370,7 +427,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         if (this.util.helper.isUndefined(infoColumn.right))
             infoColumn.right = initColumn.right;
         if (this.util.helper.isUndefined(infoColumn.titleAlign))
-            infoColumn.titleAlign = initColumn.titleAlign || this.config.table.titleAlign;
+            infoColumn.titleAlign = initColumn.titleAlign || this.util.config.table.titleAlign;
         if (infoColumn.left)
             infoColumn.isDisableRight = true;
         if (infoColumn.right)
@@ -407,7 +464,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      */
     protected getWidthNumber(width: string): number {
         if (!width)
-            width = this.config.table.defaultWidth;
+            width = this.util.config.table.defaultWidth;
         if (width.endsWith("%")) {
             width = this.util.helper.trimEnd(width, "%");
             return this.util.helper.toNumber(width) * 15;
@@ -511,10 +568,84 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * 显示表格设置弹出框
      */
     show() {
+        this.initSelfHeight();
         this.loadInitColumns();
         this.load();
-        this.isVisible = true;
-        this.cdr.detectChanges();
+        this.util.dialog.open({
+            wrapClassName: 'x-table-settings',
+            title: 'util.tableSettings',  
+            content: this.content,
+            footer: this.footer,            
+            width: this.getTableSettingsWidth(),            
+            minWidth: this.getTableSettingsMinWidth(),
+            maxWidth: this.getTableSettingsMaxWidth(),
+            minHeight: this.getTableSettingsMinHeight(),
+            maxHeight: this.getTableSettingsMaxHeight(),
+            onFullscreen: (isFullscreen) => {
+                this.handleFullscreen(isFullscreen);
+            }
+        });
+    }
+
+    /**
+     * 初始化组件高度
+     */
+    protected initSelfHeight() {
+        this._selfScrollHeight = this._initSelfScrollHeight;
+        this.selfListMaxHeight = this._initSelfListMaxHeight;
+    }
+
+    /**
+     * 获取表格设置弹出框宽度
+     */
+    private getTableSettingsWidth() {
+        const width = this.util.responsive.getWidth();
+        return this.util.config.table.getTableSettingsWidth(width);
+    }
+
+    /**
+     * 获取表格设置弹出框最小宽度
+     */
+    private getTableSettingsMinWidth() {
+        const width = this.util.responsive.getWidth();
+        return this.util.config.table.getTableSettingsMinWidth(width);
+    }
+
+    /**
+    * 获取表格设置弹出框最大宽度
+    */
+    private getTableSettingsMaxWidth() {
+        const width = this.util.responsive.getWidth();
+        return this.util.config.table.getTableSettingsMaxWidth(width);
+    }
+
+    /**
+     * 获取表格设置弹出框最小高度
+     */
+    private getTableSettingsMinHeight() {
+        const height = this.util.responsive.getHeight();
+        return this.util.config.table.getTableSettingsMinHeight(height);
+    }
+
+    /**
+     * 获取表格设置弹出框最大高度
+     */
+    private getTableSettingsMaxHeight() {
+        const height = this.util.responsive.getHeight();
+        return this.util.config.table.getTableSettingsMaxHeight(height);
+    }
+
+    /**
+     * 处理全屏变更事件
+     */
+    protected handleFullscreen(isFullscreen: boolean) {
+        const height = this.util.responsive.getHeight();
+        if (height > 800 && isFullscreen) {
+            this._selfScrollHeight = `${height - 530}px`;
+            this.selfListMaxHeight = `${height - 330}px`;
+            return;
+        }
+        this.initSelfHeight();
     }
 
     /**
@@ -596,7 +727,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * 取消事件处理
      */
     handleCancel() {
-        this.isVisible = false;
+        this.util.dialog.close();
     }
 
     /**
@@ -618,7 +749,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
             return {
                 ...column,
                 width: this.getWidthNumber(column.width).toString(),
-                titleAlign: column.titleAlign || this.config.table.titleAlign,
+                titleAlign: column.titleAlign || this.util.config.table.titleAlign,
                 isDisableLeft: column.right,
                 isDisableRight: column.left
             };
@@ -638,7 +769,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         }
         await this.save(this.info);
         this.restoreConfig();
-        this.isVisible = false;
+        this.util.dialog.close();
         this.util.message.info(I18nKeys.succeeded);
         this.cdr.markForCheck();
     }
@@ -672,7 +803,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
         let list: CdkDrag<ColumnInfo>[] = event.container.getSortedItems();
         let previous = list.find((v, i) => i === event.previousIndex);
         let current = list.find((v, i) => i === event.currentIndex);
-        this.util.render.setStyle(previous.element, "left", "180px");
+        if (this.util.responsive.isPc())
+            this.util.dom.setStyle(previous.element, "left", "180px");
         let previousIndex = this.info.columns.findIndex(t => t.title === previous.data.title);
         let currentIndex = this.info.columns.findIndex(t => t.title === current.data.title);
         if (this.isTreeTable && (previousIndex === 0 || currentIndex === 0))
@@ -779,13 +911,13 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * @param title 标题
      * @param defaultWidth 默认宽度
      */
-    getWidth(title: string, defaultWidth) {        
+    getWidth(title: string, defaultWidth) {
         if (!this.columns)
             return defaultWidth;
         let column = this.columns.find(item => item.value == title);
         if (!column)
             return defaultWidth;
-        return this.getPxWidth(column.width, defaultWidth, this.config.table.defaultWidth);
+        return this.getPxWidth(column.width, defaultWidth, this.util.config.table.defaultWidth);
     }
 
     /**
@@ -815,6 +947,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     isLeft(title: string) {
         if (!this.columnInfos)
             return false;
+        if (!this.util.responsive.isPc())
+            return false;
         let column = this.columnInfos.find(t => t.title === title);
         if (!column)
             return false;
@@ -839,6 +973,8 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
     isRight(title: string) {
         if (!this.columnInfos)
             return false;
+        if (!this.util.responsive.isPc())
+            return false;
         let column = this.columnInfos.find(t => t.title === title);
         if (!column)
             return false;
@@ -861,7 +997,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * @param title 标题
      */
     getAlign(title: string) {
-        let result = this.config.table.align;
+        let result = this.util.config.table.align;
         if (!this.columnInfos)
             return result;
         let column = this.columnInfos.find(t => t.title === title);
@@ -877,7 +1013,7 @@ export class TableSettingsComponent implements OnInit, OnDestroy {
      * @param title 标题
      */
     getTitleAlign(title: string) {
-        let result = this.config.table.titleAlign;
+        let result = this.util.config.table.titleAlign;
         if (!this.columnInfos)
             return result;
         let column = this.columnInfos.find(t => t.title === title);

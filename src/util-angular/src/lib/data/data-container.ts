@@ -35,7 +35,8 @@ export class DataContainer<TModel extends IKey> {
      * 初始化数据容器
      * @param util 操作入口
      */
-    constructor(private util: Util) {
+    constructor(private util?:Util ) {
+        this.util = util || Util.create();
         this.checkedSelection = new SelectionModel<TModel>(true, []);
         this.selectedSelection = new SelectionModel<TModel>(true, []);
         this.total = 0;

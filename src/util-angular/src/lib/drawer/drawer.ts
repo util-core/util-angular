@@ -2,24 +2,17 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Component, ComponentRef, TemplateRef } from '@angular/core';
+import { ComponentRef } from '@angular/core';
 import { NzDrawerService, NzDrawerOptions, NzDrawerRef, NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
-import { NzButtonType } from 'ng-zorro-antd/button';
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
 import { IDrawerOptions } from "./drawer-options";
-import { DrawerFooterComponent } from './drawer-footer.component';
-import { I18nKeys } from "../config/i18n-keys";
+import { DrawerResizableComponent } from "./drawer-resizable.component";
 
 /**
  * 抽屉操作
  */
 export class Drawer {
-    /**
-     * 页脚组件
-     */
-    private _footer: ComponentRef<DrawerFooterComponent>;
-
     /**
      * 初始化抽屉操作
      * @param util 操作入口
@@ -36,20 +29,19 @@ export class Drawer {
         if (options.onOpenBefore && options.onOpenBefore() === false)
             return null;
         this.initOptions(options);
-        this._footer = this.createFooter();
         let drawer: NzDrawerService = this.getDrawerService();
         let drawerRef: NzDrawerRef = drawer.create(this.toOptions(options));
-        this._footer.setInput("drawer", drawerRef);
+        let resizableRef: ComponentRef<any> = null;
+        if (this.util.config.drawer.resizable)
+            resizableRef = this.createResizableComponent(drawerRef, options);
         drawerRef.afterOpen.subscribe(() => options.onOpen && options.onOpen());
-        drawerRef.afterClose.subscribe((result) => options.onClose && options.onClose(result));
+        drawerRef.afterClose.subscribe(result => {
+            options.onClose && options.onClose(result);
+            resizableRef?.destroy();
+        });
+        if (this.util.config.drawer.resizable)
+            this.appendResizable(drawerRef, options, resizableRef);
         return drawerRef;
-    }
-
-    /**
-     * 创建页脚
-     */
-    private createFooter() {
-        return this.util.component.create(DrawerFooterComponent);
     }
 
     /**
@@ -122,55 +114,7 @@ export class Drawer {
      * 获取页脚
      */
     private getFooter(options: IDrawerOptions) {
-        if (options.showFooter === false)
-            return null;
-        if (options.footer)
-            return options.footer;
-        this._footer.setInput("btnCancelText", this.getCancelText(options));
-        this._footer.setInput("btnOkText", this.getOkText(options));
-        this._footer.setInput("btnOkType", this.getOkType(options));
-        this._footer.setInput("btnOkDanger", this.getOkDanger(options));
-        this._footer.setInput("onOk", options.onOk);
-        this._footer.setInput("okAfterClose", options.okAfterClose);
-        return this._footer.instance.footer;
-    }
-
-    /**
-     * 获取取消按钮文本
-     */
-    private getCancelText(options: IDrawerOptions) {
-        if (options.showCancel === false)
-            return null;
-        let value = !!options.cancelText ? options.cancelText : I18nKeys.cancel;
-        return this.util.i18n.get(value);
-    }
-
-    /**
-     * 获取确定按钮文本
-     */
-    private getOkText(options: IDrawerOptions) {
-        if (options.showOk === false)
-            return null;
-        let value = !!options.okText ? options.okText : I18nKeys.ok;
-        return this.util.i18n.get(value);
-    }
-
-    /**
-     * 获取确定按钮类型
-     */
-    private getOkType(options: IDrawerOptions): NzButtonType {
-        if (options.okType)
-            return options.okType;
-        return "primary";
-    }
-
-    /**
-     * 获取确定按钮危险状态
-     */
-    private getOkDanger(options: IDrawerOptions) {
-        if (options.okDanger)
-            return options.okDanger;
-        return false;
+        return options.footer;
     }
 
     /**
@@ -179,13 +123,94 @@ export class Drawer {
     private getWidth(options: IDrawerOptions) {
         if (options.width || options.size)
             return options.width;
-        return '30%';
+        let width = this.util.responsive.getWidth();
+        return this.util.config.drawer.getWidth(width);
+    }
+
+    /**
+     * 创建调整尺寸组件
+     */
+    private createResizableComponent(drawer: NzDrawerRef, options: IDrawerOptions) {
+        let component = this.util.component.create(DrawerResizableComponent);
+        component.instance.drawer = drawer;
+        component.instance.setDirection();
+        component.instance.setPadding();
+        component.setInput("minWidth", this.getMinWidth(options));
+        component.setInput("maxWidth", this.getMaxWidth(options));
+        return component;
+    }
+
+    /**
+     * 获取最小宽度
+     */
+    private getMinWidth(options: IDrawerOptions) {
+        if (this.util.helper.isUndefined(options.minWidth)) {
+            let width = this.util.responsive.getWidth();
+            return this.util.config.drawer.getMinWidth(width);
+        }
+        return options.minWidth;
+    }
+
+    /**
+     * 获取最大宽度
+     */
+    private getMaxWidth(options: IDrawerOptions) {
+        if (this.util.helper.isUndefined(options.maxWidth)) {
+            let width = this.util.responsive.getWidth();
+            return this.util.config.drawer.getMaxWidth(width);
+        }
+        return options.maxWidth;
+    }
+
+    /**
+     * 添加拖动调整尺寸
+     */
+    private appendResizable(drawer: NzDrawerRef, options: IDrawerOptions, resizableRef: ComponentRef<any>) {
+        if (!drawer)
+            return;
+        if (options.placement === "top" || options.placement === "bottom")
+            return;
+        setTimeout(() => {
+            let drawerBody = this.findDrawerBody(drawer);
+            this.setResizable(drawerBody, resizableRef);
+        }, 30);
+    }
+
+    /**
+     * 找出当前抽屉主体
+     */
+    private findDrawerBody(drawer) {
+        let element = this.util.dom.getNativeElement(drawer.componentRef);
+        if (!element)
+            return null;
+        return this.util.dom.find(".ant-drawer-body", element?.parentNode?.parentNode);
+    }    
+
+    /**
+     * 设置调整尺寸
+     */
+    private setResizable(drawerBody: Element, resizableRef: ComponentRef<any>) {
+        if (!drawerBody)
+            return;
+        let resizableElement = this.util.dom.getNativeElement(resizableRef);
+        let containerElement = this.util.dom.find(".x-drawer-container", resizableElement);
+        if (!containerElement)
+            return;
+        let i = drawerBody.childNodes.length;
+        let footer;
+        while (i > 0) {
+            i--;
+            let item = drawerBody.childNodes.item(0);
+            this.util.dom.appendChild(containerElement, item);
+        }
+        this.util.dom.appendChild(drawerBody, resizableElement);
+        this.util.dom.insertAfter(resizableElement, footer);
     }
 
     /**
      * 获取抽屉实例
      */
-    getDrawer():NzDrawerRef {
+    getDrawer(): NzDrawerRef {
         return this.util.ioc.get(NzDrawerRef);
     }
 

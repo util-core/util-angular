@@ -9,9 +9,10 @@ import { Directive } from '@angular/core';
  */
 @Directive({
     selector: '[x-input-extend]',
-    exportAs: 'xInputExtend'
+    exportAs: 'xInputExtend',
+    standalone: true
 })
-export class InputExtendDirective {    
+export class InputExtendDirective {
     /**
      * 是否显示密码
      */

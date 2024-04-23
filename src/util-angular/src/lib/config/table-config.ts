@@ -48,10 +48,6 @@ export class TableConfig {
      */
     pageSizeOptions?: number[];
     /**
-     * 表格设置对话框的宽度,默认值: 60%
-     */
-    tableSettingsWidth?: string;
-    /**
      * 是否隐藏表格设置界面中的表格配置区域,默认值: false
      */
     isHideTableConfig?: boolean;
@@ -59,4 +55,29 @@ export class TableConfig {
      * 拖动列宽时是否保存表格设置,默认值: true
      */
     isResizeColumnSave?: boolean;
+    /**
+     * 获取表格设置对话框的宽度
+     * @param width 屏幕宽度
+     */
+    getTableSettingsWidth?: (width: number) => string;
+    /**
+     * 获取表格设置对话框的最小宽度
+     * @param width 屏幕宽度
+     */
+    getTableSettingsMinWidth?: (width: number) => number;
+    /**
+     * 获取表格设置对话框的最大宽度
+     * @param width 屏幕宽度
+     */
+    getTableSettingsMaxWidth?: (width: number) => number;
+    /**
+     * 获取表格设置对话框的最小高度
+     * @param height 屏幕高度
+     */
+    getTableSettingsMinHeight?: (height: number) => number;
+    /**
+     * 获取表格设置对话框的最大高度
+     * @param height 屏幕高度
+     */
+    getTableSettingsMaxHeight?: (height: number) => number;    
 }

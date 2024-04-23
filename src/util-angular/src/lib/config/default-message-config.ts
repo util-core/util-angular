@@ -8,8 +8,5 @@ import { MessageConfig } from "./message-config";
  * 默认消息配置
  */
 export const DefaultMessageConfig: MessageConfig = {
-    /**
-     * 消息框持续时间
-     */
-    duration: 8000
+    duration: 6000
 }

@@ -5,7 +5,6 @@
 import { TemplateRef } from '@angular/core';
 import { Direction } from '@angular/cdk/bidi';
 import { NzDrawerSize, NzDrawerPlacement, NzDrawerRef } from "ng-zorro-antd/drawer";
-import { NzButtonType, NzButtonComponent } from 'ng-zorro-antd/button';
 
 /**
  * 抽屉配置
@@ -58,11 +57,7 @@ export interface IDrawerOptions {
     /**
      * 抽屉主体样式
      */
-    bodyStyle?,    
-    /**
-     * 是否显示页脚，默认为 true
-     */
-    showFooter?: boolean,
+    bodyStyle?,
     /**
      * 页脚
      */
@@ -79,6 +74,14 @@ export interface IDrawerOptions {
      * 高度, 只在方向为 'top'或'bottom' 时生效，优先级高于 size
      */
     height?: string | number,
+    /**
+     * 最小宽度
+     */
+    minWidth?: number;
+    /**
+     * 最大宽度
+     */
+    maxWidth?: number;
     /**
      * 抽屉外层容器样式类名
      */
@@ -116,39 +119,4 @@ export interface IDrawerOptions {
      * @param result 返回结果
      */
     onClose?: (result) => void;
-    /**
-     * 是否显示取消按钮，默认为 true
-     */
-    showCancel?: boolean,
-    /**
-     * 取消按钮的文字
-     */
-    cancelText?: string,
-    /**
-     * 是否显示确定按钮，默认为 true
-     */
-    showOk?: boolean,
-    /**
-     * 确定按钮的文字
-     */
-    okText?: string,
-    /**
-     * 确定按钮的类型, 可选值: 'primary' | 'default' | 'dashed' | 'link' | 'text' | null
-     */
-    okType?: NzButtonType,
-    /**
-     * 确认按钮是否为危险按钮
-     */
-    okDanger?: boolean,
-    /**
-     * 点击确定按钮事件，返回 false 阻止关闭,注意: 仅当返回Promise有效
-     * @param instance 抽屉内容组件实例,即传给抽屉的Component
-     * @param btnOk 确定按钮组件实例
-     * @param drawer 抽屉组件实例
-     */
-    onOk?: (instance, btnOk: NzButtonComponent, drawer: NzDrawerRef) => (false | void | {}) | Promise<false | void | {}>,
-    /**
-     * 确定按钮执行完成是否关闭抽屉,默认值: true,注意: 仅当onOk返回Promise有效
-     */
-    okAfterClose?: boolean;
 }

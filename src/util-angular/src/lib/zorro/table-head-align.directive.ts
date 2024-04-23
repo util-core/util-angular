@@ -8,7 +8,8 @@ import { Directive, ElementRef, Input, OnInit, OnChanges, SimpleChanges } from '
  * 表头标题对齐扩展指令
  */
 @Directive({
-    selector: '[titleAlign]'
+    selector: '[titleAlign]',
+    standalone: true
 })
 export class TableHeadAlignDirective implements OnInit, OnChanges {       
     /**

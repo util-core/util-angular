@@ -42,8 +42,9 @@ export class DataLoader<T extends IKey> {
      * 初始化数据加载器
      * @param util 操作入口
      */
-    constructor(private util: Util) {
-        this.container = new DataContainer<T>(util);
+    constructor(private util?: Util) {
+        this.util = util || Util.create();
+        this.container = new DataContainer<T>(this.util);
         this.initOnScrollToBottomLoad();
     }
 

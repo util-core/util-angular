@@ -23,7 +23,7 @@ export interface IDialogOptions {
      */
     data?,
     /**
-     * 是否垂直居中显示
+     * 是否垂直居中显示,默认值: true
      */
     centered?: boolean,
     /**
@@ -87,6 +87,22 @@ export interface IDialogOptions {
      */
     disableClose?: boolean,
     /**
+     * 最小宽度
+     */
+    minWidth?: number;
+    /**
+     * 最大宽度
+     */
+    maxWidth?: number;
+    /**
+     * 最小高度
+     */
+    minHeight?: number;
+    /**
+     * 最大高度
+     */
+    maxHeight?: number;
+    /**
      * 宽度
      */
     width?: string | number,
@@ -115,10 +131,18 @@ export interface IDialogOptions {
      */
     autofocus?: 'ok' | 'cancel' | 'auto' | null,
     /**
+     * 关闭按钮图标
+     */
+    closeIcon?: string | TemplateRef<void>,
+    /**
+     * 是否添加默认外层容器样式, 默认值: modal-wrap
+     */
+    addWrapClass?: boolean;
+    /**
      * 点击确定按钮事件，返回 false 阻止关闭
      * @param instance 弹出层组件实例
      */
-    onOk?: ( instance ) => ( false | void | {} ) | Promise<false | void | {}>,
+    onOk?: (instance) => (false | void | {}) | Promise<false | void | {}>,
     /**
      * 打开前事件，返回 false 阻止弹出
      */
@@ -130,10 +154,15 @@ export interface IDialogOptions {
     /**
      * 关闭前事件，返回 false 阻止关闭
      */
-    onCloseBefore?: ( result ) => ( false | void | {} ) | Promise<false | void | {}>,
+    onCloseBefore?: (result) => (false | void | {}) | Promise<false | void | {}>,
     /**
      * 关闭后事件
      * @param result 返回结果
      */
-    onClose?: ( result ) => void;
+    onClose?: (result) => void;
+    /**
+     * 全屏事件
+     * @param isFullscreen 是否全屏
+     */
+    onFullscreen?: (isFullscreen: boolean) => void;
 }

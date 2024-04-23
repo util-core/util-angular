@@ -23,6 +23,27 @@ export class Form {
      * 提交表单
      * @param options 表单提交参数
      */
+    async submitAsync(options: IFormSubmitOptions) {
+        if (!this.validateSubmit(options))
+            return;
+        this.initOptions(options);
+        if (!options.confirm) {
+            await this.submitFormAsync(options);
+            return;
+        }
+        this.util.message.confirm({
+            disableClose: true,
+            title: options.confirmTitle,
+            content: options.confirm,
+            onOk: () => this.submitFormAsync(options),
+            onCancel: options.complete
+        });
+    }
+
+    /**
+     * 提交表单
+     * @param options 表单提交参数
+     */
     submit(options: IFormSubmitOptions) {
         if (!this.validateSubmit(options))
             return;
@@ -32,6 +53,7 @@ export class Form {
             return;
         }
         this.util.message.confirm({
+            disableClose: true,
             title: options.confirmTitle,
             content: options.confirm,
             onOk: () => this.submitFormAsync(options),
@@ -162,8 +184,11 @@ export class Form {
         if (options.showMessage !== false)
             this.util.message.success(options.message || message || I18nKeys.succeeded);
         result = result || "ok";
-        if (options.closeDialog)
-            this.util.dialog.close(result);
+        if (options.closeDialog) {
+            setTimeout(() => {
+                this.util.dialog.close(result);
+            },300);
+        }
         if (options.closeDrawer)
             this.util.drawer.close(result);
         if (options.back)

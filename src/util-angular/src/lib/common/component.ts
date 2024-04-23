@@ -1,5 +1,5 @@
 ﻿//============== 组件操作==========================
-//Copyright 2023 何镇汐
+//Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=================================================
 import { Injector, Type, NgModuleRef, EnvironmentInjector, ViewContainerRef } from '@angular/core';
@@ -28,7 +28,11 @@ export class Component {
         environmentInjector?: EnvironmentInjector | NgModuleRef<unknown>;
         projectableNodes?: Node[][];
     }) {
+        if (!componentType)
+            return null;
         let viewContainerRef: ViewContainerRef = this.util.ioc.get(ViewContainerRef);
+        if (!viewContainerRef)
+            return null;
         return viewContainerRef.createComponent(componentType, options);
     }
 }

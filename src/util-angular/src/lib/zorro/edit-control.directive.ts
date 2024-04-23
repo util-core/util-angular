@@ -11,7 +11,8 @@ import { EditRowDirective } from "./edit-row.directive";
  */
 @Directive( {
     selector: '[x-edit-control]',
-    exportAs: 'xEditControl'
+    exportAs: 'xEditControl',
+    standalone: true
 } )
 export class EditControlDirective implements OnInit, OnDestroy {
     /**
@@ -77,23 +78,28 @@ export class EditControlDirective implements OnInit, OnDestroy {
      */
     isValid() {
         if ( !this.control )
-            return false;
+            return false;        
         return !this.control.invalid;
+    }
+
+    /**
+     * 标记为脏状态
+     */
+    dirty() {
+        this.control?.control?.markAsDirty();
+        this.control?.control?.updateValueAndValidity();
     }
 
     /**
      * 设置焦点
      */
     focus() {
-        setTimeout(() => {
-            if (this.instance && this.instance.focus) {
-                this.instance.focus();
-                return;
-            }
-            if (this.element && this.element.nativeElement) {
-                this.element.nativeElement.focus();
-            }
-        }, 0 );
+        if (this.instance && this.instance.focus) {
+            this.instance.focus();
+            return;
+        }
+        if (this.element && this.element.nativeElement)
+            this.element.nativeElement.focus();
     }
 
     /**

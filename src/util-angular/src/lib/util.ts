@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import * as Helper from './common/helper';
 import { Ioc } from './common/ioc';
 import { Message } from './message/message';
@@ -25,9 +25,13 @@ import { EventBus } from "./common/eventbus";
 import { SessionService } from "./common/session.service";
 import { ContextMenu } from "./common/context-menu";
 import { ClipboardService } from "./common/clipboard.service";
-import { Render } from "./common/render";
+import { Dom } from "./common/dom";
 import { TenantService } from "./tenant/tenant.service";
 import { Acl } from "./common/acl";
+import { Responsive } from "./common/responsive";
+import { Animation } from "./common/animation";
+import { Fullscreen as FullscreenHelper } from "./common/fullscreen";
+import { Fullscreen } from "./full-content/fullscreen";
 import { AppConfig, initAppConfig } from './config/app-config';
 import { DefaultConfig } from "./config/default-config";
 import { ModuleConfig } from './config/module-config';
@@ -125,21 +129,37 @@ export class Util {
      */
     private _clipboard: ClipboardService;
     /**
-     * 渲染器操作
+     * Dom操作
      */
-    private _render: Render;
+    private _dom: Dom;
     /**
      * 访问控制操作
      */
     private _acl: Acl;
+    /**
+     * 响应式操作
+     */
+    private _responsive: Responsive;
+    /**
+     * 动画操作
+     */
+    private _animation: Animation;
+    /**
+     * 全屏操作
+     */
+    private _fullscreenHelper: FullscreenHelper;
+    /**
+     * 全屏服务
+     */
+    private _fullscreen: Fullscreen;
 
     /**
      * 初始化操作入口
-     * @param componentInjector 组件注入器
+     * @param injector 注入器
      * @param appConfig 应用配置
      * @param moduleConfig 模块配置
      */
-    constructor(private componentInjector: Injector = null, private appConfig: AppConfig = null, private moduleConfig: ModuleConfig = null) {
+    constructor(private injector: Injector = null, private appConfig: AppConfig = null, private moduleConfig: ModuleConfig = null) {
     }
 
     /**
@@ -148,21 +168,26 @@ export class Util {
     static traceId: string = Helper.uuid();
 
     /**
-     * 全局注入器
-     */
-    static injector: Injector;
-
-    /**
      * 公共操作
      */
     helper = Helper;
+
+    /**
+     * 创建Util实例
+     */
+    static create() {
+        let config = inject(AppConfig, { optional: true });
+        initAppConfig(config);
+        let moduleConfig = inject(ModuleConfig, { optional: true });
+        return new Util(inject(Injector), config, moduleConfig);
+    }
 
     /**
      * Ioc操作
      */
     get ioc() {
         if (!this._ioc)
-            this._ioc = new Ioc(Util.injector, this.componentInjector);
+            this._ioc = new Ioc(this.injector);
         return this._ioc;
     };
 
@@ -188,6 +213,15 @@ export class Util {
      * 弹出层操作
      */
     get dialog() {
+        if (!this._dialog)
+            this._dialog = new Dialog(this);
+        return this._dialog;
+    };
+
+    /**
+     * 弹出层操作
+     */
+    get modal() {
         if (!this._dialog)
             this._dialog = new Dialog(this);
         return this._dialog;
@@ -279,7 +313,7 @@ export class Util {
      */
     get url() {
         if (!this._url)
-            this._url = new Url(this,this.moduleConfig);
+            this._url = new Url(this, this.moduleConfig);
         return this._url;
     };
 
@@ -356,12 +390,12 @@ export class Util {
     };
 
     /**
-     * 渲染器操作
+     * Dom操作
      */
-    get render() {
-        if (!this._render)
-            this._render = new Render(this);
-        return this._render;
+    get dom() {
+        if (!this._dom)
+            this._dom = new Dom(this);
+        return this._dom;
     };
 
     /**
@@ -374,32 +408,65 @@ export class Util {
     };
 
     /**
-     * 初始化
-     * @param injector 全局注入器
+     * 响应式操作
      */
-    static init(injector: Injector) {
-        this.injector = injector;
-        this.initPageSize();
+    get responsive() {
+        if (!this._responsive)
+            this._responsive = new Responsive(this);
+        return this._responsive;
+    };
+
+    /**
+     * 动画操作
+     */
+    get animation() {
+        if (!this._animation)
+            this._animation = new Animation(this);
+        return this._animation;
+    };
+
+    /**
+     * 全屏操作
+     */
+    get fullscreenHelper() {
+        if (!this._fullscreenHelper)
+            this._fullscreenHelper = new FullscreenHelper(this);
+        return this._fullscreenHelper;
+    };
+
+    /**
+     * 全屏服务
+     */
+    get fullscreen() {
+        if (!this._fullscreen)
+            this._fullscreen = new Fullscreen(this);
+        return this._fullscreen;
+    };
+
+    /**
+     * 应用配置
+     */
+    get config() {
+        if (!this.appConfig) {
+            this.appConfig = inject(AppConfig, { optional: true });
+            initAppConfig(this.appConfig);
+        }
+        return this.appConfig;
+    };
+
+    /**
+     * 初始化
+     */
+    static init() {
+        let util = Util.create();
+        this.initPageSize(util.config);
     }
 
     /**
      * 初始化分页大小
      */
-    private static initPageSize() {
-        let config = this.injector.get<AppConfig>(AppConfig, null, { optional: true });
-        if (!config)
-            return;
+    private static initPageSize(config) {
         if (config.pageSize > 0)
             DefaultConfig.pageSize = config.pageSize;
-    }
-
-    /**
-     * 获取应用配置
-     */
-    getAppConfig() {
-        if (!this.appConfig)
-            this.appConfig = this.ioc.get(AppConfig);
-        initAppConfig(this.appConfig);
-        return this.appConfig;
     }
 }

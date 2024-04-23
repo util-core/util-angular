@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { Injector, Component, ViewChild, Input, OnInit } from '@angular/core';
+import { Component, ViewChild, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ViewModel } from "../core/view-model";
 import { ComponentBase } from './component-base';
@@ -37,10 +37,9 @@ export abstract class EditComponentBase<TViewModel extends ViewModel> extends Co
 
     /**
      * 初始化组件
-     * @param injector 注入器
      */
-    constructor(injector?: Injector) {
-        super(injector);
+    constructor() {
+        super();
         this.isNew = true;
         this.model = <TViewModel>{};
         this.initDataByDialog();

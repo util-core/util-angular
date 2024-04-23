@@ -11,7 +11,8 @@ import { isEmpty } from '../common/helper';
  */
 @Directive({
     selector: '[x-required-extend]',
-    exportAs: 'xRequiredExtend'
+    exportAs: 'xRequiredExtend',
+    standalone: true
 })
 export class RequiredExtendDirective  {
     /**

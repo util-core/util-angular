@@ -8,7 +8,7 @@ import {
     differenceBy, differenceWith
 } from "lodash-es";
 import { format as format2 } from 'date-fns'
-import { UUID } from './internal/uuid';
+import { v4 as UUID } from 'uuid';
 
 /**
  * 是否未定义
@@ -72,7 +72,7 @@ export let isEmptyArray = (value): boolean => {
  * 创建唯一标识
  */
 export let uuid = (): string => {
-    return UUID.UUID();
+    return UUID();
 }
 
 /**
@@ -174,8 +174,8 @@ export let clone = <T>(obj: T): T => {
  * @param destination 目标对象
  * @param source 源对象
  */
-export let assign = (destination, source) => {
-    return assign2(destination, source);
+export let assign = (destination, ...source) => {
+    return assign2(destination, ...source);
 }
 
 /**

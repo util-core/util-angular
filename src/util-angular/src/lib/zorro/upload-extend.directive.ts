@@ -2,13 +2,12 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=========================================================
-import { Directive, Input, Output, OnInit, OnDestroy, EventEmitter, Optional, ChangeDetectorRef } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { distinctUntilChanged, debounceTime, filter, takeUntil, tap, map } from 'rxjs/operators';
+import { Directive, Input, Output, OnInit, EventEmitter, Optional, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, debounceTime, filter, tap, map } from 'rxjs/operators';
 import { NzUploadFile, NzUploadComponent, NzUploadChangeParam, UploadFilter } from 'ng-zorro-antd/upload';
 import { Util } from "../util";
-import { AppConfig, initAppConfig } from '../config/app-config';
-import { ModuleConfig } from '../config/module-config';
 import { UploadServiceBase } from '../zorro/upload.service'
 import { StateCode } from '../core/state-code';
 
@@ -17,17 +16,18 @@ import { StateCode } from '../core/state-code';
  */
 @Directive({
     selector: '[x-upload-extend]',
-    exportAs: 'xUploadExtend'
+    exportAs: 'xUploadExtend',
+    standalone: true
 })
-export class UploadExtendDirective implements OnInit, OnDestroy {
+export class UploadExtendDirective implements OnInit {
+    /**
+     * 清理对象
+     */
+    private readonly destroy$ = inject(DestroyRef);
     /**
      * 操作入口
      */
     protected util: Util;
-    /**
-     * 清理对象
-     */
-    private destroy$ = new Subject<void>();
     /**
      * 模型变更对象
      */
@@ -85,17 +85,13 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
 
     /**
      * 初始化上传扩展指令
-     * @param config 应用配置
-     * @param moduleConfig 模块配置
      * @param uploadService 上传服务
      * @param cdr 变更检测
      * @param instance 上传组件实例
      */
-    constructor(@Optional() public config: AppConfig, @Optional() moduleConfig: ModuleConfig,
-        @Optional() public uploadService: UploadServiceBase, private cdr: ChangeDetectorRef,
+    constructor( @Optional() public uploadService: UploadServiceBase, private cdr: ChangeDetectorRef,
         @Optional() public instance: NzUploadComponent) {
-        initAppConfig(config);
-        this.util = new Util(null, config, moduleConfig);
+        this.util = Util.create();
         this.files = [];
         this.modelToFilesDebounceTime = 100;
     }
@@ -114,7 +110,7 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
         if (!this.uploadService)
             throw new Error("未设置UploadServiceBase服务");
         this.modelChange$.pipe(
-            takeUntil(this.destroy$),
+            takeUntilDestroyed(this.destroy$),
             filter(value => !!value),
             distinctUntilChanged((a, b) => a === b),
             tap(value => {
@@ -135,14 +131,6 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
                 this.files = [...files];
             this.cdr.markForCheck();
         });
-    }
-
-    /**
-     * 指令清理
-     */
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     /**
@@ -350,21 +338,21 @@ export class UploadExtendDirective implements OnInit, OnDestroy {
      * 获取文件类型错误消息
      */
     private getMessageByType(files: NzUploadFile[]) {
-        return `${files.map(t => this.replace(this.config.upload.typeLimitMessage, t.name) + '<br/>').join('')}`;
+        return `${files.map(t => this.replace(this.util.config.upload.typeLimitMessage, t.name) + '<br/>').join('')}`;
     }
 
     /**
      * 获取文件大小错误消息
      */
     private getMessageBySize(files: NzUploadFile[], size) {
-        return `${files.map(t => this.replace(this.config.upload.sizeLimitMessage, t.name, size) + '<br/>').join('')}`;
+        return `${files.map(t => this.replace(this.util.config.upload.sizeLimitMessage, t.name, size) + '<br/>').join('')}`;
     }
 
     /**
      * 获取文件数量错误消息
      */
     private getMessageByLimit(limit) {
-        return this.replace(this.config.upload.fileLimitMessage, limit);
+        return this.replace(this.util.config.upload.fileLimitMessage, limit);
     }
 
     /**
