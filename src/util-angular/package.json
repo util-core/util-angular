@@ -1,6 +1,6 @@
 {
   "name": "util-angular",
-  "version": "17.4.0",
+  "version": "17.4.1",
   "author": "何镇汐 <xiadao521@qq.com>",
   "repository": {
     "type": "git",
@@ -24,10 +24,11 @@
     "@delon/theme": "^17.0.0",
     "@delon/util": "^17.0.0",
     "lodash-es": "^4.17.0",
-    "date-fns": "^2.16.1",
+    "date-fns": "^2.16.0",
     "ngx-tinymce": "^17.0.0",
     "ng-event-bus": "^6.0.0",
     "angular-oauth2-oidc": "^17.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "screenfull": "^6.0.0"
   }
 }

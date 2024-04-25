@@ -219,7 +219,7 @@ export class Util {
     };
 
     /**
-     * 弹出层操作
+     * 弹出层操作,与 util.dialog 相同
      */
     get modal() {
         if (!this._dialog)
