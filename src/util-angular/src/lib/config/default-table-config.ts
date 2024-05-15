@@ -19,6 +19,7 @@ export const DefaultTableConfig: TableConfig = {
     isShowNoNeedSaveMessage: true,
     isHideTableConfig: false,
     isResizeColumnSave: true,
+    resizeColumnSaveDelay:3000,
     getTableSettingsWidth: (width: number) => {
         if (width < 1600)
             return `${width}px`;

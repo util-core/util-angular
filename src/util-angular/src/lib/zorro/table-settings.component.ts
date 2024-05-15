@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { debounceTime, filter, tap } from 'rxjs/operators';
 import { NzCustomColumn } from 'ng-zorro-antd/table';
 import { NzResizeEvent, NzResizableModule } from 'ng-zorro-antd/resizable';
@@ -144,10 +144,6 @@ export class TableSettingsComponent implements OnInit {
      */
     private _initSelfListMaxHeight = "500px";
     /**
-     * 全屏变更事件订阅
-     */
-    private _fullScreenSubscription: Subscription;
-    /**
      * 是否隐藏表格配置区域,默认值: false
      */
     isHideTableConfig?: boolean;
@@ -271,8 +267,8 @@ export class TableSettingsComponent implements OnInit {
                 this.handleWidthChange();
                 this.restoreConfig();
             }),
-            debounceTime(3000)
-        ).subscribe(async item => {
+            debounceTime(this.util.config.table.resizeColumnSaveDelay)
+        ).subscribe(async _ => {
             if (this.util.config.table.isResizeColumnSave)
                 await this.save(this.info);
         });

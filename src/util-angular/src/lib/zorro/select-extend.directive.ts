@@ -342,9 +342,11 @@ export class SelectExtendDirective implements OnInit {
      * 搜索
      * @param value 值
      */
-    search(value: string) {
-        if (!this._isDirty && value === '')            
-            return;        
+    search(value) {        
+        if (!this._isDirty && value === '')
+            return;
+        if (value && value.value)
+            value = value.value;
         this._isDirty = true;
         this.searchChange$.next(value);
     }

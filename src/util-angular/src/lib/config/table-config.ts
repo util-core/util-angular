@@ -56,6 +56,10 @@ export class TableConfig {
      */
     isResizeColumnSave?: boolean;
     /**
+     * 拖动列宽保存表格设置的延迟时间, 单位: 毫秒, 默认值: 3000
+     */
+    resizeColumnSaveDelay?: number;
+    /**
      * 获取表格设置对话框的宽度
      * @param width 屏幕宽度
      */
