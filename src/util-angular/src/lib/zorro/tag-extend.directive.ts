@@ -5,6 +5,8 @@
 import { Directive, Input, Output, EventEmitter, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Util } from "../util";
 import { SelectItem } from "../core/select-item";
+import { SelectOption } from '../core/select-option';
+import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
 
 /**
@@ -25,21 +27,33 @@ export class TagExtendDirective implements OnInit, OnChanges {
      */
     private selectedItems: SelectItem[];
     /**
+     * 是否首次加载
+     */
+    private isFirst = true;
+    /**
+     * 上一次是否全部选中
+     */
+    private allSelectedPreviousValue?: boolean;
+    /**
+     * 列表项集合
+     */
+    options: SelectOption[];
+    /**
      * 数据源
      */
     @Input() data: SelectItem[];
     /**
      * 是否全部选中
      */
-    @Input() allSelected: boolean;
+    @Input() allSelected?: boolean;
     /**
      * 选中文本
      */
-    @Input() selectedText: string;
+    @Input() selectedText?: string;
     /**
      * 选中值
      */
-    @Input() selectedValue: string;
+    @Input() selectedValue?: string;
     /**
      * Api地址
      */
@@ -53,19 +67,19 @@ export class TagExtendDirective implements OnInit, OnChanges {
      */
     @Input() autoLoad: boolean;
     /**
-     * 选中文本变更事件
+     * 选中文本变化事件
      */
     @Output() selectedTextChange = new EventEmitter<string>();
     /**
-     * 选中值变更事件
+     * 选中值变化事件
      */
     @Output() selectedValueChange = new EventEmitter<string>();
     /**
-     * 全部选中状态变更事件
+     * 全部选中状态变化事件
      */
     @Output() allSelectedChange = new EventEmitter<boolean>();
     /**
-     * 查询参数变更事件
+     * 查询参数变化事件
      */
     @Output() queryParamChange = new EventEmitter<any>();
     /**
@@ -74,7 +88,7 @@ export class TagExtendDirective implements OnInit, OnChanges {
     @Output() onLoad = new EventEmitter<any>();
 
     /**
-     * 初始化选择框扩展指令
+     * 初始化标签扩展指令
      * @param cdr 变更检测
      */
     constructor(private cdr: ChangeDetectorRef) {
@@ -89,11 +103,29 @@ export class TagExtendDirective implements OnInit, OnChanges {
      */
     ngOnInit() {
         setTimeout(() => {
-            if (this.data)
+            if (this.data) {
+                this.loadData();
                 return;
+            }
             if (this.autoLoad)
                 this.loadUrl();
-        }, 0);
+        });
+        setTimeout(() => {
+            this.isFirst = false;
+        }, 1000);
+    }
+
+    /**
+     * 加载数据
+     * @param data 列表项集合
+     */
+    loadData(data?: SelectItem[]) {
+        this.data = data || this.data;
+        if (!this.data)
+            return;
+        let select = new SelectList(this.data);
+        this.options = select.toOptions();
+        this.setSelectedItems();
     }
 
     /**
@@ -105,26 +137,21 @@ export class TagExtendDirective implements OnInit, OnChanges {
         const { allSelected, selectedText, selectedValue } = changes;
         if (allSelected && allSelected.currentValue !== undefined && allSelected.currentValue !== allSelected.previousValue) {
             if (this.allSelected === true) {
-                this.selectAll();
+                setTimeout(() => this.selectAll());
                 return;
             }
             if (this.allSelected === false) {
-                this.unSelectAll();
+                setTimeout(() => this.unSelectAll());
                 return;
-            }            
+            }
         }
         if (selectedText && selectedText.currentValue !== selectedText.previousValue) {
-            let selectedText = this.selectedItems.map(item => item.text).join(",");
-            if (this.selectedText === selectedText)                
-                return;
-            this.selectByText();
+            setTimeout(() => this.selectByText());
             return;
         }
         if (selectedValue && selectedValue.currentValue !== selectedValue.previousValue) {
-            let selectedValue = this.selectedItems.map(item => item.value).join(",");
-            if (this.selectedValue === selectedValue)
-                return;
-            this.selectByValue();
+            setTimeout(() => this.selectByValue());
+            return;
         }
     }
 
@@ -135,51 +162,56 @@ export class TagExtendDirective implements OnInit, OnChanges {
         if (this.data.every(item => item.selected))
             return;
         this.data = this.data.map(item => new SelectItem(item.text, item.value, item.sortId, true));
-        this.setSelectItems();
-        this.setAllSelected(true);
+        this.loadData();
     }
 
     /**
      * 设置选中项列表
      */
-    private setSelectItems() {
+    private setSelectedItems() {
         this.selectedItems = this.data.filter(t => t.selected);
-        let selectedText = this.selectedItems.map(item => item.text).join(",");
-        let selectedValue = this.selectedItems.map(item => item.value).join(",");
+        let selectedText = this.selectedItems.map(item => item.text).join("|");
         this.setSelectedText(selectedText);
+        let selectedValue = this.selectedItems.map(item => item.value).join(",");
         this.setSelectedValue(selectedValue);
+        let allSelected = this.data.every(item => item.selected) ? true : undefined;
+        this.setAllSelected(allSelected);
     }
 
     /**
      * 设置选中文本
-     * @param text 选中文本
      */
-    private setSelectedText(text) {
+    private setSelectedText(text: string) {
         if (this.selectedText === text)
             return;
         this.selectedText = text;
+        if (this.isFirst)
+            return;
         this.selectedTextChange.emit(text);
     }
 
     /**
      * 设置选中值
-     * @param value 选中值
      */
     private setSelectedValue(value) {
         if (this.selectedValue === value)
             return;
         this.selectedValue = value;
+        if (this.isFirst)
+            return;
         this.selectedValueChange.emit(value);
     }
 
     /**
-     * 设置全部选中状态
-     * @param value 是否全部选中
+     * 设置全选状态
      */
     private setAllSelected(value) {
-        if (this.allSelected === value)
+        if (this.allSelectedPreviousValue === value)
             return;
         this.allSelected = value;
+        this.allSelectedPreviousValue = value;
+        if (this.isFirst)
+            return;
         this.allSelectedChange.emit(value);
     }
 
@@ -190,23 +222,20 @@ export class TagExtendDirective implements OnInit, OnChanges {
         if (this.data.every(item => !item.selected))
             return;
         this.data = this.data.map(item => new SelectItem(item.text, item.value, item.sortId, false));
-        this.selectedItems = [];
-        let selectedText = undefined;
-        let selectedValue = undefined;
-        this.setSelectedText(selectedText);
-        this.setSelectedValue(selectedValue);
-        this.setAllSelected(false);
+        this.loadData();
     }
 
     /**
      * 通过文本选中项列表
      */
-    selectByText() {
-        if (!this.selectedText) {
+    selectByText(text?) {
+        if (!text)
+            text = this.selectedText;        
+        if (!text) {
             this.unSelectAll();
             return;
         }
-        let array = this.selectedText.split(',');
+        let array = text.split('|');
         this.data = this.data.map(item => {
             if (~array.indexOf(item.text))
                 item.selected = true;
@@ -214,30 +243,28 @@ export class TagExtendDirective implements OnInit, OnChanges {
                 item.selected = false;
             return item;
         });
-        this.setSelectItems();
-        let isAllSelected = this.data.every(item => item.selected) ? true : undefined;
-        this.setAllSelected(isAllSelected);
+        this.loadData();
     }
 
     /**
      * 通过值选中项列表
      */
-    selectByValue() {
-        if (!this.selectedValue) {
+    selectByValue(value?) {
+        if (!value)
+            value = this.selectedValue;
+        if (!value) {
             this.unSelectAll();
             return;
         }
-        let array = this.selectedValue.split(',');
+        let array = value.split(',');
         this.data = this.data.map(item => {
-            if (~array.indexOf(item.value))
+            if (~array.indexOf(item.value?.toString()))
                 item.selected = true;
             else
                 item.selected = false;
             return item;
         });
-        this.setSelectItems();
-        let isAllSelected = this.data.every(item => item.selected) ? true : undefined;
-        this.setAllSelected(isAllSelected);
+        this.loadData();        
     }
 
     /**
@@ -286,7 +313,7 @@ export class TagExtendDirective implements OnInit, OnChanges {
                     return true;
                 },
                 ok: result => {
-                    this.data = result;
+                    this.loadData(result);
                     this.onLoad.emit(result);
                     if (options.ok)
                         options.ok(result);
@@ -354,13 +381,11 @@ export class TagExtendDirective implements OnInit, OnChanges {
      * @param text 文本
      */
     selectItem(selected: boolean, text) {
-        this.data = this.data.map(item => {
+        let data = this.data.map(item => {
             if (item.text === text)
                 item.selected = selected;
             return item;
         });
-        this.setSelectItems();
-        let isAllSelected = this.data.every(item => item.selected) ? true : undefined;
-        this.setAllSelected(isAllSelected);
+        this.loadData(data);
     }
 }

@@ -24,6 +24,10 @@ export class SelectOption {
      * 图标
      */
     icon?: string;
+    /**
+     * 选中
+     */
+    selected?: boolean;
 
     /**
      * 初始化列表配置项
@@ -33,6 +37,7 @@ export class SelectOption {
         this.text = item.text;
         this.value = item.value;
         this.disabled = item.disabled;
+        this.selected = item.selected;
         this.icon = item.icon;
     }
 }
