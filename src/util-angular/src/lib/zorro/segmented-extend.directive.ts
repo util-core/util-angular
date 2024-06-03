@@ -5,6 +5,8 @@
 import { Directive, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Util } from "../util";
 import { SelectItem } from '../core/select-item';
+import { SelectOption } from "../core/select-option";
+import { SelectList } from "../core/select-list";
 import { QueryParameter } from '../core/query-parameter';
 
 /**
@@ -35,17 +37,7 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
     /**
      * 数据源
      */
-    private _data: SelectItem[];
-    /**
-     * 数据源
-     */
-    @Input() get data(): SelectItem[] {
-        return this._data;
-    }
-    set data(value: SelectItem[]) {
-        this._data = value;
-        this.loadData();
-    }
+    @Input() data: SelectItem[];
     /**
      * 值
      */
@@ -83,6 +75,7 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
         this.queryParam = new QueryParameter();
         this.autoLoad = true;
         this.loading = false;
+        this.options = [];
     }
 
     /**
@@ -95,20 +88,32 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
                 return;
             if (this.autoLoad)
                 this.loadUrl();
-        });
+        }, 10);
     }
 
     /**
      * 初始化
      */
     protected init() {
-        if (!this.options && this.options.length === 0)
+        if (!this.options || this.options.length === 0)
             return;
-        this.index = this.options.findIndex(t => t.value === this.value);
-        if (this.index === -1)
-            this.index = 0;
+        this.initIndex();
         if (!this.value)
             this.setValue(this.options[0].value);
+    }
+
+    /**
+     * 初始化索引
+     */
+    private initIndex(options?: SelectOption[]) {
+        let index = 0;
+        if (options)
+            index = options.findIndex(t => t.selected);
+        if (this.value)
+            index = this.options.findIndex(t => t.value === this.value);
+        if (index === -1)
+            index = 0;
+        this.index = index;
     }
 
     /**
@@ -126,13 +131,13 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (!this.data)
             return;
-        const { value } = changes;
+        const { data, value } = changes;
+        if (data && data.currentValue !== data.previousValue) {
+            setTimeout(() => this.loadData());
+            return;
+        }
         if (value && value.currentValue !== value.previousValue) {
-            setTimeout(() => {
-                this.index = this.options.findIndex(t => t.value === this.value);
-                if (this.index === -1)
-                    this.index = 0;
-            });            
+            setTimeout(() =>this.initIndex());
         }
     }
 
@@ -141,11 +146,14 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
      * @param data 列表项集合
      */
     loadData(data?: SelectItem[]) {
-        this._data = data || this._data;
-        if (!this._data)
+        this.data = data || this.data;
+        if (!this.data)
             return;
-        this._data = this.util.helper.distinct(this._data, t => t.value);
-        this.options = this._data.map(t => {
+        let select = new SelectList(this.data);
+        let options = select.toOptions();
+        if (!options || !options.map)
+            return;
+        this.options = options.map(t => {
             return {
                 label: this.util.i18n.get(t.text),
                 value: t.value,
@@ -153,6 +161,7 @@ export class SegmentedExtendDirective implements OnInit, OnChanges {
                 icon: t.icon
             };
         });
+        this.initIndex(options);
     }
 
     /**

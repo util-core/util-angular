@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //===============================================================
-import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy, ElementRef, Self, ChangeDetectorRef } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, OnInit, HostListener, OnDestroy, ElementRef, Self } from '@angular/core';
 import { remove } from "../common/helper";
 import { EditTableDirective } from "./edit-table.directive";
 import { EditControlDirective } from './edit-control.directive';
@@ -38,7 +38,7 @@ export class EditRowDirective implements OnInit, OnDestroy {
      * @param element 行元素
      * @param table 编辑表格扩展指令
      */
-    constructor(@Self() private element: ElementRef, private table: EditTableDirective, private cdr: ChangeDetectorRef) {
+    constructor(@Self() private element: ElementRef, private table: EditTableDirective) {
         this.controls = [];
     }
 

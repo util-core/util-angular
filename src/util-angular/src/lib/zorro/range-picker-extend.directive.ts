@@ -45,7 +45,7 @@ export class RangePickerExtendDirective implements OnInit, OnChanges {
      * 初始化
      */
     ngOnInit() {
-        this.setRangeDates();
+        setTimeout(() => this.setRangeDates());
     }
 
     /**
@@ -55,7 +55,7 @@ export class RangePickerExtendDirective implements OnInit, OnChanges {
         const { beginDate, endDate } = changes;
         if (beginDate && beginDate.currentValue !== beginDate.previousValue ||
             endDate && endDate.currentValue !== endDate.previousValue) {
-            this.setRangeDates();
+            setTimeout(() => this.setRangeDates());
             return;
         }
     }
@@ -73,7 +73,7 @@ export class RangePickerExtendDirective implements OnInit, OnChanges {
             return;
         }
         if (!this.beginDate && this.endDate) {
-            this.rangeDates = [new Date(this.endDate.getFullYear(),0), this.endDate];
+            this.rangeDates = [new Date(this.endDate.getFullYear(), 0), this.endDate];
             return;
         }
         this.rangeDates = [this.beginDate, this.endDate];

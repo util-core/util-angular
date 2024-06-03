@@ -2,7 +2,7 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //=======================================================
-import { Directive, Input, Optional } from '@angular/core';
+import { Directive, Input, Optional, ElementRef } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Util } from "../util";
 import { I18nKeys } from '../config/i18n-keys';
@@ -76,10 +76,28 @@ export class ValidationExtendDirective {
     /**
      * 初始化验证扩展指令
      * @param controlModel 组件模型
-     * @param config 应用配置
+     * @param element 组件元素
      */
-    constructor(@Optional() protected controlModel: NgModel) {
+    constructor(@Optional() protected controlModel: NgModel, @Optional() protected element: ElementRef) {
         this.util = Util.create();
+    }
+
+    /**
+     * 重置
+     */
+    reset() {
+        if (!this.controlModel)
+            return;
+        this.controlModel.reset && this.controlModel.reset();
+        const control = this.controlModel.control;
+        if (!control)
+            return;
+        if (control.invalid) {
+            control.markAsDirty();
+            control.updateValueAndValidity({ onlySelf: true });
+        }
+        if (this.element && this.element.nativeElement && this.element.nativeElement.focus)
+            this.element.nativeElement.focus();
     }
 
     /**
