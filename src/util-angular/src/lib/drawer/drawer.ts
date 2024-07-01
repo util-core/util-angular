@@ -3,6 +3,7 @@
 //Licensed under the MIT license
 //================================================
 import { ComponentRef } from '@angular/core';
+import { NzConfigService, DrawerConfig } from "ng-zorro-antd/core/config";
 import { NzDrawerService, NzDrawerOptions, NzDrawerRef, NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
 import { Util } from '../util';
 import { isUndefined } from '../common/helper';
@@ -24,7 +25,7 @@ export class Drawer {
      * 打开抽屉
      * @param options 抽屉配置
      */
-    open(options?: IDrawerOptions): NzDrawerRef {
+    open(options: IDrawerOptions): NzDrawerRef {
         options = options || {};
         if (options.onOpenBefore && options.onOpenBefore() === false)
             return null;
@@ -63,29 +64,31 @@ export class Drawer {
      * 转换配置
      */
     private toOptions(options: IDrawerOptions): NzDrawerOptions {
+        const configService = this.util.ioc.get<NzConfigService>(NzConfigService);
+        const drawerConfig = configService.getConfig().drawer;
         return {
             nzTitle: this.getTitle(options),
             nzContent: options.component || options.content,
             nzData: options.data,
-            nzOnCancel: this.getOnCancel(options),
-            nzClosable: isUndefined(options.showClose) ? true : options.showClose,
             nzExtra: options.extra,
-            nzMaskClosable: !options.disableClose,
-            nzKeyboard: !options.disableClose,
-            nzMask: isUndefined(options.showMask) ? true : options.showMask,
-            nzCloseOnNavigation: isUndefined(options.closeOnNavigation) ? true : options.closeOnNavigation,
+            nzFooter: options.footer,
+            nzClosable: this.getClosable(options),
+            nzMaskClosable: this.getMaskClosable(options, drawerConfig),
+            nzKeyboard: this.getKeyboard(options),
+            nzMask: this.getMask(options, drawerConfig),
+            nzCloseOnNavigation: this.getCloseOnNavigation(options, drawerConfig),
             nzDirection: options.direction,
-            nzMaskStyle: options.maskStyle,
-            nzBodyStyle: options.bodyStyle,
-            nzFooter: this.getFooter(options),
+            nzPlacement: isUndefined(options.placement) ? 'right' : options.placement,
             nzSize: options.size,
             nzWidth: this.getWidth(options),
-            nzHeight: options.height,
+            nzHeight: options.height,            
+            nzMaskStyle: options.maskStyle,
+            nzBodyStyle: options.bodyStyle,
             nzWrapClassName: options.wrapClassName,
-            nzZIndex: options.zIndex,
-            nzPlacement: isUndefined(options.placement) ? 'right' : options.placement,
-            nzOffsetX: options.offsetX,
-            nzOffsetY: options.offsetY
+            nzZIndex: isUndefined(options.zIndex) ? 1000 : options.zIndex,
+            nzOffsetX: isUndefined(options.offsetX) ? 0 : options.offsetX,
+            nzOffsetY: isUndefined(options.offsetY) ? 0 : options.offsetY,
+            nzOnCancel: this.getOnCancel(options)
         };
     }
 
@@ -99,22 +102,62 @@ export class Drawer {
     }
 
     /**
-     * 获取取消操作
+     * 获取是否显示关闭按钮
      */
-    private getOnCancel(options: IDrawerOptions): () => Promise<any> {
-        if (!options.onCloseBefore)
-            return undefined;
-        let result = options.onCloseBefore();
-        if (this.util.helper.isPromise(result))
-            return () => <Promise<any>>result;
-        return () => Promise.resolve(result);
+    private getClosable(options: IDrawerOptions) {
+        if (!isUndefined(options.closable))
+            return options.closable;
+        if (!isUndefined(options.showClose))
+            return options.showClose;
+        return true;
     }
 
     /**
-     * 获取页脚
+     * 获取点击遮罩是否允许关闭
      */
-    private getFooter(options: IDrawerOptions) {
-        return options.footer;
+    private getMaskClosable(options: IDrawerOptions, drawerConfig: DrawerConfig) {
+        if (!isUndefined(options.maskClosable))
+            return options.maskClosable;
+        if (!isUndefined(options.disableClose))
+            return !options.disableClose;
+        if (drawerConfig && !isUndefined(drawerConfig.nzMaskClosable))
+            return drawerConfig.nzMaskClosable;
+        return true;
+    }
+
+    /**
+     * 获取按下ESC键是否允许关闭
+     */
+    private getKeyboard(options: IDrawerOptions) {
+        if (!isUndefined(options.keyboard))
+            return options.keyboard;
+        if (!isUndefined(options.disableClose))
+            return !options.disableClose;
+        return true;
+    }
+
+    /**
+     * 获取是否显示遮罩
+     */
+    private getMask(options: IDrawerOptions, drawerConfig: DrawerConfig) {
+        if (!isUndefined(options.mask))
+            return options.mask;
+        if (!isUndefined(options.showMask))
+            return options.showMask;
+        if (drawerConfig && !isUndefined(drawerConfig.nzMask))
+            return drawerConfig.nzMask;
+        return true;
+    }
+
+    /**
+     * 获取当用户在历史中前进/后退时是否关闭抽屉
+     */
+    private getCloseOnNavigation(options: IDrawerOptions, drawerConfig: DrawerConfig) {
+        if (!isUndefined(options.closeOnNavigation))
+            return options.closeOnNavigation;
+        if (drawerConfig && !isUndefined(drawerConfig.nzCloseOnNavigation))
+            return drawerConfig.nzCloseOnNavigation;
+        return true;
     }
 
     /**
@@ -144,7 +187,7 @@ export class Drawer {
      * 获取最小宽度
      */
     private getMinWidth(options: IDrawerOptions) {
-        if (this.util.helper.isUndefined(options.minWidth)) {
+        if (isUndefined(options.minWidth)) {
             let width = this.util.responsive.getWidth();
             return this.util.config.drawer.getMinWidth(width);
         }
@@ -155,11 +198,24 @@ export class Drawer {
      * 获取最大宽度
      */
     private getMaxWidth(options: IDrawerOptions) {
-        if (this.util.helper.isUndefined(options.maxWidth)) {
+        if (isUndefined(options.maxWidth)) {
             let width = this.util.responsive.getWidth();
             return this.util.config.drawer.getMaxWidth(width);
         }
         return options.maxWidth;
+    }
+
+    /**
+     * 获取取消操作
+     */
+    private getOnCancel(options: IDrawerOptions): () => Promise<any> {
+        let onCancel = options.onCancel || options.onCloseBefore;
+        if (!onCancel)
+            return undefined;
+        let result = onCancel();
+        if (this.util.helper.isPromise(result))
+            return () => <Promise<any>>result;
+        return () => Promise.resolve(result);
     }
 
     /**
@@ -184,7 +240,7 @@ export class Drawer {
         if (!element)
             return null;
         return this.util.dom.find(".ant-drawer-body", element?.parentNode?.parentNode);
-    }    
+    }
 
     /**
      * 设置调整尺寸
@@ -208,7 +264,7 @@ export class Drawer {
     }
 
     /**
-     * 获取抽屉实例
+     * 获取当前抽屉实例
      */
     getDrawer(): NzDrawerRef {
         return this.util.ioc.get(NzDrawerRef);

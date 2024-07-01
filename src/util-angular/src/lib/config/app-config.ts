@@ -14,8 +14,6 @@ import { DefaultTableConfig } from "./default-table-config";
 import { DefaultTinymceConfig } from "./default-tinymce-config";
 import { UploadConfig } from "./upload-config";
 import { DefaultUploadConfig } from "./default-upload-config";
-import { MessageConfig } from "./message-config";
-import { DefaultMessageConfig } from "./default-message-config";
 import { DialogConfig } from "./dialog-config";
 import { DefaultDialogConfig } from "./default-dialog-config";
 import { DrawerConfig } from "./drawer-config";
@@ -59,10 +57,6 @@ export class AppConfig {
      */
     upload?: UploadConfig;
     /**
-     * 消息配置
-     */
-    message?: MessageConfig;    
-    /**
      * 弹出层配置
      */
     dialog?: DialogConfig;
@@ -89,7 +83,6 @@ export function initAppConfig(config: AppConfig) {
     config.loading = config.loading || new LoadingConfig();
     config.tenant = config.tenant || new TenantConfig();
     config.upload = assign({}, DefaultUploadConfig, config.upload);
-    config.message = assign({}, DefaultMessageConfig, config.message);    
     config.dialog = assign({}, DefaultDialogConfig, config.dialog, config.modal);
     config.drawer = assign({}, DefaultDrawerConfig, config.drawer);
 }

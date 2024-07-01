@@ -6,6 +6,7 @@ import { inject, Injector } from '@angular/core';
 import * as Helper from './common/helper';
 import { Ioc } from './common/ioc';
 import { Message } from './message/message';
+import { Notification } from './message/notification';
 import { Router } from "./common/router";
 import { Dialog } from "./dialog/dialog";
 import { Drawer } from "./drawer/drawer";
@@ -49,11 +50,15 @@ export class Util {
      */
     private _message: Message;
     /**
+     * 通知操作
+     */
+    private _notification: Notification;
+    /**
      * 路由操作
      */
     private _router: Router;
     /**
-     * 弹出层操作
+     * 对话框操作
      */
     private _dialog: Dialog;
     /**
@@ -201,6 +206,15 @@ export class Util {
     };
 
     /**
+     * 通知操作
+     */
+    get notification() {
+        if (!this._notification)
+            this._notification = new Notification(this);
+        return this._notification;
+    };
+
+    /**
      * 路由操作
      */
     get router() {
@@ -210,7 +224,7 @@ export class Util {
     };
 
     /**
-     * 弹出层操作
+     * 对话框操作
      */
     get dialog() {
         if (!this._dialog)
@@ -219,7 +233,7 @@ export class Util {
     };
 
     /**
-     * 弹出层操作,与 util.dialog 相同
+     * 对话框操作
      */
     get modal() {
         if (!this._dialog)

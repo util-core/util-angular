@@ -32,6 +32,7 @@ export * from "./lib/data/data-loader";
 
 //导出dialog
 export * from "./lib/dialog/dialog-options";
+export * from "./lib/dialog/confirm-options";
 export * from "./lib/dialog/dialog-resizable.component";
 export * from "./lib/dialog/dialog-close.component";
 export * from "./lib/dialog/dialog-fullscreen.service";
@@ -40,9 +41,6 @@ export * from "./lib/dialog/dialog-fullscreen.service";
 export * from "./lib/drawer/drawer-options";
 export * from "./lib/drawer/drawer-resizable.component";
 export * from "./lib/drawer/drawer-footer.directive";
-
-//导出message
-export * from "./lib/message/confirm-options";
 
 //导出http
 export * from "./lib/http/http-method";

@@ -2,9 +2,10 @@
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
+import { TemplateRef } from '@angular/core';
 import { NzMessageService, NzMessageDataOptions } from 'ng-zorro-antd/message';
 import { Util } from '../util';
-import { IConfirmOptions } from "./confirm-options";
+import { IConfirmOptions } from "../dialog/confirm-options";
 
 /**
  * 消息操作
@@ -18,6 +19,24 @@ export class Message {
     }
 
     /**
+     * 成功消息
+     * @param message 消息
+     * @param options 消息配置
+     */
+    success(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.create('success', message, options);
+    }
+
+    /**
+     * 创建消息
+     */
+    private create(type: 'success' | 'info' | 'warning' | 'error' | 'loading', message, options?: NzMessageDataOptions) {
+        if (!message)
+            return null;
+        return this.getService().create(type, this.getMessage(message), options);
+    }
+
+    /**
      * 获取消息服务
      */
     private getService() {
@@ -25,67 +44,72 @@ export class Message {
     }
 
     /**
-     * 成功消息
-     * @param message 消息
+     * 获取消息
      */
-    success(message: string) {
-        if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        let service = this.getService();
-        service.success(message, this.getOptions());
-    }
-
-    /**
-     * 获取消息配置
-     */
-    private getOptions(): NzMessageDataOptions {
-        return {
-            nzDuration: this.util.config.message.duration
-        };
+    private getMessage(message) {
+        if (this.util.helper.isString(message))
+            return this.util.i18n.get(<string>message);
+        return message;
     }
 
     /**
      * 信息消息
      * @param message 消息
+     * @param options 消息配置
      */
-    info(message: string) {
-        if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        let service = this.getService();
-        service.info(message, this.getOptions());
+    info(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.create('info', message, options);
     }
 
     /**
      * 警告消息
      * @param message 消息
+     * @param options 消息配置
      */
-    warn(message: string) {
-        if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        let service = this.getService();
-        service.warning(message, this.getOptions());
+    warn(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.create('warning', message, options);
+    }
+
+    /**
+     * 警告消息
+     * @param message 消息
+     * @param options 消息配置
+     */
+    warning(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.warn(message, options);
     }
 
     /**
      * 错误消息
      * @param message 消息
+     * @param options 消息配置
      */
-    error(message: string) {
-        if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        let service = this.getService();
-        service.error(message, this.getOptions());
+    error(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.create('error', message, options);
+    }
+
+    /**
+     * 加载消息
+     * @param message 消息
+     * @param options 消息配置
+     */
+    loading(message: string | TemplateRef<void>, options?: NzMessageDataOptions) {
+        return this.create('loading', message, options);
+    }
+
+    /**
+     * 移除消息
+     * @param id 消息标识,如果为空,则清除所有消息
+     */
+    remove(id?: string) {
+        this.getService().remove(id);
     }
 
     /**
      * 确认
-     * @param options 配置
+     * @param options 确认配置
      */
     confirm(options: IConfirmOptions) {
-        this.util.dialog.confirm(options);
+        return this.util.dialog.confirm(options);
     }
 }

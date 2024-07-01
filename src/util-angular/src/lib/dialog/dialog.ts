@@ -1,45 +1,45 @@
-﻿//============== 弹出层操作 ======================
+﻿//============== 对话框操作 ======================
 //Copyright 2024 何镇汐
 //Licensed under the MIT license
 //================================================
-import { ComponentRef, EventEmitter } from "@angular/core";
+import { ComponentRef, EventEmitter, TemplateRef } from "@angular/core";
 import { NzModalService, ModalOptions, NzModalRef, OnClickCallback, NZ_MODAL_DATA } from "ng-zorro-antd/modal";
 import { NzButtonType } from 'ng-zorro-antd/button';
+import { NzConfigService, ModalConfig } from "ng-zorro-antd/core/config";
 import { Util } from '../util';
+import { isUndefined } from '../common/helper';
 import { I18nKeys } from '../config/i18n-keys';
-import { IConfirmOptions } from "../message/confirm-options";
+import { IConfirmOptions } from "./confirm-options";
 import { IDialogOptions } from "./dialog-options";
 import { DialogResizableComponent } from "./dialog-resizable.component";
 import { DialogCloseComponent } from "./dialog-close.component";
 import { DialogFullscreenService } from "./dialog-fullscreen.service";
 
 /**
- * 弹出层操作
+ * 对话框操作
  */
 export class Dialog {
     /**
-     * 初始化弹出层操作
+     * 初始化对话框操作
      * @param util 操作入口
      */
     constructor(private util: Util) {
     }
 
     /**
-     * 成功消息
-     * @param message 消息
-     * @param title 标题
+     * 成功消息对话框
+     * @param message 消息,支持多语言
+     * @param title 标题,支持多语言
      * @param onOk 点击确定事件处理函数
      */
-    success(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+    success(message: string | TemplateRef<void>, title?: string | TemplateRef<void>, onOk?: EventEmitter<any> | OnClickCallback<any>) {
         if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        title = this.util.i18n.get(title);
+            return null;
         let service = this.getModalService();
-        service.success({
-            nzContent: message,
-            nzTitle: title,
-            nzOnOk: onOk
+        return service.success({
+            nzContent: this.getMessage(message),
+            nzTitle: this.getMessage(title),
+            nzOnOk: onOk            
         });
     }
 
@@ -51,67 +51,80 @@ export class Dialog {
     }
 
     /**
-     * 信息消息
-     * @param message 消息
-     * @param title 标题
+     * 获取消息
+     */
+    private getMessage(message): string | TemplateRef<{}> {
+        if (this.util.helper.isString(message))
+            return this.util.i18n.get(<string>message);
+        return message;
+    }
+
+    /**
+     * 信息消息对话框
+     * @param message 消息,支持多语言
+     * @param title 标题,支持多语言
      * @param onOk 点击确定事件处理函数
      */
-    info(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+    info(message: string | TemplateRef<void>, title?: string | TemplateRef<void>, onOk?: EventEmitter<any> | OnClickCallback<any>) {
         if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        title = this.util.i18n.get(title);
+            return null;
         let service = this.getModalService();
-        service.info({
-            nzContent: message,
-            nzTitle: title,
+        return service.info({
+            nzContent: this.getMessage(message),
+            nzTitle: this.getMessage(title),
             nzOnOk: onOk
         });
     }
 
     /**
-     * 警告消息
-     * @param message 消息
-     * @param title 标题
+     * 警告消息对话框
+     * @param message 消息,支持多语言
+     * @param title 标题,支持多语言
      * @param onOk 点击确定事件处理函数
      */
-    warn(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+    warning(message: string | TemplateRef<void>, title?: string | TemplateRef<void>, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+        this.warn(message, title, onOk);
+    }
+
+    /**
+     * 警告消息对话框
+     * @param message 消息,支持多语言
+     * @param title 标题,支持多语言
+     * @param onOk 点击确定事件处理函数
+     */
+    warn(message: string | TemplateRef<void>, title?: string | TemplateRef<void>, onOk?: EventEmitter<any> | OnClickCallback<any>) {
         if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        title = this.util.i18n.get(title);
+            return null;
         let service = this.getModalService();
-        service.warning({
-            nzContent: message,
-            nzTitle: title,
+        return service.warning({
+            nzContent: this.getMessage(message),
+            nzTitle: this.getMessage(title),
             nzOnOk: onOk
         });
     }
 
     /**
-     * 错误消息
-     * @param message 消息
-     * @param title 标题
+     * 错误消息对话框
+     * @param message 消息,支持多语言
+     * @param title 标题,支持多语言
      * @param onOk 点击确定事件处理函数
      */
-    error(message: string, title?: string, onOk?: EventEmitter<any> | OnClickCallback<any>) {
+    error(message: string | TemplateRef<void>, title?: string | TemplateRef<void>, onOk?: EventEmitter<any> | OnClickCallback<any>) {
         if (!message)
-            return;
-        message = this.util.i18n.get(message);
-        title = this.util.i18n.get(title);
+            return null;
         let service = this.getModalService();
-        service.error({
-            nzContent: message,
-            nzTitle: title,
+        return service.error({
+            nzContent: this.getMessage(message),
+            nzTitle: this.getMessage(title),
             nzOnOk: onOk
         });
     }
 
     /**
-     * 打开弹出层
-     * @param options 弹出层配置
+     * 打开对话框
+     * @param options 对话框配置
      */
-    open(options?: IDialogOptions): NzModalRef {
+    open(options: IDialogOptions): NzModalRef {
         options = options || {};
         if (options.onOpenBefore && options.onOpenBefore() === false)
             return null;
@@ -133,7 +146,7 @@ export class Dialog {
             resizableRef?.destroy();
             closeRef?.destroy();
         });
-        this.initDialog(dialogRef, options, resizableRef);
+        this.initDialog(dialogRef, resizableRef);
         return dialogRef;
     }
 
@@ -166,11 +179,14 @@ export class Dialog {
     /**
      * 转换配置
      */
-    private toOptions(options: IDialogOptions, closeRef:ComponentRef<any>): ModalOptions {
+    private toOptions(options: IDialogOptions, closeRef: ComponentRef<any>): ModalOptions {
+        const configService = this.util.ioc.get<NzConfigService>(NzConfigService);
+        const modalConfig = configService.getConfig().modal;
         return {
             nzTitle: this.getTitle(options),
             nzContent: options.component || options.content,
             nzData: options.data,
+            nzFooter: this.getFooter(options),
             nzCentered: this.getCentered(options),
             nzDraggable: this.getDraggable(options),
             nzWidth: this.getWidth(options),
@@ -178,23 +194,30 @@ export class Dialog {
             nzCancelLoading: options.cancelLoading,
             nzOkText: this.getOkText(options),
             nzOkType: this.getOkType(options),
+            nzOkDisabled: options.okDisabled,
             nzOkDanger: options.okDanger,
             nzOkLoading: options.okLoading,
-            nzClosable: this.util.helper.isUndefined(options.showClose) ? true : options.showClose,
-            nzMask: this.util.helper.isUndefined(options.showMask) ? true : options.showMask,
-            nzFooter: this.getFooter(options),
-            nzMaskClosable: !options.disableClose,
-            nzKeyboard: !options.disableClose,            
+            nzCancelDisabled: options.cancelDisabled,
+            nzClosable: this.getClosable(options),
+            nzMaskClosable: this.getMaskClosable(options, modalConfig),
+            nzKeyboard: this.getKeyboard(options),
+            nzMask: this.getMask(options, modalConfig),            
+            nzCloseOnNavigation: this.getCloseOnNavigation(options, modalConfig),
             nzStyle: options.style,
             nzBodyStyle: options.bodyStyle,
             nzMaskStyle: options.maskStyle,
             nzClassName: options.className,
             nzCloseIcon: this.getCloseIcon(options, closeRef),
-            nzWrapClassName: this.getWrapClassName(options),            
+            nzWrapClassName: this.getWrapClassName(options),
+            nzZIndex: isUndefined(options.zIndex) ? 1000 : options.zIndex,
+            nzIconType: isUndefined(options.iconType) ? 'question-circle' : options.iconType,
             nzAutofocus: this.getAutofocus(options),
             nzOnOk: options.onOk,
             nzOnCancel: data => {
-                return options.onCloseBefore && options.onCloseBefore(data);
+                if (options.onCancel)
+                    return options.onCancel(data);
+                if (options.onCloseBefore)
+                    return options.onCloseBefore(data);
             }
         };
     }
@@ -210,10 +233,19 @@ export class Dialog {
     }
 
     /**
+     * 获取页脚
+     */
+    private getFooter(options: IDialogOptions) {
+        if (options.showFooter === false)
+            return null;
+        return options.footer;
+    }
+
+    /**
      * 获取垂直居中
      */
     private getCentered(options) {
-        if (this.util.helper.isUndefined(options.centered))
+        if (isUndefined(options.centered))
             return this.util.config.dialog.centered;
         return options.centered;
     }
@@ -222,7 +254,7 @@ export class Dialog {
      * 获取是否可拖动
      */
     private getDraggable(options: IDialogOptions) {
-        if (this.util.helper.isUndefined(options.draggable))
+        if (isUndefined(options.draggable))
             return this.util.config.dialog.draggable;
         return options.draggable;
     }
@@ -265,19 +297,69 @@ export class Dialog {
     }
 
     /**
-     * 获取页脚
+     * 获取是否显示关闭按钮
      */
-    private getFooter(options: IDialogOptions) {
-        if (options.showFooter === false)
-            return null;
-        return options.footer;
+    private getClosable(options: IDialogOptions) {
+        if (!isUndefined(options.closable))
+            return options.closable;
+        if (!isUndefined(options.showClose))
+            return options.showClose;
+        return true;
+    }
+
+    /**
+     * 获取按下ESC键是否允许关闭
+     */
+    private getKeyboard(options: IDialogOptions) {
+        if (!isUndefined(options.keyboard))
+            return options.keyboard;
+        if (!isUndefined(options.disableClose))
+            return !options.disableClose;
+        return true;
+    }
+
+    /**
+     * 获取点击遮罩是否允许关闭
+     */
+    private getMaskClosable(options: IDialogOptions, modalConfig: ModalConfig) {
+        if (!isUndefined(options.maskClosable))
+            return options.maskClosable;
+        if (!isUndefined(options.disableClose))
+            return !options.disableClose;
+        if (modalConfig && !isUndefined(modalConfig.nzMaskClosable))
+            return modalConfig.nzMaskClosable;
+        return true;
+    }
+
+    /**
+     * 获取是否显示遮罩
+     */
+    private getMask(options: IDialogOptions, modalConfig: ModalConfig) {
+        if (!isUndefined(options.mask))
+            return options.mask;
+        if (!isUndefined(options.showMask))
+            return options.showMask;
+        if (modalConfig && !isUndefined(modalConfig.nzMask))
+            return modalConfig.nzMask;
+        return true;
+    }
+
+    /**
+     * 获取当用户在历史中前进/后退时是否关闭对话框
+     */
+    private getCloseOnNavigation(options: IDialogOptions, modalConfig: ModalConfig) {
+        if (!isUndefined(options.closeOnNavigation))
+            return options.closeOnNavigation;
+        if (modalConfig && !isUndefined(modalConfig.nzCloseOnNavigation))
+            return modalConfig.nzCloseOnNavigation;
+        return true;
     }
 
     /**
      * 获取关闭按钮图标
      */
     private getCloseIcon(options: IDialogOptions, closeRef: ComponentRef<any>) {
-        if (!this.util.helper.isUndefined(options.closeIcon))
+        if (!isUndefined(options.closeIcon))
             return options.closeIcon;
         if (!this.util.config.dialog.fullScreen)
             return "close";
@@ -323,7 +405,7 @@ export class Dialog {
      * 获取最小宽度
      */
     private getMinWidth(options: IDialogOptions) {
-        if (this.util.helper.isUndefined(options.minWidth)) {
+        if (isUndefined(options.minWidth)) {
             let width = this.util.responsive.getWidth();
             return this.util.config.dialog.getMinWidth(width);
         }
@@ -334,7 +416,7 @@ export class Dialog {
      * 获取最大宽度
      */
     private getMaxWidth(options: IDialogOptions) {
-        if (this.util.helper.isUndefined(options.maxWidth)) {
+        if (isUndefined(options.maxWidth)) {
             let width = this.util.responsive.getWidth();
             return this.util.config.dialog.getMaxWidth(width);
         }
@@ -345,7 +427,7 @@ export class Dialog {
      * 获取最小高度
      */
     private getMinHeight(options: IDialogOptions) {
-        if (this.util.helper.isUndefined(options.minHeight)) {
+        if (isUndefined(options.minHeight)) {
             let height = this.util.responsive.getHeight();
             return this.util.config.dialog.getMinHeight(height);
         }
@@ -356,7 +438,7 @@ export class Dialog {
      * 获取最大高度
      */
     private getMaxHeight(options: IDialogOptions) {
-        if (this.util.helper.isUndefined(options.maxHeight)) {
+        if (isUndefined(options.maxHeight)) {
             let height = this.util.responsive.getHeight();
             return this.util.config.dialog.getMaxHeight(height);
         }
@@ -364,19 +446,19 @@ export class Dialog {
     }
 
     /**
-     * 初始化弹出层
+     * 初始化对话框
      */
-    private initDialog(dialog: NzModalRef, options: IDialogOptions, resizableRef: ComponentRef<any>) {
+    private initDialog(dialog: NzModalRef, resizableRef: ComponentRef<any>) {
         setTimeout(() => {
             if (this.util.config.dialog.resizable)
-                this.appendResizable(dialog, options, resizableRef);
+                this.appendResizable(dialog, resizableRef);
         }, 30);
     }
 
     /**
      * 添加拖动调整尺寸
      */
-    private appendResizable(dialog: NzModalRef, options: IDialogOptions, resizableRef: ComponentRef<any>) {
+    private appendResizable(dialog: NzModalRef, resizableRef: ComponentRef<any>) {
         let modalContent = this.util.dom.find(".ant-modal-content", dialog.containerInstance);
         if (!modalContent)
             return;
@@ -407,7 +489,7 @@ export class Dialog {
     }
 
     /**
-     * 关闭所有弹出层
+     * 关闭所有对话框
      */
     closeAll() {
         let dialog = this.getModalService();
@@ -415,7 +497,7 @@ export class Dialog {
     }
 
     /**
-     * 关闭弹出层
+     * 关闭对话框
      * @param result 返回结果
      */
     close(result?) {
@@ -424,7 +506,7 @@ export class Dialog {
     }
 
     /**
-     * 获取弹出层实例
+     * 获取对话框实例
      */
     getDialog() {
         let dialog: NzModalService = this.getModalService();
@@ -436,14 +518,14 @@ export class Dialog {
     }
 
     /**
-     * 获取数据
+     * 获取对话框数据
      */
     getData<T>() {
         return this.util.ioc.get<T>(NZ_MODAL_DATA);
     }
 
     /**
-     * 确认
+     * 确认对话框
      * @param options 配置
      */
     confirm(options: IConfirmOptions) {
@@ -451,8 +533,8 @@ export class Dialog {
         if (!options.onCancel)
             options.onCancel = () => true;
         options.title = options.title || I18nKeys.tips;
-        let service = this.util.ioc.get(NzModalService);
-        service.confirm({
+        let service = this.util.ioc.get<NzModalService>(NzModalService);
+        return service.confirm({
             nzTitle: this.getTitle(options),
             nzContent: this.getContent(options),
             nzCentered: this.getCentered(options),

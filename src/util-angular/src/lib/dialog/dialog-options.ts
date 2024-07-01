@@ -11,7 +11,11 @@ import { NzButtonType } from 'ng-zorro-antd/button';
  */
 export interface IDialogOptions {
     /**
-     * 弹出层组件
+     * 标题,支持多语言
+     */
+    title?: string | TemplateRef<any>,
+    /**
+     * 对话框组件
      */
     component?,
     /**
@@ -19,76 +23,104 @@ export interface IDialogOptions {
      */
     content?: string | TemplateRef<any>,
     /**
-     * 传入弹出层组件中的参数
+     * 传入对话框组件中的参数
      */
     data?,
+    /**
+     * 页脚
+     */
+    footer?: string | TemplateRef<{}> | Array<ModalButtonOptions>;
+    /**
+     * 是否显示页脚, 默认值: true
+     */
+    showFooter?: boolean,
     /**
      * 是否垂直居中显示,默认值: true
      */
     centered?: boolean,
     /**
-     * 是否可拖动,默认值: true
+     * 是否可拖动, 默认值: true
      */
     draggable?: boolean;
     /**
-     * 标题
+     * 是否显示关闭按钮, 默认值: true
      */
-    title?: string | TemplateRef<any>,
+    closable?: boolean,
     /**
-     * 是否显示页脚，默认为 true
-     */
-    showFooter?: boolean,
-    /**
-     * 页脚
-     */
-    footer?: string | TemplateRef<any> | Array<ModalButtonOptions>;
-    /**
-     * 是否显示右上角的关闭按钮，默认为 true
+     * 是否显示关闭按钮, 默认值: true
      */
     showClose?: boolean,
     /**
-     * 是否显示取消按钮，默认为 true
+     * 是否显示取消按钮, 默认值: true
      */
     showCancel?: boolean,
     /**
-     * 取消按钮的文字
+     * 是否显示确定按钮, 默认值: true
+     */
+    showOk?: boolean,   
+    /**
+     * 取消按钮的文字,支持多语言
      */
     cancelText?: string,
     /**
-     * 取消按钮的加载状态
+     * 确定按钮的文字,支持多语言
+     */
+    okText?: string,
+    /**
+     * 取消按钮是否加载状态, 默认值: false
      */
     cancelLoading?: boolean,
     /**
-     * 是否显示确定按钮，默认为 true
+     * 确定按钮是否加载状态,默认值: false
      */
-    showOk?: boolean,
+    okLoading?: boolean,
     /**
-     * 确定按钮的文字
+     * 是否禁用取消按钮,默认值: false
      */
-    okText?: string,
+    cancelDisabled?: boolean,
+    /**
+     * 是否禁用确定按钮,默认值: false
+     */
+    okDisabled?: boolean,
     /**
      * 确定按钮的类型, 可选值: 'primary' | 'default' | 'dashed' | 'link' | 'text' | null
      */
     okType?: NzButtonType,
     /**
-     * 确认按钮是否为危险按钮
+     * 确认按钮是否危险按钮, 默认值: false
      */
     okDanger?: boolean,
     /**
-     * 确认按钮的加载状态
+     * 是否显示遮罩，默认值: true
      */
-    okLoading?: boolean,
+    mask?: boolean,
     /**
-     * 是否显示遮罩，默认为 true
+     * 是否显示遮罩，默认值: true
      */
     showMask?: boolean,
     /**
-     * 是否禁用按下ESC键或点击屏幕关闭遮罩，默认 false
+     * 按下ESC键是否允许关闭，默认值: true
+     */
+    keyboard?: boolean,
+    /**
+     * 点击遮罩是否允许关闭，默认值: true
+     */
+    maskClosable?: boolean,
+    /**
+     * 是否禁用按下ESC键或点击遮罩关闭对话框，默认值: false
      */
     disableClose?: boolean,
     /**
-     * 最小宽度
+     * 当用户在历史中前进/后退时是否关闭对话框，默认值: true
      */
+    closeOnNavigation?: boolean,
+    /**
+     * 宽度, 使用数字时，默认单位为 px, 默认值: 520
+     */
+    width?: string | number,
+    /**
+    * 最小宽度
+    */
     minWidth?: number;
     /**
      * 最大宽度
@@ -103,44 +135,48 @@ export interface IDialogOptions {
      */
     maxHeight?: number;
     /**
-     * 宽度
+     * 图标类型,仅确认框模式下有效, 默认值: 'question-circle'
      */
-    width?: string | number,
+    iconType?: string,
     /**
-     * 弹出层样式
+     * 关闭按钮图标, 默认值: 'close'
      */
-    style?,
-    /**
-     * 弹出层主体样式
-     */
-    bodyStyle?,
-    /**
-     * 遮罩样式
-     */
-    maskStyle?,
-    /**
-     * 弹出层样式类名
-     */
-    className?: string,
-    /**
-     * 弹出层外层容器样式类名
-     */
-    wrapClassName?: string,
+    closeIcon?: string | TemplateRef<void>,
     /**
      * 自动聚焦及聚焦位置，为 null 时禁用,默认值: 'auto'
      */
     autofocus?: 'ok' | 'cancel' | 'auto' | null,
     /**
-     * 关闭按钮图标
+     * 浮层样式
      */
-    closeIcon?: string | TemplateRef<void>,
+    style?,
+    /**
+     * 对话框主体样式
+     */
+    bodyStyle?,
+    /**
+    * 遮罩样式
+    */
+    maskStyle?,
+    /**
+     * 对话框样式类名
+     */
+    className?: string,
+    /**
+     * 对话框外层容器样式类名
+     */
+    wrapClassName?: string,
     /**
      * 是否添加默认外层容器样式, 默认值: modal-wrap
      */
     addWrapClass?: boolean;
     /**
+     * 设置 z-index，默认值: 1000
+     */
+    zIndex?: number,
+    /**
      * 点击确定按钮事件，返回 false 阻止关闭
-     * @param instance 弹出层组件实例
+     * @param instance 对话框组件实例
      */
     onOk?: (instance) => (false | void | {}) | Promise<false | void | {}>,
     /**
@@ -151,6 +187,10 @@ export interface IDialogOptions {
      * 打开后事件
      */
     onOpen?: () => void,
+    /**
+    * 取消事件，返回 false 阻止关闭
+    */
+    onCancel?: (result) => (false | void | {}) | Promise<false | void | {}>,
     /**
      * 关闭前事件，返回 false 阻止关闭
      */

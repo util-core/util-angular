@@ -10,11 +10,11 @@ import { NzButtonType } from 'ng-zorro-antd/button';
  */
 export interface IConfirmOptions {
     /**
-     * 标题
+     * 标题,支持多语言
      */
     title?: string | TemplateRef<any>,
     /**
-     * 内容
+     * 内容,支持多语言
      */
     content?: string | TemplateRef<any>,
     /**

@@ -96,11 +96,11 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 展开事件
      */
-    @Output() onExpand = new EventEmitter<any>();
+    @Output() onExpand = new EventEmitter<NzTreeNode>();
     /**
      * 折叠事件
      */
-    @Output() onCollapse: EventEmitter<any> = new EventEmitter();
+    @Output() onCollapse = new EventEmitter<NzTreeNode>();
     /**
      * 子节点加载前事件,返回false停止加载
      */
@@ -108,7 +108,7 @@ export class TreeExtendDirective implements OnInit {
     /**
      * 子节点加载完成事件
      */
-    @Output() onLoadChildren: EventEmitter<any> = new EventEmitter();
+    @Output() onLoadChildren: EventEmitter<{ node: NzTreeNode, result }> = new EventEmitter();
     /**
      * 加载完成事件
      */
@@ -675,5 +675,4 @@ export class TreeExtendDirective implements OnInit {
             }
         });
     }
-    
 }

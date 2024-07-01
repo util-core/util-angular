@@ -572,7 +572,7 @@ export class TableSettingsComponent implements OnInit {
             title: 'util.tableSettings',  
             content: this.content,
             footer: this.footer,            
-            width: this.getTableSettingsWidth(),            
+            width: this.getTableSettingsWidth(),
             minWidth: this.getTableSettingsMinWidth(),
             maxWidth: this.getTableSettingsMaxWidth(),
             minHeight: this.getTableSettingsMinHeight(),
